@@ -41,3 +41,28 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# --- Java & Gradle ---
+.gradle/
+build/
+bin/
+out/
+.libs/
+architecture.html
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# --- macOS / Windows System Files ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Logs & Temp Files ---
+*.log
+*.tmp
+*.temp
