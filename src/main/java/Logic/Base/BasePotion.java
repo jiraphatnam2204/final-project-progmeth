@@ -3,16 +3,16 @@ package Logic.Base;
 import Interfaces.Consumable;
 
 public abstract class BasePotion extends Item implements Consumable {
-    private int stat;
-    public BasePotion(int stat){
-        super("Potion");
+    private double stat;
+    public BasePotion(String name,double stat){
+        super(name);
         setStat(stat);
     }
-    public int getStat() {
+    public double getStat() {
         return stat;
     }
 
-    public void setStat(int stat) {
+    public void setStat(double stat) {
         this.stat = Math.max(0,stat);
     }
 }

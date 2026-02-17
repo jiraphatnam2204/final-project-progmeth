@@ -5,16 +5,16 @@ import Logic.Util.ItemCounter;
 
 import java.util.ArrayList;
 
-public class HardstoneArmor extends BaseArmor {
-    public HardstoneArmor(){
-        super("Hardstone Armor",0,10,15,-1,50);
+public class VibraniumArmor extends BaseArmor {
+    public VibraniumArmor(){
+        super("Vibranium Armor",0,80,200,0,1500);
+
     }
     @Override
     public ArrayList<ItemCounter> getRecipe(){
         ArrayList<ItemCounter> recipe = new ArrayList<ItemCounter>();
-        recipe.add(new ItemCounter(new Stone(),5));
-        recipe.add(new ItemCounter(new HardStone(),10));
+        recipe.add(new ItemCounter(new Mithril(),30));
+        recipe.add(new ItemCounter(new Vibranium(),30));
         return recipe;
     }
-
 }

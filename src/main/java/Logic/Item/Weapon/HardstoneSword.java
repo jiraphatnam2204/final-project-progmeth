@@ -1,13 +1,14 @@
-package Logic.Item.Armor;
+package Logic.Item.Weapon;
 
 import Logic.Base.BaseArmor;
+import Logic.Base.BaseWeapon;
 import Logic.Util.ItemCounter;
 
 import java.util.ArrayList;
 
-public class HardstoneArmor extends BaseArmor {
-    public HardstoneArmor(){
-        super("Hardstone Armor",0,10,15,-1,50);
+public class HardstoneSword extends BaseWeapon {
+    public HardstoneSword(){
+        super("Hardstone Sword",20,1,50);
     }
     @Override
     public ArrayList<ItemCounter> getRecipe(){
