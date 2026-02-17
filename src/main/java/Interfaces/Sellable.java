@@ -1,5 +1,0 @@
-package Interfaces;
-
-public interface Sellable {
-    public int getPrice();
-}
