@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'application'
+group = 'ProgMethProject'
 version = '1.0-SNAPSHOT'
 
 repositories {
