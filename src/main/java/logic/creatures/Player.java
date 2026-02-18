@@ -7,10 +7,12 @@ public class Player extends BaseCreature {
 
     private int money;
     private ArrayList<String> inventory;
+    private boolean isLuck;
 
     public Player(int hp, int attack, int defense) {
         super(hp, attack, defense);
         this.money = 0;
+        this.isLuck = false;
         this.inventory = new ArrayList<>();
     }
 
@@ -28,6 +30,22 @@ public class Player extends BaseCreature {
 
     public ArrayList<String> getInventory() {
         return inventory;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public void setInventory(ArrayList<String> inventory) {
+        this.inventory = inventory;
+    }
+
+    public boolean getLuck() {
+        return isLuck;
+    }
+
+    public void setLuck(boolean luck) {
+        isLuck = luck;
     }
 
     @Override

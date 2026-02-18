@@ -1,6 +1,7 @@
 package logic.item.potion;
 
 import logic.base.BasePotion;
+import logic.creatures.Player;
 
 public class LuckPotion extends BasePotion {
     public LuckPotion(){
