@@ -14,14 +14,6 @@ public abstract class BaseCreature {
         this.defense = defense;
     }
 
-    public int getHealthPoint() {
-        return healthPoint;
-    }
-
-    public int getMaxHealthPoint() {
-        return maxHealthPoint;
-    }
-
     public boolean isAlive() {
         return healthPoint > 0;
     }
@@ -38,4 +30,3 @@ public abstract class BaseCreature {
 
     public abstract void attack(BaseCreature target);
 }
-
