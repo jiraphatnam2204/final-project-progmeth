@@ -10,6 +10,6 @@ public class NormalStone extends baseStone {
 
     @Override
     protected BaseItem createItem() {
-        return new BaseItem("Stone");
+        return new BaseItem("Normal Stone");
     }
 }

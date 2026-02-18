@@ -1,12 +1,17 @@
 package application;
 
+import interfaces.Mineable;
+import logic.base.BaseItem;
 import logic.creatures.Player;
 import logic.item.armor.HardstoneArmor;
 import logic.item.potion.HealPotion;
 import logic.item.potion.StrengthPotion;
+import logic.pickaxe.Pickaxe;
 import logic.stone.HardStone;
 import logic.stone.NormalStone;
 import logic.util.ItemCounter;
+
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -90,6 +95,51 @@ public class Main {
         StrengthPotion sp = new StrengthPotion();
         sp.consume(hero);
         System.out.println("Used Strength Potion. Attack AFTER: " + hero.getStrength());
+
+        // ---------------------------------------------------------
+        // SCENARIO 6: MINING (Durability Test)
+        // ---------------------------------------------------------
+        System.out.println("\n--- 6. Mining Simulation ---");
+
+        // 1. Create a WEAKER pickaxe to test durability logic
+        // Normal Stone Pickaxe has Power: 2
+        Pickaxe beginnerPickaxe = Pickaxe.createNormalStonePickaxe();
+
+        // 2. Create a fresh Stone
+        // Normal Stone has Durability: 5
+        NormalStone rock = new NormalStone();
+
+        System.out.println("Target: " + rock.getName() + " [HP: " + rock.getDurability() + "]");
+        System.out.println("Tool: " + beginnerPickaxe.getName() + " [Power: " + beginnerPickaxe.getPower() + "]");
+
+        // 3. Mining Loop: Keep hitting until it breaks
+        int swings = 0;
+        boolean broken = false;
+
+        while (!broken) {
+            swings++;
+            System.out.print("Swing #" + swings + "... ");
+
+            // Use the pickaxe
+            List<BaseItem> loot = beginnerPickaxe.use(rock);
+
+            // Check if we got loot (means it broke)
+            if (!loot.isEmpty()) {
+                System.out.println("CRACK! The stone broke!");
+                for (BaseItem item : loot) {
+                    System.out.println(" -> You obtained: " + item.getName());
+                }
+                broken = true;
+            } else {
+                System.out.println("Clang! (Stone HP left: " + rock.getDurability() + ")");
+            }
+
+            // Safety break to prevent infinite loops if logic fails
+            if (swings > 10) {
+                System.out.println("You got tired and stopped.");
+                break;
+            }
+        }
 
         System.out.println("\n=== GAME OVER ===");
     }
