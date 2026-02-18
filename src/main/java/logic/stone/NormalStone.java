@@ -2,7 +2,7 @@ package logic.stone;
 
 import logic.item.BaseItem;
 
-public class NormalStone extends Stone {
+public class NormalStone extends baseStone {
 
     public NormalStone() {
         super(5, 1);

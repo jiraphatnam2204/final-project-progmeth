@@ -2,7 +2,7 @@ package logic.stone;
 
 import logic.item.BaseItem;
 
-public class Mithril extends Stone {
+public class Mithril extends baseStone {
 
     public Mithril() {
         super(135, 1);

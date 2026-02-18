@@ -2,7 +2,7 @@ package logic.stone;
 
 import logic.item.BaseItem;
 
-public class Vibranium extends Stone {
+public class Vibranium extends baseStone {
 
     public Vibranium() {
         super(200, 1);

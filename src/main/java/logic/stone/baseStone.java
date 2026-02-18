@@ -6,13 +6,13 @@ import logic.item.BaseItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Stone implements Mineable {
+public abstract class baseStone implements Mineable {
 
     protected int durability;
     protected final int maxDurability;
     protected final int dropAmount;
 
-    protected Stone(int maxDurability, int dropAmount) {
+    protected baseStone(int maxDurability, int dropAmount) {
         this.maxDurability = maxDurability;
         this.durability = maxDurability;
         this.dropAmount = dropAmount;

@@ -2,7 +2,7 @@ package logic.stone;
 
 import logic.item.BaseItem;
 
-public class Iron extends Stone {
+public class Iron extends baseStone {
 
     public Iron() {
         super(35, 1);
