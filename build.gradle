@@ -1,5 +1,7 @@
 plugins {
     id 'java'
+    id 'application' // Essential for running the game easily
+    id 'org.openjfx.javafxplugin' version '0.1.0' // Simplifies JavaFX setup
 }
 
 group = 'ProgMethProject'
@@ -9,12 +11,37 @@ repositories {
     mavenCentral()
 }
 
+// JavaFX Configuration
+javafx {
+    version = "21" // Matches standard LTS versions
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media' ] // Media added for game sound
+}
+
 dependencies {
+    // JUnit 5 for testing your game logic
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+// Tells Gradle which class starts the game
+application {
+    mainClass = 'application.Main'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
 test {
     useJUnitPlatform()
+}
+
+// Ensures images/sounds in src/main/resources are bundled correctly
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources"]
+        }
+    }
 }

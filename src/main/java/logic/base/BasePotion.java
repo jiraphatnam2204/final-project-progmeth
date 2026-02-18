@@ -2,7 +2,7 @@ package logic.base;
 
 import interfaces.Consumable;
 
-public abstract class BasePotion extends Item implements Consumable {
+public abstract class BasePotion extends BaseItem implements Consumable {
     private double stat;
     public BasePotion(String name,double stat){
         super(name);

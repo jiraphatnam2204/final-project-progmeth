@@ -1,5 +1,6 @@
 package interfaces;
 
+import logic.creatures.Player;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
