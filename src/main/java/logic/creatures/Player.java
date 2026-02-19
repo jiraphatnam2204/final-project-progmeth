@@ -1,6 +1,7 @@
 package logic.creatures;
 
 import logic.base.BaseCreature;
+import logic.base.BaseItem;
 import logic.util.ItemCounter;
 import java.util.ArrayList;
 
@@ -20,7 +21,7 @@ public class Player extends BaseCreature {
     }
 
     public int getGold() { return gold; }
-    public void setGold(int money) { this.gold = Math.max(0, gold); }
+    public void setGold(int gold) { this.gold = Math.max(0, gold); }
 
     public ArrayList<ItemCounter> getInventory() { return inventory; }
 
@@ -32,6 +33,20 @@ public class Player extends BaseCreature {
             }
         }
         inventory.add(item);
+    }
+
+    public void addItem(BaseItem item, int count) {
+        addItem(new ItemCounter(item, count));
+    }
+
+    public void addItem(BaseItem item) {
+        addItem(item, 1);
+    }
+
+    public void collectDrops(java.util.List<BaseItem> drops) {
+        for (BaseItem it : drops) {
+            addItem(it, 1);
+        }
     }
 
     public void addBonus(int atk, int def, int hp, int spd) {

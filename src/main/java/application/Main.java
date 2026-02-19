@@ -121,7 +121,7 @@ public class Main {
             System.out.print("Swing #" + swings + "... ");
 
             // Use the pickaxe
-            List<BaseItem> loot = beginnerPickaxe.use(rock);
+            List<BaseItem> loot = beginnerPickaxe.use(rock, hero);
 
             // Check if we got loot (means it broke)
             if (!loot.isEmpty()) {
