@@ -18,7 +18,7 @@ public abstract class BaseWeapon extends BaseItem implements Craftable {
     }
     @Override
     public boolean canCraft(Player p){
-        if(p.getMoney() < craftingPrice) return false;
+        if(p.getGold() < craftingPrice) return false;
         ArrayList<ItemCounter> recipe = getRecipe();
         int findCount = 0;
         int itemRequire = recipe.size();
@@ -48,7 +48,7 @@ public abstract class BaseWeapon extends BaseItem implements Craftable {
                 if(remaining==0) break;
             }
         }
-        p.setMoney(p.getMoney()-getCraftingPrice());
+        p.setGold(p.getGold()-getCraftingPrice());
     }
     @Override
     public int getCraftingPrice() {

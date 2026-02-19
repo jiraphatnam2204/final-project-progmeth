@@ -31,7 +31,7 @@ public abstract class BaseArmor extends BaseItem implements Equipable,Craftable 
 
     @Override
     public void equip(Player p){
-        p.addBounus(atk,def,hp,spd);
+        p.addBonus(atk,def,hp,spd);
     }
     @Override
     public void unequip(Player p){
