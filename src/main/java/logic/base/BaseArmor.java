@@ -14,7 +14,7 @@ public abstract class BaseArmor extends BaseItem implements Equipable,Craftable 
     protected int hp = 0;
     protected int craftingPrice = 0;
     public BaseArmor(String name,int atk,int def,int hp,int spd,int craftingPrice){
-        super(name);
+        super(name,false,1);
         setAtk(atk);
         setDef(def);
         setHp(hp);
@@ -31,7 +31,7 @@ public abstract class BaseArmor extends BaseItem implements Equipable,Craftable 
 
     @Override
     public void equip(Player p){
-        p.addBounus(atk,def,hp,spd);
+        p.addBonus(atk,def,hp,spd);
     }
     @Override
     public void unequip(Player p){

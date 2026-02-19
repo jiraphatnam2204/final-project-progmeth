@@ -10,6 +10,6 @@ public class BigHealthPotion extends BasePotion {
 
     @Override
     public void consume(Player p) {
-        p.heal(this.);
+        p.heal(this.getStat());
     }
 }

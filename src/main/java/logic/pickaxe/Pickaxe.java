@@ -2,6 +2,7 @@ package logic.pickaxe;
 
 import interfaces.Mineable;
 import logic.base.BaseItem;
+import logic.creatures.Player;
 
 import java.util.List;
 
@@ -14,9 +15,9 @@ public class Pickaxe {
         this.power = Math.max(1, power);
     }
 
-    public List<BaseItem> use(Mineable target) {
+    public List<BaseItem> use(Mineable target, Player player) {
         System.out.println(this.name + " hits the target with power " + this.power);
-        return target.mine(this.power);
+        return target.mine(this.power, player);
     }
 
     // Getters and setters

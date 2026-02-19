@@ -1,16 +1,17 @@
 package logic.base;
 
 import interfaces.Craftable;
+import logic.creatures.Player;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
 
-public abstract class BaseWeapon extends Item implements Craftable {
+public abstract class BaseWeapon extends BaseItem implements Craftable {
     private int dmg;
     private double cd;
     private int craftingPrice;
     public BaseWeapon(String name,int dmg,double cd,int craftingPrice){
-        super(name);
+        super(name,false,1);
         setCd(cd);
         setDmg(dmg);
         setCraftingPrice(craftingPrice);

@@ -2,18 +2,23 @@ package logic.base;
 
 import interfaces.Consumable;
 import interfaces.Stackable;
+import logic.creatures.Player;
 
-public abstract class BasePotion extends Item implements Consumable, Stackable {
-    private double stat;
-    public BasePotion(String name,double stat){
+public abstract class BasePotion extends BaseItem implements Consumable, Stackable {
+    private int stat;
+    public BasePotion(String name,int stat){
         super(name);
         setStat(stat);
     }
-    public double getStat() {
+    @Override
+    public void consume(Player p) {
+        p.heal(stat);
+    }
+    public int getStat() {
         return stat;
     }
 
-    public void setStat(double stat) {
+    public void setStat(int stat) {
         this.stat = Math.max(0,stat);
     }
 }
