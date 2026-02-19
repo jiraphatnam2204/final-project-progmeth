@@ -1,35 +1,18 @@
 package logic.util;
 
-import logic.base.Item;
-
-import java.util.Objects;
+import logic.base.BaseItem;
 
 public class ItemCounter {
-    private Item item;
+    private BaseItem item;
     private int count;
-    public ItemCounter(Item item,int count){
-        setItem(item);
-        setCount(count);
-    }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        ItemCounter that = (ItemCounter) o;
-        return Objects.equals(item, that.item);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(item);
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public void setItem(Item item) {
+    public ItemCounter(BaseItem item, int count) {
         this.item = item;
+        this.count = Math.max(1, count);
+    }
+
+    public BaseItem getItem() {
+        return item;
     }
 
     public int getCount() {
@@ -37,6 +20,14 @@ public class ItemCounter {
     }
 
     public void setCount(int count) {
-        this.count = Math.max(0,count);
+        this.count = Math.max(0, count);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        ItemCounter other = (ItemCounter) obj;
+        return this.item.getName().equals(other.item.getName());
     }
 }

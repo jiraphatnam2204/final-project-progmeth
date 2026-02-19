@@ -1,11 +1,11 @@
 package logic.stone;
 
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 public class Iron extends baseStone {
 
     public Iron() {
-        super(35, 1);
+        super("Iron", 35, 3);
     }
 
     @Override

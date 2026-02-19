@@ -2,11 +2,12 @@ package logic.base;
 
 import interfaces.Craftable;
 import interfaces.Equipable;
+import logic.creatures.Player;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
 
-public abstract class BaseArmor extends Item implements Equipable,Craftable {
+public abstract class BaseArmor extends BaseItem implements Equipable,Craftable {
     protected int def = 0;
     protected int atk = 0;
     protected int spd = 0;

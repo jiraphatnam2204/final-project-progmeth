@@ -1,11 +1,11 @@
 package logic.stone;
 
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 public class Vibranium extends baseStone {
 
     public Vibranium() {
-        super(200, 1);
+        super("Vibranium", 200, 1);
     }
 
     @Override

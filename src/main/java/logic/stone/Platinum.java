@@ -1,11 +1,11 @@
 package logic.stone;
 
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 public class Platinum extends baseStone {
 
     public Platinum() {
-        super(80, 1);
+        super("Platinum", 80, 1);
     }
 
     @Override

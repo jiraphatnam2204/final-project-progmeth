@@ -1,6 +1,8 @@
 package logic.item.armor;
 
 import logic.base.BaseArmor;
+import logic.stone.Mithril;
+import logic.stone.Vibranium;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;

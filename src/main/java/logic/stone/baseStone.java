@@ -1,18 +1,19 @@
 package logic.stone;
 
 import interfaces.Mineable;
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class baseStone implements Mineable {
+public abstract class baseStone extends BaseItem implements Mineable {
 
     protected int durability;
     protected final int maxDurability;
     protected final int dropAmount;
 
-    protected baseStone(int maxDurability, int dropAmount) {
+    protected baseStone(String name, int maxDurability, int dropAmount) {
+        super(name);
         this.maxDurability = maxDurability;
         this.durability = maxDurability;
         this.dropAmount = dropAmount;
@@ -25,7 +26,7 @@ public abstract class baseStone implements Mineable {
         durability -= Math.max(1, minePower);
 
         if (durability <= 0) {
-            return dropItems(); // แตกแล้วค่อยดรอป
+            return dropItems();
         }
         return List.of();
     }
@@ -45,14 +46,12 @@ public abstract class baseStone implements Mineable {
         return durability <= 0;
     }
 
-    @Override
+    // Assuming Mineable interface requires these getters
     public int getDurability() {
         return durability;
     }
 
-    @Override
     public int getMaxDurability() {
         return maxDurability;
     }
-
 }

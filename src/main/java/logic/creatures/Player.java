@@ -1,46 +1,98 @@
 package logic.creatures;
 
 import logic.base.BaseCreature;
+import logic.util.ItemCounter;
 import java.util.ArrayList;
 
 public class Player extends BaseCreature {
 
     private int money;
-    private ArrayList<String> inventory;
+    private ArrayList<ItemCounter> inventory;
+    private int speed;
+    private int luck;
 
     public Player(int hp, int attack, int defense) {
         super(hp, attack, defense);
         this.money = 0;
         this.inventory = new ArrayList<>();
+        this.speed = 0;
+        this.luck = 0; // Default luck
     }
 
-    public void addMoney(int amount) {
-        this.money += Math.max(0, amount);
-    }
+    public int getGold() { return money; }
+    public int getMoney() { return money; }
+    public void setMoney(int money) { this.money = Math.max(0, money); }
+    public void setGold(int money) { setMoney(money); }
 
-    public int getMoney() {
-        return money;
-    }
+    public ArrayList<ItemCounter> getInventory() { return inventory; }
 
-    public void addItem(String item) {
+    public void addItem(ItemCounter item) {
+        for (ItemCounter existingItem : inventory) {
+            if (existingItem.equals(item)) {
+                existingItem.setCount(existingItem.getCount() + item.getCount());
+                return;
+            }
+        }
         inventory.add(item);
     }
 
-    public ArrayList<String> getInventory() {
-        return inventory;
+    public void addBounus(int atk, int def, int hp, int spd) {
+        this.attack += atk;
+        this.defense += def;
+        this.maxHealthPoint += hp;
+        this.healthPoint += hp;
+        this.speed += spd;
     }
 
-    public void setMoney(int money) {
-        this.money = money;
+    public void removeBonus(int atk, int def, int hp, int spd) {
+        this.attack = Math.max(0, this.attack - atk);
+        this.defense = Math.max(0, this.defense - def);
+        this.maxHealthPoint = Math.max(1, this.maxHealthPoint - hp);
+        if (this.healthPoint > this.maxHealthPoint) {
+            this.healthPoint = this.maxHealthPoint;
+        }
+        this.speed -= spd;
     }
 
-    public void setInventory(ArrayList<String> inventory) {
-        this.inventory = inventory;
+    public int getHealth() {
+        return this.healthPoint;
     }
 
+    public int getMaxHealth() {
+        return this.maxHealthPoint;
+    }
+
+    public void setHealth(int hp) {
+        this.healthPoint = Math.max(0, Math.min(maxHealthPoint, hp));
+    }
+
+    public int getStrength() {
+        return this.attack;
+    }
+
+    public void setStrength(int strength) {
+        this.attack = Math.max(0, strength);
+    }
+
+    public int getLuck() {
+        return luck;
+    }
+
+    public void setLuck(int luck) {
+        this.luck = Math.max(0, luck);
+    }
+
+    public int getDefense() {
+        return this.defense;
+    }
+
+    public int getAttack() {
+        return this.attack;
+    }
 
     @Override
     public void attack(BaseCreature target) {
         target.takeDamage(this.attack);
     }
+
 }
