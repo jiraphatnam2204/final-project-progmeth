@@ -6,23 +6,21 @@ import java.util.ArrayList;
 
 public class Player extends BaseCreature {
 
-    private int money;
+    private int gold;
     private ArrayList<ItemCounter> inventory;
     private int speed;
     private int luck;
 
     public Player(int hp, int attack, int defense) {
         super(hp, attack, defense);
-        this.money = 0;
+        this.gold = 0;
         this.inventory = new ArrayList<>();
         this.speed = 0;
         this.luck = 0; // Default luck
     }
 
-    public int getGold() { return money; }
-    public int getMoney() { return money; }
-    public void setMoney(int money) { this.money = Math.max(0, money); }
-    public void setGold(int money) { setMoney(money); }
+    public int getGold() { return gold; }
+    public void setGold(int money) { this.gold = Math.max(0, gold); }
 
     public ArrayList<ItemCounter> getInventory() { return inventory; }
 
@@ -36,7 +34,7 @@ public class Player extends BaseCreature {
         inventory.add(item);
     }
 
-    public void addBounus(int atk, int def, int hp, int spd) {
+    public void addBonus(int atk, int def, int hp, int spd) {
         this.attack += atk;
         this.defense += def;
         this.maxHealthPoint += hp;
