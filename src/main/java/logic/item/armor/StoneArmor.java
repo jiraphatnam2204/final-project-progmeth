@@ -1,6 +1,7 @@
 package logic.item.armor;
 
 import logic.base.BaseArmor;
+import logic.stone.NormalStone;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ public class StoneArmor extends BaseArmor {
     }
     @Override
     public ArrayList<ItemCounter> getRecipe(){
-        ItemCounter stone = new ItemCounter(new Stone(),10);
+        ItemCounter stone = new ItemCounter(new NormalStone(),10);
         ArrayList<ItemCounter> recipe = new ArrayList<ItemCounter>();
         recipe.add(stone);
         return recipe;

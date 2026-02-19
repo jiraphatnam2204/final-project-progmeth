@@ -1,7 +1,6 @@
 package logic.base;
 
 import interfaces.Craftable;
-import logic.creatures.Player;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
@@ -32,7 +31,6 @@ public abstract class BaseWeapon extends Item implements Craftable {
         }
         return true;
     }
-    
     @Override
     public void craft(Player p){
         if(!canCraft(p)) return;
@@ -49,7 +47,7 @@ public abstract class BaseWeapon extends Item implements Craftable {
                 if(remaining==0) break;
             }
         }
-        p.setMon(p.getGold()-getCraftingPrice());
+        p.setGold(p.getGold()-getCraftingPrice());
     }
     @Override
     public int getCraftingPrice() {

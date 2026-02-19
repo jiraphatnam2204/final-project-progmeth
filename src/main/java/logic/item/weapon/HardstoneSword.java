@@ -1,6 +1,8 @@
 package logic.item.weapon;
 
 import logic.base.BaseWeapon;
+import logic.stone.HardStone;
+import logic.stone.NormalStone;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
@@ -12,7 +14,7 @@ public class HardstoneSword extends BaseWeapon {
     @Override
     public ArrayList<ItemCounter> getRecipe(){
         ArrayList<ItemCounter> recipe = new ArrayList<ItemCounter>();
-        recipe.add(new ItemCounter(new Stone(),5));
+        recipe.add(new ItemCounter(new NormalStone(),5));
         recipe.add(new ItemCounter(new HardStone(),10));
         return recipe;
     }

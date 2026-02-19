@@ -1,15 +1,15 @@
 package logic.stone;
 
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 public class NormalStone extends baseStone {
 
     public NormalStone() {
-        super(5, 1);
+        super("Normal Stone", 5, 1);
     }
 
     @Override
     protected BaseItem createItem() {
-        return new BaseItem("Stone");
+        return new BaseItem("Normal Stone");
     }
 }

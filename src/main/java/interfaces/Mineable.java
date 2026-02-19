@@ -1,6 +1,6 @@
 package interfaces;
 
-import logic.item.BaseItem;
+import logic.base.BaseItem;
 
 import java.util.List;
 
