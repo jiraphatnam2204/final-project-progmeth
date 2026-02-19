@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class HardstoneArmor extends BaseArmor {
     public HardstoneArmor(){
-        super("Hardstone Armor",0,10,15,-1,50);
+        super("Hardstone Armor",0,10,15,0,50);
     }
     @Override
     public ArrayList<ItemCounter> getRecipe(){

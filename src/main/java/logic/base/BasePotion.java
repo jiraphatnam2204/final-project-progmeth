@@ -1,8 +1,9 @@
 package logic.base;
 
 import interfaces.Consumable;
+import interfaces.Stackable;
 
-public abstract class BasePotion extends Item implements Consumable {
+public abstract class BasePotion extends Item implements Consumable, Stackable {
     private double stat;
     public BasePotion(String name,double stat){
         super(name);

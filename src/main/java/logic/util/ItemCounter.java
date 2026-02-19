@@ -16,7 +16,7 @@ public class ItemCounter {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ItemCounter that = (ItemCounter) o;
-        return Objects.equals(item, that.item);
+        return this.item.getName().equals(that.item.getName());
     }
 
     @Override
@@ -39,4 +39,6 @@ public class ItemCounter {
     public void setCount(int count) {
         this.count = Math.max(0,count);
     }
+
+    public void addCount(int amount){this.count += amount;}
 }
