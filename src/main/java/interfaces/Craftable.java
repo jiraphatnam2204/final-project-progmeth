@@ -1,13 +1,10 @@
 package interfaces;
-
 import logic.creatures.Player;
 import logic.util.ItemCounter;
-
 import java.util.ArrayList;
-
 public interface Craftable {
-    public int getCraftingPrice();
-    public ArrayList<ItemCounter> getRecipe();
-    public boolean canCraft(Player p);
-    public void craft(Player p);
+    int getCraftingPrice();
+    ArrayList<ItemCounter> getRecipe();
+    boolean canCraft(Player p);
+    void craft(Player p);
 }

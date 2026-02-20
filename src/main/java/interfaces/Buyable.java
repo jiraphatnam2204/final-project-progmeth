@@ -1,5 +1,2 @@
 package interfaces;
-
-public interface Buyable {
-    public int getPrice();
-}
+public interface Buyable { int getPrice(); }
