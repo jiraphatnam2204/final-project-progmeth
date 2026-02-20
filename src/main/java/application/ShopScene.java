@@ -36,11 +36,12 @@ public class ShopScene {
 
     private static final int W = SceneManager.W;
     private static final int H = SceneManager.H;
-
+    private GraphicsContext gc;
     private final Player    player;
     private final Pickaxe[] pickaxeHolder;
     private String          feedbackMsg  = "";
     private Color           feedbackColor = Color.YELLOW;
+    private Runnable onClose;
 
     // ─── Inner class: one item for sale ───────────────────────────────
     private static class ShopItem {
@@ -56,9 +57,10 @@ public class ShopScene {
 
     private final List<ShopItem> items = new ArrayList<>();
 
-    public ShopScene(Player player, Pickaxe[] pickaxeHolder) {
+    public ShopScene(Player player, Pickaxe[] pickaxeHolder,Runnable onClose) {
         this.player        = player;
         this.pickaxeHolder = pickaxeHolder;
+        this.onClose = onClose;
         buildInventory();
     }
 
@@ -114,10 +116,12 @@ public class ShopScene {
             p -> p.addBonus(30, 0, 0, 0)
         ));
     }
-
-    public Scene build() {
+    public Pane close(){
+        return null;
+    }
+    public Pane build() {
         Canvas canvas = new Canvas(W, H);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+        this.gc = canvas.getGraphicsContext2D();
         Pane root = new Pane(canvas);
 
         // ── Buy buttons placed over each item card ────────────────────
@@ -151,17 +155,22 @@ public class ShopScene {
         }
 
         // Back button
-        Button backBtn = makeBtn("← Back to World");
-        backBtn.setLayoutX(W/2.0 - 80); backBtn.setLayoutY(H - 54);
-        backBtn.setOnAction(e -> Main.sceneManager.showGame(player, pickaxeHolder[0]));
+        Button backBtn = makeBtn("← Back t  o World");
+        backBtn.setLayoutX(W/2.0 - 80   ); backBtn.setLayoutY(H - 54);
+        backBtn.setOnAction(e -> onClose.run());
         root.getChildren().add(backBtn);
 
         // Initial draw
         redraw(gc, startX, startY, cardW, cardH, gapX, gapY);
-
-        return new Scene(root, W, H);
+        root.setPrefWidth(500);
+        root.setPrefHeight(300);
+        return root;
     }
-
+    public void update(){
+        int cardW = 200, cardH = 130;
+        int startX = 40, startY = 160, gapX = 220, gapY = 150;
+        redraw(gc, startX, startY, cardW, cardH, gapX, gapY);
+    }
     private void redraw(GraphicsContext gc, int sx, int sy, int cw, int ch, int gx, int gy) {
         // Background
         LinearGradient bg = new LinearGradient(0,0,0,1,true,CycleMethod.NO_CYCLE,

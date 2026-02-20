@@ -4,8 +4,10 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -44,7 +46,6 @@ public class GameScene {
     static final int W         = TILE_SIZE * COLS;   // 960px
     static final int H         = TILE_SIZE * ROWS;   // 720px
     static final double PLAYER_SPEED = 3.2;
-
     // ── Tile IDs ────────────────────────────────────────────────────────────────
     static final int T_GROUND      = 0;
     static final int T_GRASS       = 1;
@@ -60,7 +61,13 @@ public class GameScene {
     // ── World data ──────────────────────────────────────────────────────────────
     private final int[][]      world        = new int[ROWS][COLS];
     private final Mineable[][] stoneObjects = new Mineable[ROWS][COLS];
-
+    private StackPane root = new StackPane();
+    private Pane shopLayer;
+    private ShopScene shopScene;
+    private Pane craftingLayer;
+    private CraftingScene craftingScene;
+    private Pane inventoryLayer;
+    private InventoryScene inventoryScene;
     // ── Player ──────────────────────────────────────────────────────────────────
     private final Player  player;
     private final Pickaxe[] pickaxeHolder;   // array so sub-scenes can update it
@@ -69,7 +76,8 @@ public class GameScene {
     private int    animFrame    = 0;
     private long   lastAnimTime = 0;
     private int    playerInvincibleFrames = 0; // brief i-frames after being hit
-
+    private boolean gameEnded = false;
+    private AnimationTimer gameLoop;
     // ── Monsters ────────────────────────────────────────────────────────────────
     /** Holds a live monster instance plus its pixel position on the map */
     private static class MonsterEntity {
@@ -86,7 +94,7 @@ public class GameScene {
         }
     }
     private final List<MonsterEntity> monsters = new ArrayList<>();
-
+    //EFFECT
     // ── Combat ──────────────────────────────────────────────────────────────────
     private long lastAttackTime = 0;
     private static final long ATTACK_COOLDOWN = 600;    // ms
@@ -120,6 +128,12 @@ public class GameScene {
     public GameScene(Player player, Pickaxe pickaxe) {
         this.player        = player;
         this.pickaxeHolder = new Pickaxe[]{ pickaxe };
+        shopScene = new ShopScene(player, pickaxeHolder, this::closeShop);
+        shopLayer = shopScene.build();
+        craftingScene = new CraftingScene(player,pickaxeHolder,this::closeCraft);
+        craftingLayer = craftingScene.build();
+        inventoryScene = new InventoryScene(player, this::closeInventory);
+        inventoryLayer = inventoryScene.build();
         generateWorld();
         spawnMonsters();
         // Start player near centre, on the path
@@ -232,18 +246,44 @@ public class GameScene {
     public Scene buildScene() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        Pane root = new Pane(canvas);
+        root.getChildren().add(canvas);
         Scene scene = new Scene(root, W, H);
+        shopLayer.setVisible(false);
+        root.getChildren().add(shopLayer);
+        craftingLayer.setVisible(false);
+        root.getChildren().add(craftingLayer);
+        inventoryLayer.setVisible(false);
+        root.getChildren().add(inventoryLayer);
+        scene.setOnKeyPressed(e -> {
+            keys.add(e.getCode());
 
-        scene.setOnKeyPressed(e  -> keys.add(e.getCode()));
+            if (e.getCode() == KeyCode.ENTER) {
+                checkBuildingEntry();
+            }
+            if(e.getCode() == KeyCode.I){
+                toggleInventory();
+            }
+        });
+
+
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
-        new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             @Override public void handle(long now) {
                 update(now);
                 render(gc, now);
+                if(shopLayer.isVisible()){
+                    shopScene.update();
+                }
+                if(craftingLayer.isVisible()){
+                    craftingScene.update();
+                }
+                if(inventoryLayer.isVisible()){
+                    inventoryScene.update();
+                }
             }
-        }.start();
+        };
+        gameLoop.start();
 
         return scene;
     }
@@ -252,14 +292,20 @@ public class GameScene {
     //  UPDATE  (called ~60x/sec)
     // ══════════════════════════════════════════════════════════════════
     private void update(long nowNanos) {
-        if (!player.isAlive()) { Main.sceneManager.showGameOver(false, player); return; }
+        if (gameEnded) return;
+
+        if (!player.isAlive()) {
+            gameEnded = true;
+            gameLoop.stop();
+            Main.sceneManager.showGameOver(false, player);
+            return;
+        }
 
         handleMovement();
         handleMining(nowNanos);
         handleAttack(nowNanos);
         updateMonsters();
         updateFloatingTexts();
-        checkBuildingEntry();
 
         if (playerInvincibleFrames > 0) playerInvincibleFrames--;
     }
@@ -394,7 +440,6 @@ public class GameScene {
                     int dmg = Math.max(1, me.monster.getAttack() - player.getDefense());
                     floatingTexts.add(new FloatingText(playerX, playerY-10,
                         "-"+dmg+" HP", Color.web("#ff1744"), 1200));
-                    if (!player.isAlive()) { Main.sceneManager.showGameOver(false, player); return; }
                 }
             } else {
                 // Wander randomly
@@ -417,6 +462,31 @@ public class GameScene {
     }
 
     // ── Building Entry ────────────────────────────────────────────────
+    private void toggleInventory(){
+        boolean opening = !inventoryLayer.isVisible();
+
+        inventoryLayer.setVisible(opening);
+
+
+    }
+
+    private void closeInventory(){
+        inventoryLayer.setVisible(false);
+    }
+    private void toggleShopVisible(){
+        if(shopLayer.isVisible()) shopLayer.setVisible(false);
+        else shopLayer.setVisible(true);
+    }
+    private void closeCraft(){
+        craftingLayer.setVisible(false);
+    }
+    private void closeShop(){
+        shopLayer.setVisible(false);
+    }
+    private void toggleCraftVisisble(){
+        if(craftingLayer.isVisible()) craftingLayer.setVisible(false);
+        else craftingLayer.setVisible(true);
+    }
     private void checkBuildingEntry() {
         if (!keys.contains(KeyCode.ENTER)) return;
         int pc=(int)((playerX+TILE_SIZE/2.0)/TILE_SIZE);
@@ -427,8 +497,10 @@ public class GameScene {
             int r=pr+dr, c=pc+dc;
             if (!inBounds(r,c)) continue;
             switch (world[r][c]) {
-                case T_SHOP ->      { Main.sceneManager.showShop(player, pickaxeHolder);     return; }
-                case T_CRAFT ->     { Main.sceneManager.showCrafting(player, pickaxeHolder); return; }
+                case T_SHOP ->      {
+                    toggleShopVisible();
+                }
+                case T_CRAFT ->     { toggleCraftVisisble(); return; }
                 case T_BOSS_DOOR -> { Main.sceneManager.showBossRoom(player, pickaxeHolder); return; }
             }
         }

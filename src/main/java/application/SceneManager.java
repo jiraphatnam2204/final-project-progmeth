@@ -1,5 +1,6 @@
 package application;
 
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.creatures.Player;
 import logic.pickaxe.Pickaxe;
@@ -38,17 +39,7 @@ public class SceneManager {
         stage.setScene(game.buildScene());
     }
 
-    /** Show the shop */
-    public void showShop(Player player, Pickaxe[] pickaxeHolder) {
-        ShopScene shop = new ShopScene(player, pickaxeHolder);
-        stage.setScene(shop.build());
-    }
 
-    /** Show the crafting station */
-    public void showCrafting(Player player, Pickaxe[] pickaxeHolder) {
-        CraftingScene crafting = new CraftingScene(player, pickaxeHolder);
-        stage.setScene(crafting.build());
-    }
 
     /** Show the boss room */
     public void showBossRoom(Player player, Pickaxe[] pickaxeHolder) {

@@ -317,7 +317,7 @@ public class BossScene {
 
     private void drawGoblinKing(GraphicsContext gc, Color c, double a) {
         // Body
-        gc.setFill(Color.rgb((int)(c.getRed()*255),(int)(c.getGreen()*255),(int)(c.getBlue()*255),(int)(a*230)));
+        gc.setFill(Color.rgb((int)(c.getRed()*255),(int)(c.getGreen()*255),(int)(c.getBlue()*255),(int)(a)));
         gc.fillOval(50,80,100,110);
         // Head
         gc.setFill(Color.web("#66bb6a",(int)(a*255)/255.0)); gc.fillOval(60,20,80,70);
@@ -375,7 +375,7 @@ public class BossScene {
         gc.fillPolygon(new double[]{70,80,65},new double[]{12,12,-20},3);
         gc.fillPolygon(new double[]{120,130,135},new double[]{12,12,-20},3);
         // Eyes (glowing)
-        gc.setFill(Color.rgb(255,200,0,(int)(a*255))); gc.fillOval(70,28,18,18); gc.fillOval(112,28,18,18);
+        gc.setFill(Color.rgb(255,200,0,(int)(a))); gc.fillOval(70,28,18,18); gc.fillOval(112,28,18,18);
         gc.setFill(Color.BLACK); gc.fillOval(75,32,8,8); gc.fillOval(117,32,8,8);
         // Fire breath (when enemy turn)
         if (state == BattleState.ENEMY_TURN) {
