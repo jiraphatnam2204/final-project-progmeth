@@ -6,6 +6,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -40,7 +41,6 @@ import javafx.scene.image.Image;
  * Think of it like graph paper — each square holds one thing.
  */
 public class GameScene {
-
     // ── Constants ──────────────────────────────────────────────────────────────
     static final int TILE_SIZE = 48;
     static final int COLS      = 20;
@@ -250,6 +250,9 @@ public class GameScene {
         return Math.hypot(x-playerX, y-playerY) < dist;
     }
 
+    // mouse flag
+    private boolean leftMouseDown = false;   // attack
+    private boolean rightMouseDown = false;  // mining
     // ══════════════════════════════════════════════════════════════════
     //  SCENE BUILDER
     // ══════════════════════════════════════════════════════════════════
@@ -267,16 +270,27 @@ public class GameScene {
         scene.setOnKeyPressed(e -> {
             keys.add(e.getCode());
 
-            if (e.getCode() == KeyCode.ENTER) {
+            if (e.getCode() == KeyCode.SPACE) {
                 checkBuildingEntry();
             }
-            if(e.getCode() == KeyCode.I){
+            if(e.getCode() == KeyCode.E){
                 toggleInventory();
             }
         });
 
 
+
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
+
+        scene.setOnMousePressed(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) leftMouseDown = true;
+            if (e.getButton() == MouseButton.SECONDARY) rightMouseDown = true;
+        });
+
+        scene.setOnMouseReleased(e -> {
+            if (e.getButton() == MouseButton.PRIMARY) leftMouseDown = false;
+            if (e.getButton() == MouseButton.SECONDARY) rightMouseDown = false;
+        });
 
         gameLoop = new AnimationTimer() {
             @Override public void handle(long now) {
@@ -312,11 +326,12 @@ public class GameScene {
         }
         if(!shopLayer.isVisible()&&!inventoryLayer.isVisible()&&!craftingLayer.isVisible()) {
             handleMovement();
-            handleMining(nowNanos);
-            handleAttack(nowNanos);
+            if (leftMouseDown)  handleAttack(nowNanos);
+            if (rightMouseDown) handleMining(nowNanos);
             updateMonsters();
             updateFloatingTexts();
         }
+
 
         if (playerInvincibleFrames > 0) playerInvincibleFrames--;
     }
@@ -350,7 +365,6 @@ public class GameScene {
 
     // ── Mining ───────────────────────────────────────────────────────
     private void handleMining(long nowNanos) {
-        if (!keys.contains(KeyCode.E) && !keys.contains(KeyCode.SPACE)) return;
         long nowMs = nowNanos/1_000_000;
         if (nowMs - lastMineTime < MINE_COOLDOWN) return;
         lastMineTime = nowMs;
@@ -390,7 +404,6 @@ public class GameScene {
 
     // ── Attack ───────────────────────────────────────────────────────
     private void handleAttack(long nowNanos) {
-        if (!keys.contains(KeyCode.F) && !keys.contains(KeyCode.Z)) return;
         long nowMs = nowNanos/1_000_000;
         if (nowMs - lastAttackTime < ATTACK_COOLDOWN) return;
         lastAttackTime = nowMs;
@@ -500,7 +513,7 @@ public class GameScene {
         else craftingLayer.setVisible(true);
     }
     private void checkBuildingEntry() {
-        if (!keys.contains(KeyCode.ENTER)) return;
+        if (!keys.contains(KeyCode.SPACE)) return;
         int pc=(int)((playerX+TILE_SIZE/2.0)/TILE_SIZE);
         int pr=(int)((playerY+TILE_SIZE/2.0)/TILE_SIZE);
 
@@ -612,7 +625,7 @@ public class GameScene {
                 gc.strokeRect(c*TILE_SIZE+2, r*TILE_SIZE+2, TILE_SIZE-4, TILE_SIZE-4);
                 gc.setFill(Color.CYAN); gc.setFont(Font.font("Arial",FontWeight.BOLD,10));
                 gc.setTextAlign(TextAlignment.CENTER);
-                gc.fillText("[ENTER]", c*TILE_SIZE+TILE_SIZE/2.0, r*TILE_SIZE-4);
+                gc.fillText("[SPACE]", c*TILE_SIZE+TILE_SIZE/2.0, r*TILE_SIZE-4);
                 gc.setTextAlign(TextAlignment.LEFT);
                 gc.setLineWidth(1);
             }
