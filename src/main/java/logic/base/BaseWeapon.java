@@ -1,8 +1,9 @@
 package logic.base;
 import interfaces.Craftable;
+import interfaces.Equipable;
 import logic.creatures.Player; import logic.util.ItemCounter;
 import java.util.ArrayList;
-public abstract class BaseWeapon extends BaseItem implements Craftable {
+public abstract class BaseWeapon extends BaseItem implements Craftable, Equipable {
     private int dmg, craftingPrice; private double cd;
     public BaseWeapon(String name, int dmg, double cd, int craftingPrice) {
         super(name, false, 1); setCd(cd); setDmg(dmg); setCraftingPrice(craftingPrice);
@@ -17,6 +18,14 @@ public abstract class BaseWeapon extends BaseItem implements Craftable {
             if (it.getCount() > cnt) return false;
         }
         return true;
+    }
+    @Override
+    public void equip(Player p){
+        p.addBonus(dmg,0,0,0);
+    }
+    @Override
+    public void unequip(Player p){
+        p.removeBonus(dmg,0,0,0);
     }
     @Override public void craft(Player p) {
         if (!canCraft(p)) return;

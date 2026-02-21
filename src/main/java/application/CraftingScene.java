@@ -162,10 +162,16 @@ public class CraftingScene {
             gc.setFont(Font.font("Arial",FontWeight.BOLD,12));
             gc.setTextAlign(TextAlignment.CENTER);
             gc.fillText(name, x+cardW/2.0, y+20);
-
+            gc.setFill(Color.WHITE);
+            gc.setFont(Font.font("Arial",FontWeight.BOLD,8));
+            int yP = 0;
+            for(ItemCounter mat : item.getRecipe()){
+                gc.fillText(mat.getItem().getName() + " : " + mat.getCount(), x+cardW/2.0, y+40+10*yP++);
+            }
             gc.setFont(Font.font("Arial",10));
             gc.setFill(Color.web("#ffd700"));
-            gc.fillText(item.getCraftingPrice()+"g", x+cardW/2.0, y+40);
+            gc.fillText(item.getCraftingPrice()+"g", x+cardW/2.0, y+cardH/1.35);
+
 
             gc.setTextAlign(TextAlignment.LEFT);
         }

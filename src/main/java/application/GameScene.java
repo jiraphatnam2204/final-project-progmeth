@@ -300,12 +300,13 @@ public class GameScene {
             Main.sceneManager.showGameOver(false, player);
             return;
         }
-
-        handleMovement();
-        handleMining(nowNanos);
-        handleAttack(nowNanos);
-        updateMonsters();
-        updateFloatingTexts();
+        if(!shopLayer.isVisible()&&!inventoryLayer.isVisible()&&!craftingLayer.isVisible()) {
+            handleMovement();
+            handleMining(nowNanos);
+            handleAttack(nowNanos);
+            updateMonsters();
+            updateFloatingTexts();
+        }
 
         if (playerInvincibleFrames > 0) playerInvincibleFrames--;
     }
@@ -415,7 +416,7 @@ public class GameScene {
     private void updateMonsters() {
         double aggroRange  = TILE_SIZE * 5.0;
         double attackRange = TILE_SIZE * 1.2;
-        double monSpd = 1.4;
+        double monSpd = 0.5;
 
         for (MonsterEntity me : monsters) {
             if (!me.monster.isAlive()) continue;
@@ -464,9 +465,10 @@ public class GameScene {
     // ── Building Entry ────────────────────────────────────────────────
     private void toggleInventory(){
         boolean opening = !inventoryLayer.isVisible();
-
         inventoryLayer.setVisible(opening);
-
+        if (opening) {
+            inventoryScene.refresh(); // build ตอนเปิดเท่านั้น
+        }
 
     }
 

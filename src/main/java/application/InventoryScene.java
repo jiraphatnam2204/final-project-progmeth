@@ -9,6 +9,7 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 import logic.base.BasePotion;
+import logic.base.BaseWeapon;
 import logic.creatures.Player;
 import logic.util.ItemCounter;
 import logic.base.BaseItem;
@@ -70,7 +71,8 @@ public class InventoryScene {
                         "   ATK: " + player.getStrength() +
                         "   DEF: " + player.getDefense()
         );
-
+    }
+    public void refresh(){
         itemListBox.getChildren().clear();
 
         if (player.getInventory().isEmpty()) {
@@ -100,7 +102,22 @@ public class InventoryScene {
                     if (counter.getCount() <= 0) {
                         player.getInventory().remove(counter);
                     }
-                    update();
+                    refresh();
+                });
+                row.getChildren().addAll(name, useBtn);
+
+            }
+            else if(item instanceof BaseWeapon) {
+                useBtn = new Button("Equip");
+
+                useBtn.setOnAction(e -> {
+                    ((BaseWeapon) item).equip(player);
+                    counter.addCount(-1);
+
+                    if (counter.getCount() <= 0) {
+                        player.getInventory().remove(counter);
+                    }
+                    refresh();
                 });
                 row.getChildren().addAll(name, useBtn);
 

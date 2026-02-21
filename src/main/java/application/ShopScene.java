@@ -69,19 +69,15 @@ public class ShopScene {
         // ── Potions ──────────────────────────────────────────────────
         items.add(new ShopItem(
             "Small Potion", "Heals 10 HP", 20, Color.web("#e53935"),
-            p -> { p.getInventory().add(new ItemCounter(new SmallHealthPotion(), 1)); p.heal(10); }
-        ));
-        items.add(new ShopItem(
-            "Heal Potion", "Heals 20% max HP", 50, Color.web("#f44336"),
-            p -> { var pot = new HealPotion(); pot.consume(p); p.getInventory().add(new ItemCounter(pot,1)); }
+            p -> { p.getInventory().add(new ItemCounter(new SmallHealthPotion(), 1));}
         ));
         items.add(new ShopItem(
             "Medium Potion", "Heals 50 HP", 80, Color.web("#c62828"),
-            p -> { p.getInventory().add(new ItemCounter(new MediumHealthPotion(), 1)); p.heal(50); }
+            p -> { p.getInventory().add(new ItemCounter(new MediumHealthPotion(), 1));}
         ));
         items.add(new ShopItem(
             "Big Potion", "Heals 100 HP", 120, Color.web("#b71c1c"),
-            p -> { p.getInventory().add(new ItemCounter(new BigHealthPotion(), 1)); p.heal(100); }
+            p -> { p.getInventory().add(new ItemCounter(new BigHealthPotion(), 1));}
         ));
 
         // ── Pickaxes ─────────────────────────────────────────────────
@@ -105,15 +101,15 @@ public class ShopScene {
         // ── Weapons (add bonus ATK via addBonus) ─────────────────────
         items.add(new ShopItem(
             "Stone Sword", "+5 ATK", 30, Color.web("#9e9e9e"),
-            p -> p.addBonus(5, 0, 0, 0)
+            p -> p.addItem(new StoneSword(),1)
         ));
         items.add(new ShopItem(
             "Iron Sword", "+15 ATK", 150, Color.web("#b0bec5"),
-            p -> p.addBonus(15, 0, 0, 0)
+            p -> p.addItem(new IronSword(),1)
         ));
         items.add(new ShopItem(
             "Platinum Sword", "+30 ATK", 400, Color.web("#80d8ff"),
-            p -> p.addBonus(30, 0, 0, 0)
+            p -> p.addItem(new PlatinumSword(),1)
         ));
     }
     public Pane close(){
