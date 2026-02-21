@@ -152,7 +152,7 @@ public class ShopScene {
 
         // Back button
         Button backBtn = makeBtn("← Back t  o World");
-        backBtn.setLayoutX(W/2.0 - 80   ); backBtn.setLayoutY(H - 54);
+        backBtn.setLayoutX(W/2.0 - 80   ); backBtn.setLayoutY(H - 80);
         backBtn.setOnAction(e -> onClose.run());
         root.getChildren().add(backBtn);
 

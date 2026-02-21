@@ -88,7 +88,7 @@ public class CraftingScene {
         Button backBtn = makeBtn("← Back");
         backBtn.setPrefWidth(120);
         backBtn.setLayoutX(W/2.0 - 60);
-        backBtn.setLayoutY(H-52);
+        backBtn.setLayoutY(H-80);
         backBtn.setOnAction(e -> onClose.run());
         root.getChildren().add(backBtn);
 

@@ -19,7 +19,7 @@ public class SceneManager {
 
     // Window dimensions — used by all scenes
     public static final int W = 960;
-    public static final int H = 720;
+    public static final int H = 755;
 
     public SceneManager(Stage stage) {
         this.stage = stage;
