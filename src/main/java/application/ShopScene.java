@@ -69,15 +69,15 @@ public class ShopScene {
         // ── Potions ──────────────────────────────────────────────────
         items.add(new ShopItem(
             "Small Potion", "Heals 10 HP", 20, Color.web("#e53935"),
-            p -> { p.getInventory().add(new ItemCounter(new SmallHealthPotion(), 1));}
+            p -> { p.addItem(new SmallHealthPotion(), 1);}
         ));
         items.add(new ShopItem(
             "Medium Potion", "Heals 50 HP", 80, Color.web("#c62828"),
-            p -> { p.getInventory().add(new ItemCounter(new MediumHealthPotion(), 1));}
+                p -> { p.addItem(new MediumHealthPotion(), 1);}
         ));
         items.add(new ShopItem(
             "Big Potion", "Heals 100 HP", 120, Color.web("#b71c1c"),
-            p -> { p.getInventory().add(new ItemCounter(new BigHealthPotion(), 1));}
+                p -> { p.addItem(new BigHealthPotion(), 1);}
         ));
 
         // ── Pickaxes ─────────────────────────────────────────────────
