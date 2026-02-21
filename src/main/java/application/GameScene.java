@@ -68,6 +68,8 @@ public class GameScene {
     private CraftingScene craftingScene;
     private Pane inventoryLayer;
     private InventoryScene inventoryScene;
+    private Pane bossLayer;
+    private BossScene bossScene;
     // ── Player ──────────────────────────────────────────────────────────────────
     private final Player  player;
     private final Pickaxe[] pickaxeHolder;   // array so sub-scenes can update it
@@ -516,7 +518,7 @@ public class GameScene {
                     toggleShopVisible();
                 }
                 case T_CRAFT ->     { toggleCraftVisisble(); return; }
-                case T_BOSS_DOOR -> { Main.sceneManager.showBossRoom(player, pickaxeHolder); return; }
+                case T_BOSS_DOOR -> { gameLoop.stop();Main.sceneManager.showBossRoom(player, pickaxeHolder); return; }
             }
         }
         showNotif("Nothing to enter nearby.");
