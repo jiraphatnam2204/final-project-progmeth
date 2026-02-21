@@ -54,10 +54,19 @@ public class MainMenuScene {
         Button quitBtn   = makeButton("✕   QUIT",        "#c62828", "#ef5350");
 
         startBtn.setOnAction(e -> {
-            // Create fresh player and default pickaxe, then launch game
-            Player player = new Player(100, 20, 5);
-            player.setGold(200);
-            Pickaxe[] pickaxeHolder = { Pickaxe.createNormalStonePickaxe() };
+            // ── TEST MODE: generous starting resources ──
+            Player player = new Player(99999, 20, 9999); // 99999 HP + 9999 DEF = effectively invincible
+            player.setGold(9999);   // plenty of gold to buy/craft anything
+
+            // Pre-fill inventory with crafting materials
+            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.NormalStone(), 30));
+            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.HardStone(),   20));
+            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Iron(),        20));
+            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Platinum(),    15));
+            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(),     15));
+
+            // Start with a strong pickaxe so mining is fast
+            Pickaxe[] pickaxeHolder = { Pickaxe.createIronPickaxe() };
             Main.sceneManager.showGame(player, pickaxeHolder[0]);
         });
         quitBtn.setOnAction(e -> System.exit(0));
@@ -97,8 +106,8 @@ public class MainMenuScene {
     private void drawBackground(GraphicsContext gc, double titleBob) {
         // Deep space gradient background
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#0a0a1a")),
-            new Stop(1, Color.web("#1a0a2e")));
+                new Stop(0, Color.web("#0a0a1a")),
+                new Stop(1, Color.web("#1a0a2e")));
         gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
@@ -141,9 +150,9 @@ public class MainMenuScene {
 
         // Title main
         LinearGradient titleGrad = new LinearGradient(0, 0.2, 0, 0.8, true, CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#ffd700")),
-            new Stop(0.5, Color.web("#ff8c00")),
-            new Stop(1, Color.web("#ffd700")));
+                new Stop(0, Color.web("#ffd700")),
+                new Stop(0.5, Color.web("#ff8c00")),
+                new Stop(1, Color.web("#ffd700")));
         gc.setFill(titleGrad);
         gc.fillText("⚔ Mining RPG ⚔", W / 2.0, H * 0.28 + bobY);
 
@@ -182,17 +191,17 @@ public class MainMenuScene {
         btn.setPrefWidth(240);
         btn.setPrefHeight(48);
         String base  = "-fx-background-color:" + colorHex + ";" +
-                       "-fx-text-fill:white;" +
-                       "-fx-font-size:15px;" +
-                       "-fx-font-weight:bold;" +
-                       "-fx-background-radius:8;" +
-                       "-fx-cursor:hand;";
+                "-fx-text-fill:white;" +
+                "-fx-font-size:15px;" +
+                "-fx-font-weight:bold;" +
+                "-fx-background-radius:8;" +
+                "-fx-cursor:hand;";
         String hover = "-fx-background-color:" + hoverHex + ";" +
-                       "-fx-text-fill:white;" +
-                       "-fx-font-size:15px;" +
-                       "-fx-font-weight:bold;" +
-                       "-fx-background-radius:8;" +
-                       "-fx-cursor:hand;";
+                "-fx-text-fill:white;" +
+                "-fx-font-size:15px;" +
+                "-fx-font-weight:bold;" +
+                "-fx-background-radius:8;" +
+                "-fx-cursor:hand;";
         btn.setStyle(base);
         btn.setOnMouseEntered(e -> btn.setStyle(hover));
         btn.setOnMouseExited(e  -> btn.setStyle(base));

@@ -222,7 +222,7 @@ public class GameScene {
     private void spawnMonsters() {
         Random rng = new Random(55);
         // Spread monsters around the map, avoiding player start area
-        int[][] specs = {{0,5},{1,4},{2,2}};  // {type, count}
+        int[][] specs = {{0,2},{1,1},{2,1}};  // {type, count} — reduced for testing
         for (int[] spec : specs) {
             for (int i = 0; i < spec[1]; i++) {
                 double mx, my;
@@ -350,7 +350,7 @@ public class GameScene {
     private boolean canMoveTo(double nx, double ny) {
         int m = 5;
         return !isSolid(nx+m,ny+m) && !isSolid(nx+TILE_SIZE-m,ny+m)
-            && !isSolid(nx+m,ny+TILE_SIZE-m) && !isSolid(nx+TILE_SIZE-m,ny+TILE_SIZE-m);
+                && !isSolid(nx+m,ny+TILE_SIZE-m) && !isSolid(nx+TILE_SIZE-m,ny+TILE_SIZE-m);
     }
 
     private boolean isSolid(double px, double py) {
@@ -385,7 +385,7 @@ public class GameScene {
                 String name = drops.get(0).getName();
                 showNotif("+ " + drops.size() + "x " + name);
                 floatingTexts.add(new FloatingText(tc*TILE_SIZE, tr*TILE_SIZE,
-                    "+"+drops.size()+" "+name, Color.YELLOW, 1500));
+                        "+"+drops.size()+" "+name, Color.YELLOW, 1500));
             }
         } else {
             showNotif("Mining... ["+stone.getDurability()+"/"+stone.getMaxDurability()+"]");
@@ -417,13 +417,13 @@ public class GameScene {
                 player.attack(me.monster);  // uses Player.attack() from your code
                 int dmg = Math.max(1, player.getAttack() - me.monster.getDefense());
                 floatingTexts.add(new FloatingText(me.x+8, me.y-8,
-                    "-"+dmg, Color.web("#ff5252"), 1000));
+                        "-"+dmg, Color.web("#ff5252"), 1000));
                 hit = true;
                 if (!me.monster.isAlive()) {
                     int gold = me.monster.dropMoney();
                     player.setGold(player.getGold()+gold);
                     floatingTexts.add(new FloatingText(me.x, me.y-20,
-                        "+"+gold+"g !", Color.GOLD, 1800));
+                            "+"+gold+"g !", Color.GOLD, 1800));
                     showNotif("Monster defeated! +" + gold + " gold");
                     it.remove();
                 }
@@ -460,7 +460,7 @@ public class GameScene {
                     playerInvincibleFrames = 50;
                     int dmg = Math.max(1, me.monster.getAttack() - player.getDefense());
                     floatingTexts.add(new FloatingText(playerX, playerY-10,
-                        "-"+dmg+" HP", Color.web("#ff1744"), 1200));
+                            "-"+dmg+" HP", Color.web("#ff1744"), 1200));
                 }
             } else {
                 // Wander randomly
@@ -475,7 +475,7 @@ public class GameScene {
                 double ny = me.y + me.dy;
                 // Don't walk into walls
                 if (!isSolid(nx+5,ny+5) && !isSolid(nx+TILE_SIZE-5,ny+5)
-                    && !isSolid(nx+5,ny+TILE_SIZE-5) && !isSolid(nx+TILE_SIZE-5,ny+TILE_SIZE-5)) {
+                        && !isSolid(nx+5,ny+TILE_SIZE-5) && !isSolid(nx+TILE_SIZE-5,ny+TILE_SIZE-5)) {
                     me.x = nx; me.y = ny;
                 }
             }
@@ -710,8 +710,8 @@ public class GameScene {
     private void drawPlayer(GraphicsContext gc) {
         double px=playerX, py=playerY;
         boolean moving = keys.stream().anyMatch(k->
-            k==KeyCode.W||k==KeyCode.A||k==KeyCode.S||k==KeyCode.D||
-            k==KeyCode.UP||k==KeyCode.DOWN||k==KeyCode.LEFT||k==KeyCode.RIGHT);
+                k==KeyCode.W||k==KeyCode.A||k==KeyCode.S||k==KeyCode.D||
+                        k==KeyCode.UP||k==KeyCode.DOWN||k==KeyCode.LEFT||k==KeyCode.RIGHT);
         int legBob = (moving && animFrame%2==0) ? 2 : 0;
 
         // Invincibility flash
@@ -769,9 +769,9 @@ public class GameScene {
             gc.setFill(Color.rgb(255,255,200,0.3)); gc.fillOval(-8,-18,16,22);
         }
         gc.setFill(Color.web("#b0bec5")); gc.fillPolygon(
-            new double[]{-3,3,0}, new double[]{16,16,-8}, 3);
+                new double[]{-3,3,0}, new double[]{16,16,-8}, 3);
         gc.setFill(Color.web("#eceff1")); gc.fillPolygon(
-            new double[]{-1,1,0}, new double[]{14,14,-6}, 3);
+                new double[]{-1,1,0}, new double[]{14,14,-6}, 3);
         gc.restore();
     }
 

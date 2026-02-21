@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -59,6 +60,8 @@ public class BossScene {
     private Color   bossColor;
     private String  bossEmoji;
 
+    private Image imgBoss1, imgBoss2, imgBoss3;
+
     // ── Battle state ─────────────────────────────────────────────────
     private enum BattleState { PLAYER_TURN, ENEMY_TURN, VICTORY, DEFEAT, ALL_CLEAR }
     private BattleState state = BattleState.PLAYER_TURN;
@@ -77,6 +80,9 @@ public class BossScene {
     public BossScene(Player player, Pickaxe[] pickaxeHolder) {
         this.player        = player;
         this.pickaxeHolder = pickaxeHolder;
+        imgBoss1 = new Image(getClass().getResourceAsStream("/images/Akaza.png"));
+        imgBoss2 = new Image(getClass().getResourceAsStream("/images/Kokushibo.png"));
+        imgBoss3 = new Image(getClass().getResourceAsStream("/images/Muzan.png"));
         loadBoss(0);
     }
 
@@ -300,10 +306,15 @@ public class BossScene {
 
         double alpha = currentBoss.isAlive() ? 1.0 : 0.3;
 
-        switch(bossIndex) {
-            case 0 -> drawGoblinKing(gc, bossColor, alpha);
-            case 1 -> drawOrcWarlord(gc, bossColor, alpha);
-            case 2 -> drawDragon(gc, bossColor, alpha);
+        Image img = switch(bossIndex) {
+            case 0 -> imgBoss1;
+            case 1 -> imgBoss2;
+            default -> imgBoss3;
+        };
+        if (img != null && !img.isError()) {
+            gc.setGlobalAlpha(alpha);          // fades out when boss dies
+            gc.drawImage(img, 0, 0, 280, 280); // x=0, y=0, width=200, height=280
+            gc.setGlobalAlpha(1.0);            // reset transparency back to normal
         }
         gc.restore();
 
