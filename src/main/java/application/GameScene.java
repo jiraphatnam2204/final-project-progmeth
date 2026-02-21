@@ -4,7 +4,6 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
@@ -19,8 +18,6 @@ import logic.creatures.Player;
 import logic.creatures.EasyMonster;
 import logic.creatures.MediumMonster;
 import logic.creatures.HardMonster;
-import logic.item.potion.SmallHealthPotion;
-import logic.item.potion.HealPotion;
 import logic.pickaxe.Pickaxe;
 import logic.stone.*;
 import logic.util.ItemCounter;
@@ -141,9 +138,9 @@ public class GameScene {
         craftingLayer = craftingScene.build();
         inventoryScene = new InventoryScene(player, this::closeInventory);
         inventoryLayer = inventoryScene.build();
-        imgEasyMonster   = new Image(getClass().getResourceAsStream("/images/rui.png"));
+        imgEasyMonster   = new Image(getClass().getResourceAsStream("/images/Rui.png"));
         imgMediumMonster = new Image(getClass().getResourceAsStream("/images/Enmu.png"));
-        imgHardMonster   = new Image(getClass().getResourceAsStream("/images/daki.png"));
+        imgHardMonster   = new Image(getClass().getResourceAsStream("/images/Daki.png"));
         generateWorld();
         spawnMonsters();
         // Start player near centre, on the path
