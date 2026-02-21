@@ -32,3 +32,7 @@ out/
 ### OS Files ###
 .DS_Store
 Thumbs.db
+
+# Claude AI
+.claude/
+CLAUDE.md

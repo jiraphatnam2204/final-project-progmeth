@@ -26,6 +26,8 @@ import logic.util.ItemCounter;
 import interfaces.Mineable;
 
 import java.util.*;
+import javafx.scene.image.Image;
+
 
 /**
  * GameScene: The overworld — a top-down tile map where the player:
@@ -80,6 +82,9 @@ public class GameScene {
     private int    playerInvincibleFrames = 0; // brief i-frames after being hit
     private boolean gameEnded = false;
     private AnimationTimer gameLoop;
+    private Image imgEasyMonster;
+    private Image imgMediumMonster;
+    private Image imgHardMonster;
     // ── Monsters ────────────────────────────────────────────────────────────────
     /** Holds a live monster instance plus its pixel position on the map */
     private static class MonsterEntity {
@@ -136,6 +141,9 @@ public class GameScene {
         craftingLayer = craftingScene.build();
         inventoryScene = new InventoryScene(player, this::closeInventory);
         inventoryLayer = inventoryScene.build();
+        imgEasyMonster   = new Image(getClass().getResourceAsStream("/images/rui.png"));
+        imgMediumMonster = new Image(getClass().getResourceAsStream("/images/Enmu.png"));
+        imgHardMonster   = new Image(getClass().getResourceAsStream("/images/daki.png"));
         generateWorld();
         spawnMonsters();
         // Start player near centre, on the path
@@ -631,56 +639,59 @@ public class GameScene {
     private void drawMonsters(GraphicsContext gc) {
         for (MonsterEntity me : monsters) {
             if (!me.monster.isAlive()) continue;
-            double x=me.x, y=me.y;
+            double x = me.x, y = me.y;
 
-            // Shadow
-            gc.setFill(Color.rgb(0,0,0,0.2)); gc.fillOval(x+6,y+38,36,10);
+            // Shadow under the monster
+            gc.setFill(Color.rgb(0, 0, 0, 0.2));
+            gc.fillOval(x + 6, y + 38, 36, 10);
 
-            Color bodyColor = switch(me.type) {
-                case 0  -> Color.web("#ef9a9a"); // easy  = light red
-                case 1  -> Color.web("#ce93d8"); // medium= purple
-                default -> Color.web("#f44336"); // hard  = bright red
+            // Pick the right image based on monster type
+            Image img = switch (me.type) {
+                case 0  -> imgEasyMonster;
+                case 1  -> imgMediumMonster;
+                default -> imgHardMonster;
             };
-            Color darkBody = bodyColor.darker();
 
-            // Body
-            gc.setFill(bodyColor); gc.fillOval(x+8,y+14,32,28);
-            // Arms
-            gc.setFill(darkBody);
-            gc.fillOval(x+2,y+18,12,10); gc.fillOval(x+34,y+18,12,10);
-            // Head
-            gc.setFill(bodyColor.brighter()); gc.fillOval(x+12,y+4,24,20);
-            // Eyes (scary)
-            gc.setFill(Color.RED);
-            gc.fillOval(x+16,y+9,5,5); gc.fillOval(x+27,y+9,5,5);
-            gc.setFill(Color.web("#1a0000")); gc.fillOval(x+17,y+10,3,3); gc.fillOval(x+28,y+10,3,3);
-            // Horns (harder monsters)
-            if (me.type>=1) {
-                gc.setFill(Color.web("#4a0000"));
-                gc.fillPolygon(new double[]{x+17,x+21,x+13},new double[]{y+6,y+1,y+1},3);
-                gc.fillPolygon(new double[]{x+31,x+35,x+27},new double[]{y+6,y+1,y+1},3);
+            // Draw the image stretched to fill the tile
+            // gc.drawImage(image, destX, destY, destWidth, destHeight)
+            if (img != null && !img.isError()) {
+                gc.drawImage(img, x, y, TILE_SIZE, TILE_SIZE);
+            } else {
+                // Fallback: draw a red box if image failed to load
+                gc.setFill(Color.RED);
+                gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                gc.setFill(Color.WHITE);
+                gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.fillText("?", x + TILE_SIZE / 2.0, y + TILE_SIZE / 2.0);
+                gc.setTextAlign(TextAlignment.LEFT);
             }
 
-            // Aggro indicator
+            // Aggro indicator (red glow + "!" when chasing you) — kept from original
             if (me.aggro) {
-                gc.setFill(Color.rgb(255,50,50,0.4));
-                gc.fillOval(x-4,y-4,TILE_SIZE+8,TILE_SIZE+8);
-                gc.setFill(Color.RED); gc.setFont(Font.font("Arial",FontWeight.BOLD,11));
-                gc.setTextAlign(TextAlignment.CENTER); gc.fillText("!",x+TILE_SIZE/2.0,y); gc.setTextAlign(TextAlignment.LEFT);
+                gc.setFill(Color.rgb(255, 50, 50, 0.4));
+                gc.fillOval(x - 4, y - 4, TILE_SIZE + 8, TILE_SIZE + 8);
+                gc.setFill(Color.RED);
+                gc.setFont(Font.font("Arial", FontWeight.BOLD, 11));
+                gc.setTextAlign(TextAlignment.CENTER);
+                gc.fillText("!", x + TILE_SIZE / 2.0, y);
+                gc.setTextAlign(TextAlignment.LEFT);
             }
 
             // HP bar
-            int hp=me.monster.getHealthPoint(), mhp=me.monster.getMaxHealthPoint();
-            double pct=(double)hp/mhp;
-            gc.setFill(Color.web("#1a0000",0.6)); gc.fillRect(x+2,y+TILE_SIZE-8,TILE_SIZE-4,5);
-            gc.setFill(pct>0.5?Color.LIMEGREEN:pct>0.25?Color.ORANGE:Color.RED);
-            gc.fillRect(x+2,y+TILE_SIZE-8,(TILE_SIZE-4)*pct,5);
+            int hp = me.monster.getHealthPoint(), mhp = me.monster.getMaxHealthPoint();
+            double pct = (double) hp / mhp;
+            gc.setFill(Color.web("#1a0000", 0.6));
+            gc.fillRect(x + 2, y + TILE_SIZE - 8, TILE_SIZE - 4, 5);
+            gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
+            gc.fillRect(x + 2, y + TILE_SIZE - 8, (TILE_SIZE - 4) * pct, 5);
 
-            // Monster name label
-            gc.setFont(Font.font("Arial",9));
-            String name = me.type==0?"Goblin":me.type==1?"Orc":"Troll";
-            gc.setFill(Color.WHITE); gc.setTextAlign(TextAlignment.CENTER);
-            gc.fillText(name+" "+hp+"/"+mhp, x+TILE_SIZE/2.0, y+TILE_SIZE+10);
+            // Monster name + HP label below the sprite
+            gc.setFont(Font.font("Arial", 9));
+            String name = me.type == 0 ? "Goblin" : me.type == 1 ? "Orc" : "Troll";
+            gc.setFill(Color.WHITE);
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.fillText(name + " " + hp + "/" + mhp, x + TILE_SIZE / 2.0, y + TILE_SIZE + 10);
             gc.setTextAlign(TextAlignment.LEFT);
         }
     }
