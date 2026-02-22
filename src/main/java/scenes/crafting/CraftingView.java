@@ -7,83 +7,66 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import logic.base.BaseItem;
 import logic.util.ItemCounter;
 
-/**
- * CraftingView — the "face" of the crafting screen.
- *
- * Responsibility: ONLY drawing and layout. No game logic.
- *   - Builds the Pane with all Craft buttons
- *   - Draws recipe cards on a Canvas
- *   - Shows feedback messages (success/fail) from the controller
- *   - Delegates every craft attempt to CraftingController
- */
 public class CraftingView {
 
     private static final int W = SceneManager.W;
     private static final int H = SceneManager.H;
 
-    // Layout constants — column/card dimensions used in both build() and redraw()
-    private static final int COLS   = 4;
+    private static final int COLS = 4;
     private static final int CARD_W = 210;
     private static final int CARD_H = 150;
     private static final int START_X = 18;
     private static final int START_Y = 130;
-    private static final int GAP_X  = 232;
-    private static final int GAP_Y  = 165;
+    private static final int GAP_X = 232;
+    private static final int GAP_Y = 165;
 
     private final CraftingController controller;
     private final Runnable onClose;
 
-    // Canvas is kept as a field so redraw() can access it any time
     private Canvas canvas;
     private GraphicsContext gc;
 
-    // Feedback message shown at the bottom (updated after every craft attempt)
-    private String feedbackMsg  = "";
-    private Color  feedbackColor = Color.YELLOW;
+    private String feedbackMsg = "";
+    private Color feedbackColor = Color.YELLOW;
 
     public CraftingView(CraftingController controller, Runnable onClose) {
         this.controller = controller;
-        this.onClose    = onClose;
+        this.onClose = onClose;
     }
 
-    // ── Build ─────────────────────────────────────────────────────────────────
-
-    /**
-     * Creates and returns the complete crafting overlay Pane.
-     * Call this once; then call update() every frame to keep stats fresh.
-     */
     public Pane build() {
         canvas = new Canvas(W, H);
-        gc     = canvas.getGraphicsContext2D();
+        gc = canvas.getGraphicsContext2D();
 
         Pane root = new Pane(canvas);
-        root.setStyle("-fx-background-color: rgba(0,0,0,0.6);");
 
-        // Create one "Craft" button per recipe
         for (int i = 0; i < controller.getRecipes().size(); i++) {
             int col = i % COLS;
             int row = i / COLS;
-            double bx = START_X + col * GAP_X + CARD_W / 2.0 - 45;
-            double by = START_Y + row * GAP_Y + CARD_H - 30;
+
+            double bx = START_X + col * GAP_X + CARD_W / 2.0 - 50;
+            double by = START_Y + row * GAP_Y + CARD_H - 32;
 
             Button btn = makeBtn("Craft");
             btn.setLayoutX(bx);
             btn.setLayoutY(by);
 
-            final int recipeIndex = i; // must be effectively final for the lambda
+            final int recipeIndex = i;
             btn.setOnAction(e -> handleCraftClick(recipeIndex));
 
             root.getChildren().add(btn);
         }
 
-        // "Back" button returns to the game world
-        Button backBtn = makeBtn("← Back");
+        Button backBtn = makeBtn("← Back to World");
         backBtn.setPrefWidth(120);
         backBtn.setLayoutX(W / 2.0 - 60);
         backBtn.setLayoutY(H - 80);
@@ -94,114 +77,120 @@ public class CraftingView {
         return root;
     }
 
-    // ── Event handling ────────────────────────────────────────────────────────
-
-    /**
-     * Called when the player clicks a "Craft" button.
-     * The View asks the Controller to do the real work, then updates the display.
-     *
-     * This is the key MVC pattern in action:
-     *   View gets click → asks Controller → Controller returns result → View displays it
-     */
     private void handleCraftClick(int recipeIndex) {
         CraftingController.CraftResult result = controller.craft(recipeIndex);
-        feedbackMsg   = result.message();
+        feedbackMsg = result.message();
         feedbackColor = result.success() ? Color.LIMEGREEN : Color.web("#ff5252");
         redraw();
     }
 
-    /** Called every frame by GameScene to keep player stats fresh on screen. */
     public void update() {
         redraw();
     }
 
-    // ── Rendering ─────────────────────────────────────────────────────────────
-
     private void redraw() {
         var player = controller.getPlayer();
 
-        // ── Background ──────────────────────────────────────────────────────
-        gc.setFill(Color.rgb(10, 20, 40, 0.95));
+        LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, Color.web("#0a1428")),
+                new Stop(1, Color.web("#14283c")));
+        gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
-        // ── Title ───────────────────────────────────────────────────────────
-        gc.setFill(Color.web("#80cbc4"));
-        gc.setFont(Font.font("Georgia", FontWeight.BOLD, 34));
+        gc.setFill(Color.web("#80cbc4")); // A nice teal color for crafting
+        gc.setFont(Font.font("Georgia", FontWeight.BOLD, 36));
         gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText("⚒ CRAFTING STATION", W / 2.0, 55);
+        gc.fillText("⚒ CRAFTING STATION", W / 2.0, 60);
 
-        // ── Player stats bar ────────────────────────────────────────────────
-        gc.setFont(Font.font("Arial", 14));
-        gc.setFill(Color.WHITE);
+        gc.setFill(Color.web("#b2dfdb"));
+        gc.setFont(Font.font("Arial", 16));
         gc.fillText(
-                "Gold: " + player.getGold()
-                + " | ATK: "  + player.getAttack()
-                + " | DEF: "  + player.getDefense()
-                + " | HP: "   + player.getHealth() + "/" + player.getMaxHealth(),
-                W / 2.0, 85
+                "Gold: " + player.getGold() + "g"
+                        + "  |  HP: " + player.getHealth() + "/" + player.getMaxHealth()
+                        + "  |  ATK: " + player.getAttack()
+                        + "  |  DEF: " + player.getDefense(),
+                W / 2.0, 95
         );
 
         gc.setTextAlign(TextAlignment.LEFT);
 
-        // ── Recipe cards ────────────────────────────────────────────────────
+        Font materialFont = Font.font("Arial", FontWeight.NORMAL, 12);
+        Font goldFont = Font.font("Arial", FontWeight.BOLD, 14);
+
         for (int i = 0; i < controller.getRecipes().size(); i++) {
             Craftable recipe = controller.getRecipes().get(i);
-            int    col  = i % COLS;
-            int    row  = i / COLS;
-            double x    = START_X + col * GAP_X;
-            double y    = START_Y + row * GAP_Y;
+
+            int col = i % COLS;
+            int row = i / COLS;
+            double x = START_X + col * GAP_X;
+            double y = START_Y + row * GAP_Y;
+
             boolean canCraft = recipe.canCraft(player);
+            Color headerColor = Color.web("#00838f");
 
-            // Card background — blue if craftable, dark red if not
             gc.setFill(canCraft
-                    ? Color.rgb(20, 40, 70, 0.95)
-                    : Color.rgb(40, 20, 20, 0.95));
-            gc.fillRoundRect(x, y, CARD_W, CARD_H, 10, 10);
+                    ? Color.rgb(40, 40, 40, 0.92)
+                    : Color.rgb(30, 20, 20, 0.85));
+            gc.fillRoundRect(x, y, CARD_W, CARD_H, 12, 12);
 
-            // Item name
+            gc.setStroke(canCraft ? headerColor : Color.web("#444444"));
+            gc.setLineWidth(2);
+            gc.strokeRoundRect(x, y, CARD_W, CARD_H, 12, 12);
+
+            gc.setFill(canCraft ? headerColor.deriveColor(0, 1, 1, 0.8) : Color.web("#444444"));
+            gc.fillRoundRect(x, y, CARD_W, 26, 12, 0);
+            gc.fillRect(x, y + 14, CARD_W, 12);
+
             String name = ((BaseItem) recipe).getName();
             gc.setFill(Color.WHITE);
-            gc.setFont(Font.font("Arial", FontWeight.BOLD, 12));
+            gc.setFont(Font.font("Arial", FontWeight.BOLD, 13));
             gc.setTextAlign(TextAlignment.CENTER);
-            gc.fillText(name, x + CARD_W / 2.0, y + 20);
+            gc.fillText(name, x + CARD_W / 2.0, y + 18);
 
-            // Required materials list
-            gc.setFont(Font.font("Arial", FontWeight.BOLD, 8));
+            gc.setFont(materialFont);
+            gc.setFill(Color.web("#cfd8dc"));
             int matRow = 0;
             for (ItemCounter mat : recipe.getRecipe()) {
                 gc.fillText(
                         mat.getItem().getName() + " : " + mat.getCount(),
-                        x + CARD_W / 2.0, y + 40 + 10 * matRow++
+                        x + CARD_W / 2.0,
+                        y + 48 + (16 * matRow)
                 );
+                matRow++;
             }
 
-            // Gold cost
-            gc.setFont(Font.font("Arial", 10));
-            gc.setFill(Color.web("#ffd700"));
-            gc.fillText(recipe.getCraftingPrice() + "g", x + CARD_W / 2.0, y + CARD_H / 1.35);
+            gc.setFont(goldFont);
+            gc.setFill(canCraft ? Color.web("#ffd700") : Color.web("#757575"));
+            gc.fillText(recipe.getCraftingPrice() + "g", x + CARD_W / 2.0, y + 90);
 
             gc.setTextAlign(TextAlignment.LEFT);
         }
 
-        // ── Feedback banner ─────────────────────────────────────────────────
         if (!feedbackMsg.isEmpty()) {
-            gc.setFill(Color.rgb(0, 0, 0, 0.85));
-            gc.fillRoundRect(W / 2.0 - 200, H - 90, 400, 32, 10, 10);
+            gc.setFill(Color.rgb(0, 0, 0, 0.8));
+            gc.fillRoundRect(W / 2.0 - 200, H - 96, 400, 32, 10, 10);
             gc.setFill(feedbackColor);
             gc.setFont(Font.font("Arial", FontWeight.BOLD, 14));
             gc.setTextAlign(TextAlignment.CENTER);
-            gc.fillText(feedbackMsg, W / 2.0, H - 68);
+            gc.fillText(feedbackMsg, W / 2.0, H - 74);
             gc.setTextAlign(TextAlignment.LEFT);
         }
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
 
     private Button makeBtn(String text) {
         Button b = new Button(text);
-        b.setPrefWidth(90);
-        b.setPrefHeight(24);
-        b.setStyle("-fx-background-color:#00acc1;-fx-text-fill:white;");
+        b.setPrefWidth(100);
+        b.setPrefHeight(26);
+
+        String baseStyle = "-fx-background-color:#00838f;-fx-text-fill:white;"
+                + "-fx-font-weight:bold;-fx-font-size:11px;"
+                + "-fx-background-radius:5;-fx-cursor:hand;";
+
+        b.setStyle(baseStyle);
+
+        b.setOnMouseEntered(e -> b.setStyle(baseStyle.replace("#00838f", "#00acc1")));
+        b.setOnMouseExited(e -> b.setStyle(baseStyle));
         return b;
     }
 }

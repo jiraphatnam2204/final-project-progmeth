@@ -4,29 +4,16 @@ import application.SceneManager;
 
 import java.util.Random;
 
-/**
- * MainMenuController — the "brain" of the main menu.
- * <p>
- * Responsibility: ONLY animation state management.
- * - Holds the 120 falling-star positions, speeds, and sizes
- * - Updates star positions each frame (moves them downward)
- * - Wraps stars back to the top when they fall off-screen
- * <p>
- * Why put this in a controller?  Even though it's purely visual data,
- * separating it means the View can be replaced (e.g. different background style)
- * without touching the animation math.
- */
 public class MainMenuController {
 
     private static final int W = SceneManager.W;
     private static final int H = SceneManager.H;
     private static final int STAR_COUNT = 120;
 
-    // Star arrays — public-read so MainMenuView can draw them
     private final double[] starX = new double[STAR_COUNT];
     private final double[] starY = new double[STAR_COUNT];
-    private final double[] starSpd = new double[STAR_COUNT]; // pixels per frame
-    private final double[] starR = new double[STAR_COUNT]; // radius
+    private final double[] starSpd = new double[STAR_COUNT];
+    private final double[] starR = new double[STAR_COUNT];
 
     public MainMenuController() {
         Random rng = new Random();
@@ -38,15 +25,12 @@ public class MainMenuController {
         }
     }
 
-    // ── Per-frame update ─────────────────────────────────────────────────────
-
-    /**
-     * Moves each star downward by its speed.
-     * Stars that fall past the bottom wrap back to the top at a random X.
-     *
-     * @param dt time elapsed since last frame (in seconds) — not currently used
-     *           but good practice to accept for future speed scaling
-     */
+    // Updates the position of every star frame-by-frame.
+    // Think of this like a digital waterfall. We loop through every single star and
+    // push it down the screen by adding its unique speed to its Y-coordinate.
+    // If a star falls past the bottom edge of the screen (starY > H), we instantly
+    // teleport it back to the top (starY = 0) at a brand-new random X position.
+    // This creates the illusion of infinite falling stars using only 120 objects.
     public void update(double dt) {
         for (int i = 0; i < STAR_COUNT; i++) {
             starY[i] += starSpd[i];
@@ -56,8 +40,6 @@ public class MainMenuController {
             }
         }
     }
-
-    // ── Getters ───────────────────────────────────────────────────────────────
 
     public double[] getStarX() {
         return starX;

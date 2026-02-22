@@ -12,21 +12,8 @@ import logic.util.ItemCounter;
 
 import java.util.*;
 
-/**
- * GameController — the "brain" of the main game world.
- * <p>
- * Responsibility: ALL game logic. Zero JavaFX drawing.
- * - Holds the world tile grid and stone objects
- * - Manages player position and movement
- * - Handles attacking and mining
- * - Runs monster AI
- * - Manages respawn queues for ores and monsters
- * - Tracks input state (held keys and mouse buttons)
- * - Notifies View about visual events via getters/flags
- */
 public class GameController {
 
-    // ── World constants ────────────────────────────────────────────────────────
     public static final int TILE_SIZE = 48;
     public static final int COLS = 20;
     public static final int ROWS = 15;
@@ -56,44 +43,38 @@ public class GameController {
     private static final long MON_RESPAWN_MIN = 1_000;
     private static final long MON_RESPAWN_MAX = 3_000;
 
-    // ── World data ─────────────────────────────────────────────────────────────
     private final int[][] world = new int[ROWS][COLS];
     private final Mineable[][] stoneObjects = new Mineable[ROWS][COLS];
 
-    // ── Entities ───────────────────────────────────────────────────────────────
     private final Player player;
     private final Pickaxe[] pickaxeHolder;
     private final List<MonsterEntity> monsters = new ArrayList<>();
 
-    // ── Floating damage/pickup texts (read by View for rendering) ─────────────
     private final List<FloatingText> floatingTexts = new ArrayList<>();
 
-    // ── Input state ────────────────────────────────────────────────────────────
     private final Set<KeyCode> keys = new HashSet<>();
-    // ── Respawn queues ─────────────────────────────────────────────────────────
-    // Ore queue: [row, col, tileType, respawnAtMs]
     private final List<long[]> oreRespawnQueue = new ArrayList<>();
-    // Monster queue: [monsterType, respawnAtMs]
+
     private final List<long[]> monsterRespawnQueue = new ArrayList<>();
     private final Random spawnRng = new Random();
     private boolean leftMouseDown = false;
     private boolean rightMouseDown = false;
-    // ── Player movement/animation state ───────────────────────────────────────
+
     private double playerX, playerY;
     private int facing = 2; // 0=up 1=left 2=down 3=right
     private int animFrame = 0;
     private long lastAnimTime = 0;
     private int playerInvincibleFrames = 0;
-    // ── Attack animation state ─────────────────────────────────────────────────
+
     private boolean isAttackAnim = false;
     private long attackAnimEndMs = 0;
     private long lastAttackTime = 0;
-    // ── Mining ────────────────────────────────────────────────────────────────
+
     private long lastMineTime = 0;
-    // ── Notification banner ────────────────────────────────────────────────────
+
     private String notifMsg = "";
     private long notifTime = 0;
-    // ── Game-ended flag ────────────────────────────────────────────────────────
+
     private boolean gameEnded = false;
 
     public GameController(Player player, Pickaxe pickaxe) {
@@ -104,8 +85,6 @@ public class GameController {
         this.playerX = 9 * TILE_SIZE;
         this.playerY = 7 * TILE_SIZE;
     }
-
-    // ── World generation ──────────────────────────────────────────────────────
 
     private void generateWorld() {
         Random rng = new Random(77);
@@ -198,13 +177,6 @@ public class GameController {
             }
     }
 
-    // ── Main update (called every frame) ─────────────────────────────────────
-
-    /**
-     * Main game-logic update.
-     * Call this every frame BEFORE rendering.
-     * Returns false if the game should end (player died).
-     */
     public boolean update(long nowNanos, AnimationTimer gameLoop) {
         if (gameEnded) return false;
 
@@ -234,8 +206,6 @@ public class GameController {
 
         return true;
     }
-
-    // ── Input handlers ────────────────────────────────────────────────────────
 
     private void handleMovement() {
         double dx = 0, dy = 0;
@@ -357,8 +327,6 @@ public class GameController {
         player.getInventory().add(new ItemCounter(item, 1));
     }
 
-    // ── Monster AI ────────────────────────────────────────────────────────────
-
     private void updateMonsters() {
         double aggroRange = TILE_SIZE * 5.0;
         double attackRange = TILE_SIZE * 1.2;
@@ -369,7 +337,6 @@ public class GameController {
             me.aggro = dist < aggroRange;
 
             if (me.aggro) {
-                // Chase player
                 double nx = playerX - me.x, ny = playerY - me.y;
                 double len = Math.max(1, Math.hypot(nx, ny));
                 double spd = 0.5 * (1 + me.type * 0.3);
@@ -379,12 +346,11 @@ public class GameController {
                 if (dist < attackRange && playerInvincibleFrames <= 0) {
                     me.monster.attack(player);
                     playerInvincibleFrames = 50;
-                    int dmg = Math.max(1, me.monster.getAttack() - player.getDefense());
+                    int dmg = Math.max(0, me.monster.getAttack() - player.getDefense());
                     floatingTexts.add(new FloatingText(playerX, playerY - 10, "-" + dmg + " HP",
                             javafx.scene.paint.Color.web("#ff1744"), 1200));
                 }
             } else {
-                // Wander randomly
                 me.moveTimer -= 1.0 / 60;
                 if (me.moveTimer <= 0) {
                     me.moveTimer = 1.5 + Math.random() * 2;
@@ -402,8 +368,6 @@ public class GameController {
         }
     }
 
-    // ── Respawn system ────────────────────────────────────────────────────────
-
     private void processRespawns(long nowMs) {
         int[] fullOrePool = {
                 T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK,
@@ -412,7 +376,6 @@ public class GameController {
                 T_PLATINUM, T_MITHRIL, T_VIBRANIUM
         };
 
-        // Ore respawns
         oreRespawnQueue.removeIf(entry -> {
             if (nowMs < entry[3]) return false;
             int r = (int) entry[0], c = (int) entry[1];
@@ -435,7 +398,6 @@ public class GameController {
             return true;
         });
 
-        // Monster respawns
         monsterRespawnQueue.removeIf(entry -> {
             if (nowMs < entry[1]) return false;
             int type = (int) entry[0];
@@ -459,12 +421,6 @@ public class GameController {
         });
     }
 
-    // ── Building interaction ──────────────────────────────────────────────────
-
-    /**
-     * Checks what building (if any) the player is standing next to.
-     * Returns a BuildingType enum so the caller (View/GameView) can open the right overlay.
-     */
     public BuildingType checkBuildingEntry() {
         int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
         int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
@@ -490,15 +446,11 @@ public class GameController {
         for (FloatingText ft : floatingTexts) ft.y += ft.vy;
     }
 
-    // ── Floating text cleanup ─────────────────────────────────────────────────
-
     private boolean canMoveTo(double nx, double ny) {
         int m = 5;
         return !isSolid(nx + m, ny + m) && !isSolid(nx + TILE_SIZE - m, ny + m)
                 && !isSolid(nx + m, ny + TILE_SIZE - m) && !isSolid(nx + TILE_SIZE - m, ny + TILE_SIZE - m);
     }
-
-    // ── Utility ───────────────────────────────────────────────────────────────
 
     public boolean isSolid(double px, double py) {
         int c = (int) (px / TILE_SIZE), r = (int) (py / TILE_SIZE);
@@ -515,9 +467,6 @@ public class GameController {
         return Math.hypot(x - playerX, y - playerY) < dist;
     }
 
-    /**
-     * Returns [row, col] of the tile the player is currently facing.
-     */
     public int[] facingTile() {
         int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
         int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
@@ -542,8 +491,6 @@ public class GameController {
         keys.add(key);
     }
 
-    // ── Input setters (called from View's event handlers) ─────────────────────
-
     public void keyReleased(KeyCode key) {
         keys.remove(key);
     }
@@ -559,8 +506,6 @@ public class GameController {
     public Player getPlayer() {
         return player;
     }
-
-    // ── Getters for View ──────────────────────────────────────────────────────
 
     public Pickaxe[] getPickaxeHolder() {
         return pickaxeHolder;
@@ -616,11 +561,6 @@ public class GameController {
 
     public enum BuildingType {NONE, SHOP, CRAFT, BOSS}
 
-    // ── Inner classes ─────────────────────────────────────────────────────────
-
-    /**
-     * Holds a monster instance along with its world position and AI state.
-     */
     public static class MonsterEntity {
         public Monster monster;
         public double x, y, moveTimer, dx, dy;
@@ -636,9 +576,6 @@ public class GameController {
         }
     }
 
-    /**
-     * A piece of text that floats upward and fades out over time.
-     */
     public static class FloatingText {
         public double x, y, vy;
         public String text;

@@ -8,41 +8,23 @@ import logic.util.ItemCounter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * BossController — the "brain" of the boss battle screen.
- * <p>
- * Responsibility: ALL combat logic, NO JavaFX/visual code.
- * - Manages which boss we're fighting (bossIndex)
- * - Tracks BattleState (whose turn it is)
- * - Executes player attack, heal, and enemy turn
- * - Maintains the combat log
- * - Exposes combat state so BossView can draw correctly
- */
 public class BossController {
 
-    // ── Battle state enum ─────────────────────────────────────────────────────
 
     private final Player player;
 
-    // ── Boss data (immutable) ─────────────────────────────────────────────────
-    // All three bosses — filled once, fought in order
     private final BossInfo[] bosses;
 
-    // ── Fields ────────────────────────────────────────────────────────────────
-    // Combat log — last 7 messages shown to player
     private final List<String> log = new ArrayList<>();
     private int bossIndex = 0;
     private Monster currentBoss;
     private String bossName;
     private Color bossColor;
     private BattleState state = BattleState.PLAYER_TURN;
-    // ── Animation trigger flags (read by BossView) ────────────────────────────
-    // These are set to true when an action happens, and the View resets them after
-    // playing the animation.
-    private boolean pendingAttackAnim = false; // player attacked → show slash sprite
-    private boolean pendingBossShake = false; // boss took damage → shake boss image
-    private boolean pendingPlayerShake = false; // player took damage → shake player
-    private long lastEnemyActionMs = 0;     // timestamp of last ENEMY_TURN entry
+    private boolean pendingAttackAnim = false;
+    private boolean pendingBossShake = false;
+    private boolean pendingPlayerShake = false;
+    private long lastEnemyActionMs = 0;
 
     public BossController(Player player) {
         this.player = player;
@@ -54,9 +36,6 @@ public class BossController {
         loadBoss(0);
     }
 
-    /**
-     * Switches to the boss at the given index and resets the log.
-     */
     public void loadBoss(int index) {
         bossIndex = index;
         BossInfo bi = bosses[index];
@@ -69,11 +48,6 @@ public class BossController {
                 + "  ATK: " + player.getAttack() + "  DEF: " + player.getDefense());
     }
 
-    /**
-     * Executes a player attack.
-     * Returns an ActionResult describing what happened.
-     * The View uses the result to play animations and enable/disable buttons.
-     */
     public ActionResult doPlayerAttack() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
 
@@ -110,16 +84,9 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
-    // ── Boss loading ──────────────────────────────────────────────────────────
-
-    /**
-     * Executes a player heal action.
-     * Uses the first potion in inventory, or falls back to rest if none found.
-     */
     public ActionResult doPlayerHeal() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
 
-        // Try to use a potion first
         for (ItemCounter ic : player.getInventory()) {
             if (ic.getItem() instanceof BasePotion pot) {
                 pot.consume(player);
@@ -134,7 +101,6 @@ public class BossController {
             }
         }
 
-        // No potions — just rest for a small heal
         int heal = Math.max(5, player.getMaxHealth() / 10);
         player.heal(heal);
         log.add("You rest briefly... +" + heal + " HP  ("
@@ -145,11 +111,6 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
-    // ── Player actions ────────────────────────────────────────────────────────
-
-    /**
-     * Executes the enemy's turn (called by the View's AnimationTimer after a delay).
-     */
     public ActionResult doEnemyTurn() {
         if (state != BattleState.ENEMY_TURN) return ActionResult.NONE;
 
@@ -158,7 +119,7 @@ public class BossController {
         if (crit) baseDmg = (int) (baseDmg * 1.6);
 
         currentBoss.attack(player);
-        int actualDmg = Math.max(1, baseDmg - player.getDefense());
+        int actualDmg = Math.max(0, baseDmg - player.getDefense());
         String suffix = crit ? " 💥CRIT!" : "";
         log.add(bossName + " attacks you for " + actualDmg + " dmg!" + suffix);
         log.add("Your HP: " + player.getHealth() + "/" + player.getMaxHealth());
@@ -177,9 +138,6 @@ public class BossController {
         return ActionResult.PLAYER_TURN;
     }
 
-    /**
-     * Advances to the next boss (called when the "Next Boss" button is pressed).
-     */
     public void advanceToNextBoss() {
         if (bossIndex + 1 < bosses.length) {
             loadBoss(bossIndex + 1);
@@ -194,8 +152,6 @@ public class BossController {
     public Monster getCurrentBoss() {
         return currentBoss;
     }
-
-    // ── Getters ───────────────────────────────────────────────────────────────
 
     public String getBossName() {
         return bossName;
@@ -229,7 +185,6 @@ public class BossController {
         return bossIndex + 1 < bosses.length;
     }
 
-    // Animation flags — View reads these, then calls clearXxxFlag() after animating
     public boolean isPendingAttackAnim() {
         return pendingAttackAnim;
     }
@@ -258,9 +213,6 @@ public class BossController {
         while (log.size() > 7) log.remove(0);
     }
 
-    /**
-     * Represents whose turn it is, or a terminal state.
-     */
     public enum BattleState {
         PLAYER_TURN,
         ENEMY_TURN,
@@ -269,12 +221,6 @@ public class BossController {
         ALL_CLEAR    // all bosses defeated
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    /**
-     * Describes what happened after an action — lets BossView update buttons/state
-     * without knowing any game logic itself.
-     */
     public enum ActionResult {
         NONE,           // action was ignored (wrong turn)
         ENEMY_TURN,     // player acted; it's now the enemy's turn
@@ -284,11 +230,6 @@ public class BossController {
         PLAYER_DEFEATED // player died — trigger game over screen
     }
 
-    // ── Action result enum ────────────────────────────────────────────────────
-
-    /**
-     * Holds the display name, monster instance, and accent colour for one boss.
-     */
     public record BossInfo(String name, Monster monster, Color color) {
     }
 }

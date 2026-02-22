@@ -17,21 +17,11 @@ import logic.util.ItemCounter;
 
 import java.util.List;
 
-/**
- * InventoryView — the "face" of the inventory screen.
- * <p>
- * Responsibility: ONLY layout and visual updates. No equip/pagination logic.
- * - Builds the inventory window VBox
- * - Renders item rows for the current page
- * - Wires buttons to InventoryController actions
- * - Calls refresh() to redraw when state changes
- */
 public class InventoryView {
 
     private final InventoryController controller;
     private final Runnable onClose;
 
-    // Live-update Text nodes — we hold references so refresh() can update them
     private VBox itemListBox;
     private Text goldText;
     private Text statText;
@@ -44,12 +34,9 @@ public class InventoryView {
         this.onClose = onClose;
     }
 
-    // ── Build ─────────────────────────────────────────────────────────────────
-
-    /**
-     * Creates and returns the full inventory overlay Pane.
-     * Must be called once before refresh() or update() can work.
-     */
+    // Assembles the foundational layout of the inventory window.
+    // This acts like building the physical dashboard of a car. You only do this once
+    // to put the dials and screens in place. Later methods will update what those dials actually say.
     public Pane build() {
         StackPane overlay = new StackPane();
         overlay.setPrefSize(960, 720);
@@ -68,12 +55,10 @@ public class InventoryView {
                         "-fx-border-width: 1.5;"
         );
 
-        // ── Title ─────────────────────────────────────────────────────────
         Text title = new Text("⚔  INVENTORY");
         title.setFill(Color.web("#f8f8f2"));
         title.setFont(Font.font("Georgia", FontWeight.BOLD, 26));
 
-        // ── Player stats (live-updated) ───────────────────────────────────
         goldText = new Text();
         goldText.setFill(Color.web("#ffd700"));
         goldText.setFont(Font.font("Arial", FontWeight.BOLD, 13));
@@ -86,7 +71,6 @@ public class InventoryView {
         equippedText.setFill(Color.web("#50fa7b"));
         equippedText.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
-        // ── Unequip buttons ───────────────────────────────────────────────
         HBox unequipRow = new HBox(10);
         unequipRow.setAlignment(Pos.CENTER);
 
@@ -103,11 +87,9 @@ public class InventoryView {
         });
         unequipRow.getChildren().addAll(unequipWeaponBtn, unequipArmorBtn);
 
-        // ── Item list area ─────────────────────────────────────────────────
         itemListBox = new VBox(5);
         itemListBox.setPrefHeight(InventoryController.ITEMS_PER_PAGE * 46.0);
 
-        // ── Pagination controls ────────────────────────────────────────────
         prevBtn = makeBtn("◀  Prev", "#44475a");
         nextBtn = makeBtn("Next  ▶", "#44475a");
         pageLabel = new Text("Page 1 / 1");
@@ -126,7 +108,6 @@ public class InventoryView {
         HBox pageRow = new HBox(16, prevBtn, pageLabel, nextBtn);
         pageRow.setAlignment(Pos.CENTER);
 
-        // ── Close button ───────────────────────────────────────────────────
         Button closeBtn = makeBtn("Close  [E]", "#ff5555");
         closeBtn.setOnAction(e -> onClose.run());
 
@@ -146,11 +127,9 @@ public class InventoryView {
         return overlay;
     }
 
-    // ── Live update (called every frame) ─────────────────────────────────────
-
-    /**
-     * Updates live stat text nodes without rebuilding the whole UI.
-     */
+    // Refreshes the simple text values (HP, Gold, currently equipped gear).
+    // This is like updating the digital numbers on a scoreboard. It doesn't tear down
+    // the stadium, it just changes the fast-moving data.
     public void update() {
         Player player = controller.getPlayer();
         goldText.setText("💰 Gold: " + player.getGold());
@@ -166,12 +145,9 @@ public class InventoryView {
         equippedText.setText("Equipped:  " + w + "   |   " + a);
     }
 
-    // ── Refresh (rebuild item list for current page) ───────────────────────────
-
-    /**
-     * Clears and rebuilds the item list for the current page.
-     * Called after any action that might change inventory (equip, use, page turn).
-     */
+    // Completely wipes the visible items and redraws them based on the current page.
+    // If you drink a potion or flip the page, this acts like wiping a whiteboard clean
+    // and re-writing the newly updated list from scratch so it stays perfectly accurate.
     public void refresh() {
         update();
         itemListBox.getChildren().clear();
@@ -189,7 +165,6 @@ public class InventoryView {
             return;
         }
 
-        // Update pagination controls
         int totalPages = controller.getTotalPages();
         controller.clampPage();
         int page = controller.getCurrentPage();
@@ -198,7 +173,6 @@ public class InventoryView {
         prevBtn.setDisable(page == 0);
         nextBtn.setDisable(page >= totalPages - 1);
 
-        // Render the visible page slice
         List<ItemCounter> pageItems = controller.getPageItems();
         int startIndex = page * InventoryController.ITEMS_PER_PAGE;
         for (int i = 0; i < pageItems.size(); i++) {
@@ -207,11 +181,6 @@ public class InventoryView {
         }
     }
 
-    // ── Row builder ───────────────────────────────────────────────────────────
-
-    /**
-     * Builds one row (HBox) for a single inventory slot.
-     */
     private HBox buildItemRow(ItemCounter counter, int rowNum, boolean even) {
         BaseItem item = counter.getItem();
 
@@ -224,12 +193,10 @@ public class InventoryView {
                         "-fx-padding: 4 12 4 12;"
         );
 
-        // Row number
         Text numLbl = new Text(String.format("%2d.", rowNum));
         numLbl.setFill(Color.web("#6272a4"));
         numLbl.setFont(Font.font("Arial", 11));
 
-        // Type icon — weapons get ⚔, armors get 🛡, potions get 🧪
         String icon = item instanceof BaseWeapon ? "⚔"
                 : item instanceof BaseArmor ? "🛡"
                 : item instanceof BasePotion ? "🧪"
@@ -237,7 +204,6 @@ public class InventoryView {
         Text iconLbl = new Text(icon);
         iconLbl.setFont(Font.font("Arial", 15));
 
-        // Name with stat suffix and count
         String suffix = controller.buildStatSuffix(item);
         Text nameLbl = new Text(item.getName() + suffix + "  ×" + counter.getCount());
         nameLbl.setFill(
@@ -248,7 +214,6 @@ public class InventoryView {
         );
         nameLbl.setFont(Font.font("Arial", FontWeight.BOLD, 12));
 
-        // Spacer pushes the action button to the right edge
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
 
@@ -258,10 +223,6 @@ public class InventoryView {
         return row;
     }
 
-    /**
-     * Appends the correct action button to the row based on item type.
-     * Potions get "Use", weapons/armors get "Equip"/"Equipped".
-     */
     private void addActionButton(HBox row, BaseItem item, ItemCounter counter) {
         if (item instanceof BasePotion potion) {
             Button useBtn = makeBtn("Use", "#50fa7b");
@@ -294,8 +255,6 @@ public class InventoryView {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private Button makeBtn(String text, String bgColor) {
         Button btn = new Button(text);
         btn.setPrefHeight(28);
@@ -309,7 +268,6 @@ public class InventoryView {
         return btn;
     }
 
-    // Overload without color (uses default teal)
     private Button makeBtn(String text) {
         return makeBtn(text, "#00acc1");
     }

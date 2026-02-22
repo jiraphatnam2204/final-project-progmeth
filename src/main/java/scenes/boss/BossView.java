@@ -21,29 +21,18 @@ import logic.pickaxe.Pickaxe;
 
 import java.util.Objects;
 
-/**
- * BossView — the "face" of the boss battle screen.
- * <p>
- * Responsibility: ALL JavaFX drawing and button management.
- * - Loads and draws boss/player sprite images
- * - Manages visual animation state (shake offsets, attack flash, animTime)
- * - Runs the AnimationTimer; calls BossController for logic at the right times
- * - Updates button visibility/enabled state based on controller results
- */
 public class BossView {
 
     private static final int W = SceneManager.W;
     private static final int H = SceneManager.H;
-    private static final long ANIM_DURATION = 600; // ms for attack flash
+    private static final long ANIM_DURATION = 600;
 
     private final BossController controller;
     private final Pickaxe[] pickaxeHolder;
 
-    // ── Sprites ───────────────────────────────────────────────────────────────
     private Image imgBoss1, imgBoss2, imgBoss3;
     private Image imgPlayerIdle, imgPlayerAttack;
 
-    // ── Visual-only animation state (no game logic here) ─────────────────────
     private double animTime = 0;    // continuously increases each frame
     private boolean showAttackAnim = false;
     private long attackAnimEndMs = 0;
@@ -52,7 +41,6 @@ public class BossView {
     private double playerShakeX = 0;
     private long lastPlayerShake = 0;
 
-    // ── Buttons ───────────────────────────────────────────────────────────────
     private Button attackBtn, healBtn, fleeBtn, nextBtn;
 
     public BossView(BossController controller, Pickaxe[] pickaxeHolder) {
@@ -60,8 +48,6 @@ public class BossView {
         this.pickaxeHolder = pickaxeHolder;
         loadImages();
     }
-
-    // ── Image loading ─────────────────────────────────────────────────────────
 
     private void loadImages() {
         imgBoss1 = new Image(Objects.requireNonNull(
@@ -84,17 +70,12 @@ public class BossView {
         }
     }
 
-    // ── Build ─────────────────────────────────────────────────────────────────
 
-    /**
-     * Builds and returns the complete boss-battle Scene.
-     */
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         Pane root = new Pane(canvas);
 
-        // ── Buttons ─────────────────────────────────────────────────────────
         attackBtn = makeBtn("⚔  Attack", "#c62828", "#ef5350");
         healBtn = makeBtn("💊  Heal", "#1b5e20", "#388e3c");
         fleeBtn = makeBtn("🏃  Flee", "#4a148c", "#7b1fa2");
@@ -110,7 +91,6 @@ public class BossView {
         nextBtn.setLayoutY(H - 90);
         nextBtn.setVisible(false);
 
-        // Button actions delegate to controller; View then reacts to ActionResult
         attackBtn.setOnAction(e -> handleAttack());
         healBtn.setOnAction(e -> handleHeal());
         fleeBtn.setOnAction(e -> Main.sceneManager.showGame(
@@ -119,7 +99,6 @@ public class BossView {
 
         root.getChildren().addAll(attackBtn, healBtn, fleeBtn, nextBtn);
 
-        // ── Animation loop ───────────────────────────────────────────────────
         new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -139,12 +118,10 @@ public class BossView {
         return new Scene(root, W, H);
     }
 
-    // ── Button handlers ───────────────────────────────────────────────────────
 
     private void handleAttack() {
         BossController.ActionResult result = controller.doPlayerAttack();
 
-        // Consume controller's animation flags
         if (controller.isPendingAttackAnim()) {
             showAttackAnim = true;
             attackAnimEndMs = System.currentTimeMillis() + ANIM_DURATION;
@@ -179,7 +156,6 @@ public class BossView {
     private void handleNextBoss() {
         if (controller.hasNextBoss()) {
             controller.advanceToNextBoss();
-            // Reset buttons to normal combat state
             nextBtn.setVisible(false);
             attackBtn.setVisible(true);
             healBtn.setVisible(true);
@@ -190,10 +166,6 @@ public class BossView {
         }
     }
 
-    /**
-     * Translates a controller ActionResult into button state changes.
-     * This is the key split: controller says WHAT happened, view decides HOW to show it.
-     */
     private void applyResult(BossController.ActionResult result) {
         switch (result) {
             case ENEMY_TURN -> setButtonsEnabled(false);
@@ -211,14 +183,12 @@ public class BossView {
                         Main.sceneManager.showGameOver(false, controller.getPlayer()));
             }
             default -> {
-            } // NONE — do nothing
+            }
         }
     }
 
-    // ── Visual state updates ──────────────────────────────────────────────────
 
     private void updateVisualState() {
-        // Clear shakes after 80 ms
         if (System.currentTimeMillis() - lastShakeTime > 80) bossShakeX = 0;
         if (System.currentTimeMillis() - lastPlayerShake > 80) playerShakeX = 0;
 
@@ -227,12 +197,9 @@ public class BossView {
             showAttackAnim = false;
     }
 
-    // ── Rendering ─────────────────────────────────────────────────────────────
-
     private void render(GraphicsContext gc) {
         Color bossColor = controller.getBossColor();
 
-        // Animated background gradient — centre colour tinted by boss colour
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0a0015")),
                 new Stop(0.5, bossColor.deriveColor(0, 0.3, 0.2, 1)),
@@ -240,12 +207,10 @@ public class BossView {
         gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
-        // Pulsing aura behind boss
         gc.setFill(bossColor.deriveColor(0, 0.5, 0.3, 0.06));
         double pulse = 1 + Math.sin(animTime * 1.5) * 0.04;
         gc.fillOval(W * 0.6 - 150 * pulse, H * 0.25 - 150 * pulse, 300 * pulse, 300 * pulse);
 
-        // Arena floor
         gc.setFill(Color.web("#1a0a0a", 0.6));
         gc.fillRect(0, H * 0.55, W, H * 0.45);
         gc.setStroke(Color.web("#3a1a1a", 0.5));
@@ -288,7 +253,6 @@ public class BossView {
         }
         gc.restore();
 
-        // Name plate
         double npX = W * 0.62 + 160 - 120;
         gc.setFill(Color.rgb(0, 0, 0, 0.7));
         gc.fillRoundRect(npX, H * 0.08, 240, 30, 8, 8);
@@ -303,13 +267,11 @@ public class BossView {
         double px = W * 0.06 + playerShakeX;
         double py = H * 0.12;
 
-        // Highlight glow when it's player's turn
         if (controller.getState() == BossController.BattleState.PLAYER_TURN) {
             gc.setFill(Color.rgb(100, 150, 255, 0.12));
             gc.fillOval(px - 30, py - 20, spriteW + 60, spriteH + 40);
         }
 
-        // Drop shadow
         gc.setFill(Color.rgb(0, 0, 0, 0.25));
         gc.fillOval(px + spriteW * 0.15, py + spriteH - 10, spriteW * 0.7, 20);
 
@@ -319,7 +281,6 @@ public class BossView {
         if (sprite != null && !sprite.isError()) {
             gc.drawImage(sprite, px, py, spriteW, spriteH);
 
-            // "YOU" name plate above player
             double plateW = 80, plateH = 30;
             double plateX = px + spriteW / 2.0 - plateW / 2.0;
             double plateY = py - 38;
@@ -386,7 +347,6 @@ public class BossView {
         gc.strokeRoundRect(lx, ly, lw, lh, 10, 10);
 
         for (int i = 0; i < log.size(); i++) {
-            // Older lines fade out; the latest line is bright and bold
             double a = 0.4 + 0.6 * ((i + 1.0) / log.size());
             boolean isLatest = (i == log.size() - 1);
             Color c = isLatest
@@ -421,8 +381,6 @@ public class BossView {
         gc.fillText(indicator, W / 2.0, H * 0.62 + 15);
         gc.setTextAlign(TextAlignment.LEFT);
     }
-
-    // ── Button helpers ────────────────────────────────────────────────────────
 
     private void setButtonsEnabled(boolean on) {
         attackBtn.setDisable(!on);

@@ -17,16 +17,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import logic.util.ItemCounter;
 
-/**
- * GameOverView — the "face" of the game-over / victory screen.
- * <p>
- * Responsibility: ONLY visual output.
- * - Draws the animated background (gradient + particles)
- * - Draws the big title ("VICTORY!" or "GAME OVER")
- * - Draws the final stats box
- * - Runs the AnimationTimer (which calls controller.updateParticles())
- * - Creates the Main Menu / Quit buttons
- */
 public class GameOverView {
 
     private static final int W = SceneManager.W;
@@ -38,17 +28,13 @@ public class GameOverView {
         this.controller = controller;
     }
 
-    // ── Build ─────────────────────────────────────────────────────────────────
-
-    /**
-     * Builds and returns the complete game-over Scene.
-     */
+    // Sets up the main Scene, acting like a stage crew preparing before the curtain opens.
+    // It creates the layout, places the buttons, and starts the infinite animation loop.
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         Pane root = new Pane(canvas);
 
-        // ── Buttons ─────────────────────────────────────────────────────────
         Button menuBtn = makeBtn("Main Menu", "#1565c0", "#1976d2");
         Button quitBtn = makeBtn("Quit", "#c62828", "#ef5350");
 
@@ -62,23 +48,25 @@ public class GameOverView {
 
         root.getChildren().addAll(menuBtn, quitBtn);
 
-        // ── Animation loop ───────────────────────────────────────────────────
+        // The AnimationTimer acts like a movie projector running at 60 frames per second.
+        // Every frame, it updates the math (particle positions) and tells the GraphicsContext
+        // to erase the old frame and paint the new one.
         new AnimationTimer() {
-            double t = 0; // time accumulator for bobbing/pulsing effects
+            double t = 0;
 
             @Override
             public void handle(long now) {
-                t += 1.0 / 60; // advance by one frame (~16ms at 60fps)
-                controller.updateParticles(); // logic handles position math
-                draw(gc, t);                  // view handles all drawing
+                t += 1.0 / 60;
+                controller.updateParticles();
+                draw(gc, t);
             }
         }.start();
 
         return new Scene(root, W, H);
     }
 
-    // ── Drawing ───────────────────────────────────────────────────────────────
-
+    // The traffic controller for drawing. It checks the game state to decide whether
+    // to paint the Victory screen or the Defeat screen, and always slaps the stats box on top.
     private void draw(GraphicsContext gc, double t) {
         if (controller.isWon()) {
             drawVictory(gc, t);
@@ -88,8 +76,8 @@ public class GameOverView {
         drawStatsBox(gc);
     }
 
+    // Draws the victory screen: a shiny gradient background, confetti particles, and glowing text.
     private void drawVictory(GraphicsContext gc, double t) {
-        // Dark golden background
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0d0800")),
                 new Stop(0.5, Color.web("#2a1800")),
@@ -97,7 +85,6 @@ public class GameOverView {
         gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
-        // Confetti particles — 3 alternating colours
         double[] px = controller.getPx();
         double[] py = controller.getPy();
         double[] pr = controller.getPr();
@@ -109,13 +96,15 @@ public class GameOverView {
             gc.fillOval(px[i], py[i], pr[i], pr[i]);
         }
 
-        // Bobbing title offset (Math.sin creates a smooth up-down wave)
+        // Math.sin() naturally loops between -1 and 1. Multiplying it scales that wave up,
+        // which makes the text "bob" up and down smoothly over time, like a boat on water.
         double bob = Math.sin(t * 2) * 8;
 
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFont(Font.font("Georgia", FontWeight.BOLD, 80));
 
-        // Glow shadow layers (drawn behind the main text)
+        // This loop draws the same text 10 times, getting slightly more transparent and offset
+        // each time. This creates a cheap but effective "glowing shadow" behind the real text.
         for (int d = 10; d >= 1; d--) {
             gc.setFill(Color.rgb(255, 200, 0, (5.0 * d) / 255.0));
             gc.fillText("🏆 VICTORY! 🏆", W / 2.0 + d, H * 0.28 + bob + d);
@@ -128,15 +117,14 @@ public class GameOverView {
         gc.fillText("All bosses defeated! The kingdom is saved!", W / 2.0, H * 0.42 + bob * 0.5);
     }
 
+    // Draws the defeat screen: a dark red gradient, falling ash particles, and red text.
     private void drawDefeat(GraphicsContext gc, double t) {
-        // Deep red background
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0a0000")),
                 new Stop(1, Color.web("#1a0000")));
         gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
-        // Falling ash particles
         double[] px = controller.getPx();
         double[] py = controller.getPy();
         double[] pr = controller.getPr();
@@ -151,7 +139,6 @@ public class GameOverView {
         gc.setTextAlign(TextAlignment.CENTER);
         gc.setFont(Font.font("Georgia", FontWeight.BOLD, 88));
 
-        // Red glow shadow layers
         for (int d = 8; d >= 1; d--) {
             gc.setFill(Color.rgb(200, 0, 0, (6.0 * d) / 255.0));
             gc.fillText("💀 GAME OVER 💀", W / 2.0 + d, H * 0.28 + bob + d);
@@ -164,9 +151,7 @@ public class GameOverView {
         gc.fillText("You were vanquished...", W / 2.0, H * 0.42);
     }
 
-    /**
-     * Draws the dark panel showing final HP, ATK, DEF, gold, and inventory.
-     */
+    // Renders a semi-transparent dark panel holding the player's final game data.
     private void drawStatsBox(GraphicsContext gc) {
         var player = controller.getPlayer();
 
@@ -198,11 +183,11 @@ public class GameOverView {
         }
         gc.fillText(inv.isEmpty() ? "(none)" : inv.toString(), W / 2.0, H * 0.50 + 96);
 
+        // Reset text alignment back to default so other drawing operations aren't messed up
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
-    // ── Helper ────────────────────────────────────────────────────────────────
-
+    // Helper method to create UI buttons and apply CSS styling (like hover effects) directly via code.
     private Button makeBtn(String text, String bg, String hover) {
         Button b = new Button(text);
         b.setPrefWidth(130);
