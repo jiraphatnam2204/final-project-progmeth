@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -35,6 +36,11 @@ public class MainMenuScene {
     private final double[] starSpd = new double[120];  // falling speed
     private final double[] starR   = new double[120];  // radius
 
+    // ── Logo image ───────────────────────────────────────────────────
+    // We load it ONCE here, not inside the animation loop.
+    // Think of it like loading a photo into RAM once, then just displaying it every frame.
+    private final Image logo;
+
     public MainMenuScene() {
         Random rng = new Random();
         for (int i = 0; i < 120; i++) {
@@ -43,6 +49,16 @@ public class MainMenuScene {
             starSpd[i] = 0.3 + rng.nextDouble() * 0.8;
             starR[i]   = 1 + rng.nextDouble() * 2;
         }
+
+        // Load the logo — falls back to null safely if the file is missing
+        Image loaded = null;
+        try {
+            var stream = getClass().getResourceAsStream("/images/logo.png");
+            if (stream != null) loaded = new Image(stream);
+        } catch (Exception e) {
+            System.out.println("Logo not found — skipping logo draw.");
+        }
+        this.logo = loaded;
     }
 
     public Scene build() {
@@ -50,22 +66,20 @@ public class MainMenuScene {
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         // --- Buttons overlay (JavaFX nodes on top of canvas) ---
-        Button startBtn  = makeButton("▶   NEW GAME",    "#43a047", "#66bb6a");
-        Button quitBtn   = makeButton("✕   QUIT",        "#c62828", "#ef5350");
+        Button startBtn  = makeButton("PLAY GAME",    "#43a047", "#66bb6a");
+        Button quitBtn   = makeButton("QUIT",        "#c62828", "#ef5350");
 
         startBtn.setOnAction(e -> {
             // ── TEST MODE: generous starting resources ──
-            Player player = new Player(99999, 20, 9999); // 99999 HP + 9999 DEF = effectively invincible
-            player.setGold(9999);   // plenty of gold to buy/craft anything
+            Player player = new Player(99999, 20, 9999);
+            player.setGold(999999);
 
-            // Pre-fill inventory with crafting materials
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.NormalStone(), 30));
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.HardStone(),   20));
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Iron(),        20));
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Platinum(),    15));
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(),     15));
 
-            // Start with a strong pickaxe so mining is fast
             Pickaxe[] pickaxeHolder = { Pickaxe.createIronPickaxe() };
             Main.sceneManager.showGame(player, pickaxeHolder[0]);
         });
@@ -135,18 +149,21 @@ public class MainMenuScene {
         // Title text with bob animation
         double bobY = Math.sin(titleBob) * 6;
 
+        // ── Draw the logo above the title ────────────────────────────
+        // The logo bobs up and down at the same rhythm as the title text.
+        drawLogo(gc, bobY);
+
         // Outer glow
-        gc.setFill(Color.rgb(255, 200, 50, 0.15));
-        gc.setFont(Font.font("Georgia", FontWeight.BOLD, 76));
+        gc.setFont(Font.font("Georgia", FontWeight.BOLD, 52));
         gc.setTextAlign(TextAlignment.CENTER);
         for (int d = 8; d >= 1; d--) {
             gc.setFill(Color.rgb(255, 160, 0, 0.04 * d));
-            gc.fillText("⚔ Mining RPG ⚔", W / 2.0 + d, H * 0.28 + bobY + d);
+            gc.fillText("Tanjiro: The Swordsmith", W / 2.0 + d, H * 0.38 + bobY + d);
         }
 
         // Title shadow
         gc.setFill(Color.web("#3a1a00"));
-        gc.fillText("⚔ Mining RPG ⚔", W / 2.0 + 4, H * 0.28 + bobY + 4);
+        gc.fillText("Tanjiro: The Swordsmith", W / 2.0 + 4, H * 0.38 + bobY + 4);
 
         // Title main
         LinearGradient titleGrad = new LinearGradient(0, 0.2, 0, 0.8, true, CycleMethod.NO_CYCLE,
@@ -154,17 +171,63 @@ public class MainMenuScene {
                 new Stop(0.5, Color.web("#ff8c00")),
                 new Stop(1, Color.web("#ffd700")));
         gc.setFill(titleGrad);
-        gc.fillText("⚔ Mining RPG ⚔", W / 2.0, H * 0.28 + bobY);
+        gc.fillText("Tanjiro: The Swordsmith", W / 2.0, H * 0.38 + bobY);
 
         // Subtitle
         gc.setFont(Font.font("Georgia", 22));
         gc.setFill(Color.rgb(180, 210, 255, 0.85));
-        gc.fillText("Mine. Craft. Fight. Survive.", W / 2.0, H * 0.38 + bobY * 0.5);
+        gc.fillText("Mine, Craft, Fight, Survive", W / 2.0, H * 0.47 + bobY * 0.5);
 
         // Instructions
         gc.setFont(Font.font("Arial", 13));
         gc.setFill(Color.rgb(140, 160, 180, 0.7));
-        gc.fillText("WASD: Move   |   E: Mine   |   F: Attack   |   TAB: Map/Menu", W / 2.0, H * 0.90);
+        gc.fillText("WASD: Move   |   E: Inventory   |   LMB: Attack   |   RMB: Mine   ", W / 2.0, H * 0.90);
+    }
+
+    /**
+     * Draws the circular logo centered above the title.
+     *
+     * How the circular clip works:
+     *   1. gc.save()            → save the current drawing state (like saving your game)
+     *   2. beginPath() + arc()  → trace an invisible circle path
+     *   3. clip()               → anything drawn after this is ONLY visible inside that circle
+     *   4. drawImage()          → draw the logo; only the circular region shows
+     *   5. gc.restore()         → undo the clip so future drawing isn't affected
+     *
+     * After restoring, we draw the golden ring on top as decoration.
+     */
+    private void drawLogo(GraphicsContext gc, double bobY) {
+        if (logo == null || logo.isError()) return; // skip if image failed to load
+
+        double logoSize = 175;                        // diameter of the circle
+        double cx = W / 2.0;                         // center X
+        double cy = H * 0.15 + bobY;                 // center Y — sits above the title
+
+        // ── Outer golden glow ring (drawn first so it appears behind the logo) ──
+        gc.setFill(Color.rgb(255, 200, 50, 0.18));
+        gc.fillOval(cx - logoSize / 2.0 - 12, cy - logoSize / 2.0 - 12,
+                logoSize + 24, logoSize + 24);
+
+        // ── Clip to a circle, then draw the image inside it ──────────
+        gc.save();                            // remember current drawing state
+        gc.beginPath();
+        gc.arc(cx, cy, logoSize / 2.0, logoSize / 2.0, 0, 360); // trace the circle
+        gc.closePath();
+        gc.clip();                            // restrict future drawing to this circle
+
+        // Draw the logo image centred on (cx, cy)
+        gc.drawImage(logo,
+                cx - logoSize / 2.0,          // top-left X
+                cy - logoSize / 2.0,          // top-left Y
+                logoSize, logoSize);           // width, height
+
+        gc.restore();                         // remove the clip — back to normal drawing
+
+        // ── Golden decorative ring drawn on top of the logo ──────────
+        gc.setStroke(Color.web("#ffd700"));
+        gc.setLineWidth(3);
+        gc.strokeOval(cx - logoSize / 2.0, cy - logoSize / 2.0, logoSize, logoSize);
+        gc.setLineWidth(1); // reset line width so other shapes aren't affected
     }
 
     private void drawTorch(GraphicsContext gc, double x, double y, double t) {

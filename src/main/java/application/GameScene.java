@@ -82,6 +82,15 @@ public class GameScene {
     private Image imgEasyMonster;
     private Image imgMediumMonster;
     private Image imgHardMonster;
+
+    // ── Player sprite images ─────────────────────────────────────────────────────
+    // Index matches the 'facing' variable: 0=up, 1=left, 2=down, 3=right
+    private final Image[] playerWalkImgs  = new Image[4];   // walk frames per direction
+    private final Image[] playerSlashImgs = new Image[4];   // slash frames per direction
+
+    // Track whether the slash animation is currently playing
+    private boolean isAttackAnim    = false;
+    private long    attackAnimEndMs = 0;     // timestamp when slash image should stop showing
     // ── Monsters ────────────────────────────────────────────────────────────────
     /** Holds a live monster instance plus its pixel position on the map */
     private static class MonsterEntity {
@@ -141,11 +150,43 @@ public class GameScene {
         imgEasyMonster   = new Image(getClass().getResourceAsStream("/images/Rui.png"));
         imgMediumMonster = new Image(getClass().getResourceAsStream("/images/Enmu.png"));
         imgHardMonster   = new Image(getClass().getResourceAsStream("/images/Daki.png"));
+
+        // ── Load player sprites ──────────────────────────────────────────────────
+        // File names must match exactly — place them in src/main/resources/images/
+        // Walk images: shown while the player is moving
+        // Slash images: shown briefly (600ms) when the player attacks
+        //
+        // The array index matches the 'facing' variable:
+        //   [0] = facing UP    → player_walk_up.png  / player_slash_up.png
+        //   [1] = facing LEFT  → player_walk_left.png / player_slash_left.png
+        //   [2] = facing DOWN  → player_walk_down.png / player_slash_down.png
+        //   [3] = facing RIGHT → player_walk_right.png / player_slash_right.png
+        String[] dirs = {"up", "left", "down", "right"};
+        for (int i = 0; i < 4; i++) {
+            playerWalkImgs[i]  = loadImage("/images/player_walk_"  + dirs[i] + ".png");
+            playerSlashImgs[i] = loadImage("/images/player_slash_" + dirs[i] + ".png");
+        }
         generateWorld();
         spawnMonsters();
         // Start player near centre, on the path
         this.playerX = 9 * TILE_SIZE;
         this.playerY = 7 * TILE_SIZE;
+    }
+
+    /**
+     * Safely loads an image from the resources folder.
+     * Returns null if the file doesn't exist — drawPlayer() will fall back
+     * to the old shape-drawn character automatically.
+     */
+    private Image loadImage(String resourcePath) {
+        try {
+            var stream = getClass().getResourceAsStream(resourcePath);
+            if (stream == null) return null;          // file not found — no crash
+            return new Image(stream);
+        } catch (Exception e) {
+            System.out.println("Could not load image: " + resourcePath);
+            return null;
+        }
     }
 
     // ══════════════════════════════════════════════════════════════════
@@ -222,7 +263,7 @@ public class GameScene {
     private void spawnMonsters() {
         Random rng = new Random(55);
         // Spread monsters around the map, avoiding player start area
-        int[][] specs = {{0,2},{1,1},{2,1}};  // {type, count} — reduced for testing
+        int[][] specs = {{0,1},{1,1},{2,1}};  // {type, count}
         for (int[] spec : specs) {
             for (int i = 0; i < spec[1]; i++) {
                 double mx, my;
@@ -331,6 +372,11 @@ public class GameScene {
 
 
         if (playerInvincibleFrames > 0) playerInvincibleFrames--;
+
+        // Turn off the slash animation once its time is up
+        if (isAttackAnim && System.currentTimeMillis() > attackAnimEndMs) {
+            isAttackAnim = false;
+        }
     }
 
     private void handleMovement() {
@@ -404,6 +450,13 @@ public class GameScene {
         long nowMs = nowNanos/1_000_000;
         if (nowMs - lastAttackTime < ATTACK_COOLDOWN) return;
         lastAttackTime = nowMs;
+
+        // Show the slash sprite image for the full attack cooldown duration.
+        // IMPORTANT: use System.currentTimeMillis() here, NOT nowMs.
+        // nowMs = nowNanos/1_000_000 comes from System.nanoTime() which has a
+        // different origin than System.currentTimeMillis(), so they can't be mixed.
+        isAttackAnim    = true;
+        attackAnimEndMs = System.currentTimeMillis() + ATTACK_COOLDOWN;
 
         // Attack all monsters within melee range
         double range = TILE_SIZE * 1.6;
@@ -708,50 +761,70 @@ public class GameScene {
 
     // ── Player ────────────────────────────────────────────────────────
     private void drawPlayer(GraphicsContext gc) {
-        double px=playerX, py=playerY;
-        boolean moving = keys.stream().anyMatch(k->
-                k==KeyCode.W||k==KeyCode.A||k==KeyCode.S||k==KeyCode.D||
-                        k==KeyCode.UP||k==KeyCode.DOWN||k==KeyCode.LEFT||k==KeyCode.RIGHT);
-        int legBob = (moving && animFrame%2==0) ? 2 : 0;
+        double px = playerX, py = playerY;
 
-        // Invincibility flash
-        if (playerInvincibleFrames > 0 && animFrame%2==0) return;
+        // Invincibility flash: skip every other frame so the player blinks
+        if (playerInvincibleFrames > 0 && animFrame % 2 == 0) return;
+
+        // ── Try to draw a sprite image first ────────────────────────
+        // Pick the right array: slash image when attacking, walk image otherwise
+        Image[] spriteSet = isAttackAnim ? playerSlashImgs : playerWalkImgs;
+        Image   sprite    = spriteSet[facing];   // facing: 0=up 1=left 2=down 3=right
+
+        if (sprite != null && !sprite.isError()) {
+            // Shadow underneath the sprite
+            gc.setFill(Color.rgb(0, 0, 0, 0.25));
+            gc.fillOval(px + 8, py + 38, 32, 10);
+
+            // Draw the sprite image scaled to one tile size (48×48)
+            gc.drawImage(sprite, px, py, TILE_SIZE, TILE_SIZE);
+
+            // We're done — no need for the old shape code below
+            return;
+        }
+
+        // ── Fallback: draw the old shape-based character ─────────────
+        // This runs automatically if any image file is missing.
+        boolean moving = keys.stream().anyMatch(k ->
+                k == KeyCode.W || k == KeyCode.A || k == KeyCode.S || k == KeyCode.D ||
+                        k == KeyCode.UP || k == KeyCode.DOWN || k == KeyCode.LEFT || k == KeyCode.RIGHT);
+        int legBob = (moving && animFrame % 2 == 0) ? 2 : 0;
 
         // Shadow
-        gc.setFill(Color.rgb(0,0,0,0.25)); gc.fillOval(px+8,py+38,32,10);
+        gc.setFill(Color.rgb(0, 0, 0, 0.25)); gc.fillOval(px+8, py+38, 32, 10);
 
         // Legs
         gc.setFill(Color.web("#4e342e"));
-        gc.fillRoundRect(px+12,py+34+legBob, 10,10,4,4);
-        gc.fillRoundRect(px+26,py+34-legBob, 10,10,4,4);
+        gc.fillRoundRect(px+12, py+34+legBob, 10, 10, 4, 4);
+        gc.fillRoundRect(px+26, py+34-legBob, 10, 10, 4, 4);
 
         // Cape / cloak
         gc.setFill(Color.web("#880e4f"));
-        gc.fillRoundRect(px+10,py+18,28,22,5,5);
+        gc.fillRoundRect(px+10, py+18, 28, 22, 5, 5);
 
         // Body (armour)
         gc.setFill(Color.web("#1565c0"));
-        gc.fillRoundRect(px+12,py+20,24,18,5,5);
+        gc.fillRoundRect(px+12, py+20, 24, 18, 5, 5);
 
         // Head
         gc.setFill(Color.web("#ffcc80"));
-        gc.fillOval(px+14,py+6,20,20);
+        gc.fillOval(px+14, py+6, 20, 20);
 
         // Hair
         gc.setFill(Color.web("#4e342e"));
-        gc.fillRect(px+14,py+6,20,8);
+        gc.fillRect(px+14, py+6, 20, 8);
 
         // Eyes
         gc.setFill(Color.web("#1a237e"));
-        switch(facing) {
-            case 2 -> { gc.fillOval(px+18,py+14,4,4); gc.fillOval(px+26,py+14,4,4); }
-            case 0 -> { gc.setFill(Color.web("#c49a5a")); gc.fillRect(px+14,py+6,20,12); }
-            case 1 -> gc.fillOval(px+15,py+14,4,4);
-            case 3 -> gc.fillOval(px+29,py+14,4,4);
+        switch (facing) {
+            case 2 -> { gc.fillOval(px+18, py+14, 4, 4); gc.fillOval(px+26, py+14, 4, 4); }
+            case 0 -> { gc.setFill(Color.web("#c49a5a")); gc.fillRect(px+14, py+6, 20, 12); }
+            case 1 -> gc.fillOval(px+15, py+14, 4, 4);
+            case 3 -> gc.fillOval(px+29, py+14, 4, 4);
         }
 
-        // Sword (equipped weapon glow)
-        boolean attacking = keys.contains(KeyCode.F)||keys.contains(KeyCode.Z);
+        // Sword
+        boolean attacking = isAttackAnim || keys.contains(KeyCode.F) || keys.contains(KeyCode.Z);
         drawSword(gc, px, py, attacking);
     }
 
@@ -801,20 +874,20 @@ public class GameScene {
         gc.setFill(hpPct>0.5?Color.web("#e53935"):hpPct>0.25?Color.ORANGE:Color.RED);
         gc.fillRoundRect(10,8,170*hpPct,16,5,5);
         gc.setFill(Color.WHITE); gc.setFont(Font.font("Arial",FontWeight.BOLD,11));
-        gc.fillText("❤  "+player.getHealth()+" / "+player.getMaxHealth(), 14, 21);
+        gc.fillText("HP: "+player.getHealth()+" / "+player.getMaxHealth(), 14, 21);
 
         // Attack stat
         gc.setFill(Color.web("#ff8a65"));
-        gc.fillText("⚔ ATK: "+player.getAttack(), 14, 42);
+        gc.fillText("ATK: "+player.getAttack(), 14, 42);
 
         // Defense stat
         gc.setFill(Color.web("#90caf9"));
-        gc.fillText("🛡 DEF: "+player.getDefense(), 80, 42);
+        gc.fillText("DEF: "+player.getDefense(), 80, 42);
 
         // Gold
         gc.setFill(Color.web("#ffd700"));
         gc.setFont(Font.font("Arial",FontWeight.BOLD,13));
-        gc.fillText("💰 "+player.getGold()+"g", 200, 23);
+        gc.fillText("GOLD: "+player.getGold()+"g", 200, 23);
 
         // Pickaxe
         gc.setFill(Color.web("#b0bec5")); gc.setFont(Font.font("Arial",11));
@@ -824,7 +897,7 @@ public class GameScene {
         long alive = monsters.stream().filter(me->me.monster.isAlive()).count();
         gc.setFill(alive==0?Color.LIMEGREEN:Color.web("#ff8a80"));
         gc.setFont(Font.font("Arial",FontWeight.BOLD,11));
-        gc.fillText("👾 Monsters: "+alive, W-150, 23);
+        gc.fillText("Monsters: "+alive, W-150, 23);
         if (alive == 0) gc.fillText("✓ Area clear!", W-150, 42);
 
         // Inventory panel (bottom-left)
@@ -850,7 +923,7 @@ public class GameScene {
         gc.setFill(Color.web("#80cbc4")); gc.setFont(Font.font("Arial",FontWeight.BOLD,11));
         gc.fillText("CONTROLS", W-180, H-100);
         gc.setFill(Color.WHITE); gc.setFont(Font.font("Arial",10));
-        String[] lines={"WASD/↑↓←→  Move","E/Space     Mine rock","F/Z         Attack","ENTER       Enter building","(yellow border = mine target)","(cyan border = enter building)"};
+        String[] lines={"WASD-Move","E-Enter building","LMB-Attack","RMB-Mine","(yellow border = mine target)","(cyan border = enter building)"};
         for (int i=0;i<lines.length;i++) gc.fillText(lines[i], W-180, H-86+i*14);
 
         // Notification bar

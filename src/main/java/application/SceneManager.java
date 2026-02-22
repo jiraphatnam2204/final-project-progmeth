@@ -1,6 +1,5 @@
 package application;
 
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import logic.creatures.Player;
 import logic.pickaxe.Pickaxe;
@@ -29,12 +28,14 @@ public class SceneManager {
 
     /** Show the main menu */
     public void showMainMenu() {
+        AudioManager.playBGM("/sounds/menu.mp3",  0.1);
         MainMenuScene menu = new MainMenuScene();
         stage.setScene(menu.build());
     }
 
     /** Show the overworld (mining + monsters) */
     public void showGame(Player player, Pickaxe pickaxe) {
+        AudioManager.playBGM("/sounds/bgm.mp3",   0.1);
         GameScene game = new GameScene(player, pickaxe);
         stage.setScene(game.buildScene());
     }
@@ -43,12 +44,14 @@ public class SceneManager {
 
     /** Show the boss room */
     public void showBossRoom(Player player, Pickaxe[] pickaxeHolder) {
+        AudioManager.playBGM("/sounds/boss.mp3", 0.02);
         BossScene boss = new BossScene(player, pickaxeHolder);
         stage.setScene(boss.build());
     }
 
     /** Show the game-over / victory screen */
     public void showGameOver(boolean won, Player player) {
+        AudioManager.playBGM("/sounds/boss.mp3", 0.02);
         GameOverScene over = new GameOverScene(won, player);
         stage.setScene(over.build());
     }

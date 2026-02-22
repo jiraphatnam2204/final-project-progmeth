@@ -49,9 +49,9 @@ public class BossScene {
     // ── Boss definitions ─────────────────────────────────────────────
     private record BossInfo(String name, Monster monster, Color color, String emoji) {}
     private final BossInfo[] bosses = {
-        new BossInfo("Goblin King",   new EasyMonster(),  Color.web("#66bb6a"), "👺"),
-        new BossInfo("Orc Warlord",   new MediumMonster(),Color.web("#ce93d8"), "👹"),
-        new BossInfo("The Dragon",    new HardMonster(),  Color.web("#ef5350"), "🐉"),
+            new BossInfo("Akaza",   new EasyMonster(),  Color.web("#66bb6a"), "👺"),
+            new BossInfo("Kokushibo",   new MediumMonster(),Color.web("#ce93d8"), "👹"),
+            new BossInfo("Muzan",    new HardMonster(),  Color.web("#ef5350"), "🐉"),
     };
 
     private int    bossIndex   = 0;     // which boss we're fighting
@@ -61,6 +61,18 @@ public class BossScene {
     private String  bossEmoji;
 
     private Image imgBoss1, imgBoss2, imgBoss3;
+
+    // ── Player sprite images ─────────────────────────────────────────────────────
+    // player_idle.png   → shown when waiting for your turn / enemy's turn
+    // player_attack.png → shown briefly when you click Attack
+    // Place both in: src/main/resources/images/
+    private Image imgPlayerIdle;
+    private Image imgPlayerAttack;
+
+    // Controls how long the attack image stays visible after clicking Attack
+    private boolean showAttackAnim    = false;
+    private long    attackAnimEndMs   = 0;
+    private static final long ANIM_DURATION = 600; // ms
 
     // ── Battle state ─────────────────────────────────────────────────
     private enum BattleState { PLAYER_TURN, ENEMY_TURN, VICTORY, DEFEAT, ALL_CLEAR }
@@ -83,7 +95,27 @@ public class BossScene {
         imgBoss1 = new Image(getClass().getResourceAsStream("/images/Akaza.png"));
         imgBoss2 = new Image(getClass().getResourceAsStream("/images/Kokushibo.png"));
         imgBoss3 = new Image(getClass().getResourceAsStream("/images/Muzan.png"));
+
+        // Load player sprites — won't crash if the file is missing (falls back to shapes)
+        imgPlayerIdle   = loadImage("/images/player_idle.png");
+        imgPlayerAttack = loadImage("/images/player_slash_right.png");
         loadBoss(0);
+    }
+
+    /**
+     * Safely loads an image from the resources' folder.
+     * Returns null if the file doesn't exist — drawPlayerChar() will fall back
+     * to the old shape-drawn character automatically. No crash.
+     */
+    private Image loadImage(String path) {
+        try {
+            var stream = getClass().getResourceAsStream(path);
+            if (stream == null) return null;
+            return new Image(stream);
+        } catch (Exception e) {
+            System.out.println("Could not load image: " + path);
+            return null;
+        }
     }
 
     private void loadBoss(int index) {
@@ -144,6 +176,11 @@ public class BossScene {
                 if (System.currentTimeMillis() - lastShakeTime > 80) bossShakeX = 0;
                 if (System.currentTimeMillis() - lastPlayerShake > 80) playerShakeX = 0;
 
+                // Turn off attack image once its duration is over
+                if (showAttackAnim && System.currentTimeMillis() > attackAnimEndMs) {
+                    showAttackAnim = false;
+                }
+
                 // Enemy turn: wait 1 second, then act
                 if (state == BattleState.ENEMY_TURN
                         && System.currentTimeMillis() - lastActionTime > 900) {
@@ -165,6 +202,10 @@ public class BossScene {
         player.attack(currentBoss);
         int dmg = Math.max(1, player.getAttack() - currentBoss.getDefense());
         log.add("You hit " + bossName + " for " + dmg + " dmg!");
+
+        // Show attack image for ANIM_DURATION ms
+        showAttackAnim  = true;
+        attackAnimEndMs = System.currentTimeMillis() + ANIM_DURATION;
 
         // Boss recoil shake
         bossShakeX = 8; lastShakeTime = System.currentTimeMillis();
@@ -266,9 +307,9 @@ public class BossScene {
     private void render(GraphicsContext gc) {
         // Background — dramatic dark gradient
         LinearGradient bg = new LinearGradient(0,0,0,1,true,CycleMethod.NO_CYCLE,
-            new Stop(0, Color.web("#0a0015")),
-            new Stop(0.5, bossColor.deriveColor(0,0.3,0.2,1)),
-            new Stop(1, Color.web("#0a0015")));
+                new Stop(0, Color.web("#0a0015")),
+                new Stop(0.5, bossColor.deriveColor(0,0.3,0.2,1)),
+                new Stop(1, Color.web("#0a0015")));
         gc.setFill(bg); gc.fillRect(0,0,W,H);
 
         // Atmospheric circles
@@ -300,9 +341,10 @@ public class BossScene {
         gc.scale(scale, scale);
         gc.translate(-100, -140);
 
-        // Boss glow aura
+        // Boss glow aura — sized to wrap the 280×280 boss image
+        // 20px padding each side → starts at (-20, -20), size (320, 320)
         gc.setFill(bossColor.deriveColor(0,1,1,0.15));
-        gc.fillOval(-30, -20, 260, 320);
+        gc.fillOval(-30, -30, 390, 390);
 
         double alpha = currentBoss.isAlive() ? 1.0 : 0.3;
 
@@ -313,7 +355,7 @@ public class BossScene {
         };
         if (img != null && !img.isError()) {
             gc.setGlobalAlpha(alpha);          // fades out when boss dies
-            gc.drawImage(img, 0, 0, 280, 280); // x=0, y=0, width=200, height=280
+            gc.drawImage(img, 0, 0, 320, 320); // x=0, y=0, width=200, height=280
             gc.setGlobalAlpha(1.0);            // reset transparency back to normal
         }
         gc.restore();
@@ -404,61 +446,123 @@ public class BossScene {
         gc.fillRect(50,260,30,10); gc.fillRect(120,260,30,10);
     }
 
-    /** Draw the player on the left side */
+    /** Draw the player on the left side — scaled up for battle visibility */
     private void drawPlayerChar(GraphicsContext gc) {
-        double px = W * 0.10 + playerShakeX;
-        double py = H * 0.22;
+        // ── Sizing constants ──────────────────────────────────────────
+        // Change these two numbers to resize the whole player at once.
+        double spriteW = 240;   // was 120 → now 1.5× bigger
+        double spriteH = 320;   // was 160 → now 1.5× bigger
 
-        // Glow when it's player's turn
+        // Position: centred in the left third of the screen
+        double px = W * 0.06 + playerShakeX;
+        double py = H * 0.12;
+
+        // ── Glow — sized to wrap the actual sprite ────────────────────
+        // We add some padding (30px each side) so the glow sits just
+        // outside the character, like a soft aura.
         if (state == BattleState.PLAYER_TURN) {
-            gc.setFill(Color.rgb(100,150,255,0.12));
-            gc.fillOval(px-20, py-10, 160, 220);
+            gc.setFill(Color.rgb(100, 150, 255, 0.12));
+            gc.fillOval(px - 30, py - 20, spriteW + 60, spriteH + 40);
         }
 
-        // Shadow
-        gc.setFill(Color.rgb(0,0,0,0.25)); gc.fillOval(px+20,py+155,80,20);
+        // ── Shadow — sits right at the sprite's feet ──────────────────
+        gc.setFill(Color.rgb(0, 0, 0, 0.25));
+        gc.fillOval(px + spriteW * 0.15, py + spriteH - 10, spriteW * 0.7, 20);
 
-        // Player body (larger battle sprite)
-        gc.setFill(Color.web("#880e4f")); gc.fillRoundRect(px+30,py+70,60,55,10,10); // cape
-        gc.setFill(Color.web("#1565c0")); gc.fillRoundRect(px+35,py+75,50,45,8,8);  // armor
-        gc.setFill(Color.web("#4e342e")); gc.fillRect(px+35,py+118,20,30); gc.fillRect(px+65,py+118,20,30); // legs
+        // ── Try to draw a sprite image ────────────────────────────────
+        Image sprite = (showAttackAnim && imgPlayerAttack != null && !imgPlayerAttack.isError())
+                ? imgPlayerAttack
+                : imgPlayerIdle;
+
+        if (sprite != null && !sprite.isError()) {
+            gc.drawImage(sprite, px, py, spriteW, spriteH);
+
+            // "YOU" label centred above the sprite
+            gc.setFill(Color.web("#80cbc4"));
+            gc.setFont(Font.font("Arial", FontWeight.BOLD, 14));
+            gc.setTextAlign(TextAlignment.CENTER);
+            gc.fillText("YOU", px + spriteW / 2.0, py - 8);
+            gc.setTextAlign(TextAlignment.LEFT);
+            return;
+        }
+
+        // ── Fallback: shape-drawn character (scaled up) ───────────────
+        // All coordinates are relative to (px, py) and scaled to spriteW/spriteH
+        // so changing the two constants above resizes everything together.
+        double sx = spriteW / 180.0;   // horizontal scale factor
+        double sy = spriteH / 240.0;   // vertical scale factor
+
+        // Cape / cloak
+        gc.setFill(Color.web("#880e4f"));
+        gc.fillRoundRect(px + 30*sx, py + 80*sy, 120*sx, 100*sy, 14, 14);
+
+        // Body (armour)
+        gc.setFill(Color.web("#1565c0"));
+        gc.fillRoundRect(px + 40*sx, py + 90*sy, 100*sx, 80*sy, 10, 10);
+
+        // Legs
+        gc.setFill(Color.web("#4e342e"));
+        gc.fillRoundRect(px + 45*sx, py + 168*sy, 35*sx, 55*sy, 6, 6);
+        gc.fillRoundRect(px + 100*sx, py + 168*sy, 35*sx, 55*sy, 6, 6);
+
+        // Boots
+        gc.setFill(Color.web("#3e2723"));
+        gc.fillRoundRect(px + 42*sx, py + 210*sy, 40*sx, 18*sy, 6, 6);
+        gc.fillRoundRect(px + 97*sx, py + 210*sy, 40*sx, 18*sy, 6, 6);
 
         // Head
-        gc.setFill(Color.web("#ffcc80")); gc.fillOval(px+40,py+30,50,50);
-        gc.setFill(Color.web("#4e342e")); gc.fillRect(px+40,py+30,50,18); // hair
+        gc.setFill(Color.web("#ffcc80"));
+        gc.fillOval(px + 45*sx, py + 20*sy, 90*sx, 70*sy);
+
+        // Hair
+        gc.setFill(Color.web("#4e342e"));
+        gc.fillRoundRect(px + 43*sx, py + 18*sy, 94*sx, 32*sy, 12, 12);
 
         // Eyes
         gc.setFill(Color.web("#1a237e"));
-        gc.fillOval(px+48,py+52,8,8); gc.fillOval(px+68,py+52,8,8);
+        gc.fillOval(px + 60*sx, py + 50*sy, 14*sx, 14*sy);
+        gc.fillOval(px + 106*sx, py + 50*sy, 14*sx, 14*sy);
+
+        // Mouth
+        gc.setFill(Color.web("#bf360c"));
+        gc.fillRoundRect(px + 76*sx, py + 70*sy, 28*sx, 6*sy, 4, 4);
+
+        // Shoulder guards
+        gc.setFill(Color.web("#0d47a1"));
+        gc.fillOval(px + 22*sx, py + 85*sy, 30*sx, 22*sy);
+        gc.fillOval(px + 128*sx, py + 85*sy, 30*sx, 22*sy);
 
         // Sword (drawn big for battle)
         gc.save();
-        gc.translate(px+112, py+80);
+        gc.translate(px + 165*sx, py + 100*sy);
         gc.rotate(state == BattleState.PLAYER_TURN ? -20 : 10);
-        gc.setFill(Color.web("#795548")); gc.fillRoundRect(-5,-5,10,35,4,4); // handle
-        gc.setFill(Color.web("#ffd700")); gc.fillRect(-10,30,20,8); // guard
-        gc.setFill(Color.web("#b0bec5")); gc.fillPolygon(new double[]{-6,6,0},new double[]{38,38,-18},3);
-        gc.setFill(Color.web("#eceff1")); gc.fillPolygon(new double[]{-3,3,0},new double[]{36,36,-14},3);
+        gc.setFill(Color.web("#795548")); gc.fillRoundRect(-6,-6, 12*sx, 50*sy, 5, 5);
+        gc.setFill(Color.web("#ffd700")); gc.fillRect(-12, 44*sy, 24*sx, 10*sy);
+        gc.setFill(Color.web("#b0bec5"));
+        gc.fillPolygon(new double[]{-8*sx, 8*sx, 0}, new double[]{54*sy, 54*sy, -24*sy}, 3);
+        gc.setFill(Color.web("#eceff1"));
+        gc.fillPolygon(new double[]{-4*sx, 4*sx, 0}, new double[]{50*sy, 50*sy, -20*sy}, 3);
         gc.restore();
 
-        // "YOU" label
-        gc.setFill(Color.web("#80cbc4")); gc.setFont(Font.font("Arial",FontWeight.BOLD,12));
+        // "YOU" label centred above the sprite
+        gc.setFill(Color.web("#80cbc4"));
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 14));
         gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText("YOU", px+65, py+22);
+        gc.fillText("YOU", px + spriteW / 2.0, py + 10);
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
     private void drawBossHPBar(GraphicsContext gc) {
         double bx = W * 0.55;
         double pct = currentBoss.isAlive()
-            ? (double)currentBoss.getHealthPoint()/currentBoss.getMaxHealthPoint() : 0;
+                ? (double)currentBoss.getHealthPoint()/currentBoss.getMaxHealthPoint() : 0;
         gc.setFill(Color.rgb(0,0,0,0.65)); gc.fillRoundRect(bx,H*0.60,350,22,6,6);
         gc.setFill(pct>0.5?Color.web("#ef5350"):pct>0.25?Color.ORANGE:Color.web("#b71c1c"));
         gc.fillRoundRect(bx,H*0.60,350*pct,22,6,6);
         gc.setFill(Color.WHITE); gc.setFont(Font.font("Arial",FontWeight.BOLD,12));
         gc.setTextAlign(TextAlignment.CENTER);
         gc.fillText(bossName+": "+currentBoss.getHealthPoint()+"/"+currentBoss.getMaxHealthPoint(),
-                    bx+175, H*0.60+15);
+                bx+175, H*0.60+15);
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
@@ -470,7 +574,7 @@ public class BossScene {
         gc.setFill(Color.WHITE); gc.setFont(Font.font("Arial",FontWeight.BOLD,12));
         gc.setTextAlign(TextAlignment.CENTER);
         gc.fillText("HP: "+player.getHealth()+"/"+player.getMaxHealth()
-                    +" | ATK:"+player.getAttack()+" DEF:"+player.getDefense(), 170, H*0.60+15);
+                +" | ATK:"+player.getAttack()+" DEF:"+player.getDefense(), 170, H*0.60+15);
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
@@ -512,7 +616,7 @@ public class BossScene {
         Button b = new Button(text);
         b.setPrefWidth(140); b.setPrefHeight(36);
         String s = "-fx-background-color:"+bg+";-fx-text-fill:white;-fx-font-weight:bold;" +
-                   "-fx-font-size:13px;-fx-background-radius:7;-fx-cursor:hand;";
+                "-fx-font-size:13px;-fx-background-radius:7;-fx-cursor:hand;";
         String h = s.replace(bg,hover);
         b.setStyle(s); b.setOnMouseEntered(e->b.setStyle(h)); b.setOnMouseExited(e->b.setStyle(s));
         return b;
