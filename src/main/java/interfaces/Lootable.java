@@ -1,5 +1,2 @@
 package interfaces;
-
-public interface Lootable {
-    int dropMoney();
-}
+public interface Lootable { int dropMoney(); }
