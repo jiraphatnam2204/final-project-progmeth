@@ -30,9 +30,9 @@ public class BossScene {
     private final Player player;
     private final Pickaxe[] pickaxeHolder;
     private final BossInfo[] bosses = {
-            new BossInfo("Akaza", new EasyMonster(), Color.web("#64B5F6")),
-            new BossInfo("Kokushibo", new MediumMonster(), Color.web("#ce93d8")),
-            new BossInfo("Muzan", new HardMonster(), Color.web("#ef5350")),
+            new BossInfo("Akaza", new EasyBoss(400,40,10,100), Color.web("#64B5F6")),
+            new BossInfo("Kokushibo", new MediumBoss(400,40,10,10), Color.web("#ce93d8")),
+            new BossInfo("Muzan", new HardBoss(400,40,10,10), Color.web("#ef5350")),
     };
     private final List<String> log = new ArrayList<>();
     private int bossIndex = 0;

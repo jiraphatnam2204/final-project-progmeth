@@ -60,7 +60,7 @@ public class MainMenuScene {
         Button quitBtn = makeButton("QUIT", "#c62828", "#ef5350");
 
         startBtn.setOnAction(e -> {
-            Player player = new Player(99999, 20, 9999);
+            Player player = new Player(100, 20, 10);
             player.setGold(999999);
 
             player.getInventory().add(new logic.util.ItemCounter(new logic.stone.NormalStone(), 30));
