@@ -432,7 +432,6 @@ public class GameScene {
             me.aggro = dist < aggroRange;
 
             if (me.aggro) {
-                // Move toward player
                 double nx = playerX - me.x;
                 double ny = playerY - me.y;
                 double len = Math.max(1, Math.hypot(nx, ny));
@@ -466,12 +465,11 @@ public class GameScene {
         }
     }
 
-    // ── Building Entry ────────────────────────────────────────────────
     private void toggleInventory() {
         boolean opening = !inventoryLayer.isVisible();
         inventoryLayer.setVisible(opening);
         if (opening) {
-            inventoryScene.refresh(); // build ตอนเปิดเท่านั้น
+            inventoryScene.refresh();
         }
 
     }
@@ -627,7 +625,6 @@ public class GameScene {
                 gc.setTextAlign(TextAlignment.LEFT);
             }
 
-        // Highlight facing tile (if it's a rock)
         int[] ft = facingTile();
         if (inBounds(ft[0], ft[1]) && world[ft[0]][ft[1]] >= T_NORMAL_ROCK && world[ft[0]][ft[1]] <= T_PLATINUM) {
             gc.setStroke(Color.YELLOW);
@@ -635,7 +632,7 @@ public class GameScene {
             gc.strokeRect(ft[1] * TILE_SIZE + 2, ft[0] * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
             gc.setLineWidth(1);
         }
-        // Highlight adjacent buildings
+
         int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
         int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
         for (int dr = -1; dr <= 1; dr++)
@@ -682,29 +679,23 @@ public class GameScene {
         }
     }
 
-    // ── Monsters ─────────────────────────────────────────────────────
     private void drawMonsters(GraphicsContext gc) {
         for (MonsterEntity me : monsters) {
             if (!me.monster.isAlive()) continue;
             double x = me.x, y = me.y;
 
-            // Shadow under the monster
             gc.setFill(Color.rgb(0, 0, 0, 0.2));
             gc.fillOval(x + 6, y + 38, 36, 10);
 
-            // Pick the right image based on monster type
             Image img = switch (me.type) {
                 case 0 -> imgEasyMonster;
                 case 1 -> imgMediumMonster;
                 default -> imgHardMonster;
             };
 
-            // Draw the image stretched to fill the tile
-            // gc.drawImage(image, destX, destY, destWidth, destHeight)
             if (img != null && !img.isError()) {
                 gc.drawImage(img, x, y, TILE_SIZE, TILE_SIZE);
             } else {
-                // Fallback: draw a red box if image failed to load
                 gc.setFill(Color.RED);
                 gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                 gc.setFill(Color.WHITE);
@@ -714,7 +705,6 @@ public class GameScene {
                 gc.setTextAlign(TextAlignment.LEFT);
             }
 
-            // Aggro indicator (red glow + "!" when chasing you) — kept from original
             if (me.aggro) {
                 gc.setFill(Color.rgb(255, 50, 50, 0.4));
                 gc.fillOval(x - 4, y - 4, TILE_SIZE + 8, TILE_SIZE + 8);
@@ -725,7 +715,6 @@ public class GameScene {
                 gc.setTextAlign(TextAlignment.LEFT);
             }
 
-            // HP bar
             int hp = me.monster.getHealthPoint(), mhp = me.monster.getMaxHealthPoint();
             double pct = (double) hp / mhp;
             gc.setFill(Color.web("#1a0000", 0.6));
@@ -733,7 +722,6 @@ public class GameScene {
             gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
             gc.fillRect(x + 2, y + TILE_SIZE - 8, (TILE_SIZE - 4) * pct, 5);
 
-            // Monster name + HP label below the sprite
             gc.setFont(Font.font("Arial", 9));
             String name = me.type == 0 ? "Goblin" : me.type == 1 ? "Orc" : "Troll";
             gc.setFill(Color.WHITE);
@@ -749,14 +737,12 @@ public class GameScene {
         if (playerInvincibleFrames > 0 && animFrame % 2 == 0) return;
 
         Image[] spriteSet = isAttackAnim ? playerSlashImgs : playerWalkImgs;
-        Image sprite = spriteSet[facing];   // facing: 0=up 1=left 2=down 3=right
+        Image sprite = spriteSet[facing];
 
         if (sprite != null && !sprite.isError()) {
             gc.setFill(Color.rgb(0, 0, 0, 0.25));
             gc.fillOval(px + 8, py + 38, 32, 10);
-
             gc.drawImage(sprite, px, py, TILE_SIZE, TILE_SIZE);
-
             return;
         }
     }
