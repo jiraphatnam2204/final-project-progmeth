@@ -7,7 +7,6 @@ public class AudioManager {
 
     private static MediaPlayer mediaPlayer;
 
-    // Play a looping background track
     public static void playBGM(String resourcePath, double volume) {
         stopBGM();
         try {
@@ -17,7 +16,7 @@ public class AudioManager {
             Media media = new Media(url.toString());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-            mediaPlayer.setVolume(volume); // 0.0 = 0%, 1.0 = 100%
+            mediaPlayer.setVolume(volume);
             mediaPlayer.play();
 
         } catch (Exception e) {
@@ -34,7 +33,7 @@ public class AudioManager {
 
     public static void setVolume(double volume) {
         if (mediaPlayer != null) {
-            mediaPlayer.setVolume(volume); // 0.0 = silent, 1.0 = full
+            mediaPlayer.setVolume(volume);
         }
     }
 }
