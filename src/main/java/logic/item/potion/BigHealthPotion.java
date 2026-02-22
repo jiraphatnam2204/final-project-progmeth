@@ -1,5 +1,9 @@
 package logic.item.potion;
-import logic.base.BasePotion; import logic.creatures.Player;
+
+import logic.base.BasePotion;
+
 public class BigHealthPotion extends BasePotion {
-    public BigHealthPotion() { super("Big Health Potion", 100); }
+    public BigHealthPotion() {
+        super("Big Health Potion", 200);
+    }
 }

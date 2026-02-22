@@ -1,4 +1,4 @@
-package application;
+package audio;
 
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -11,7 +11,10 @@ public class AudioManager {
         stopBGM();
         try {
             var url = AudioManager.class.getResource(resourcePath);
-            if (url == null) { System.out.println("Not found: " + resourcePath); return; }
+            if (url == null) {
+                System.out.println("Not found: " + resourcePath);
+                return;
+            }
 
             Media media = new Media(url.toString());
             mediaPlayer = new MediaPlayer(media);
