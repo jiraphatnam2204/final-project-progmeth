@@ -1,5 +1,2 @@
 package interfaces;
-
-public interface Stackable {
-    int maxStack = 30;
-}
+public interface Stackable { int maxStack = 30; }

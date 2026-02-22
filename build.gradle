@@ -45,3 +45,9 @@ sourceSets {
         }
     }
 }
+
+run {
+    jvmArgs = [
+            '--enable-native-access=javafx.media',
+    ]
+}
