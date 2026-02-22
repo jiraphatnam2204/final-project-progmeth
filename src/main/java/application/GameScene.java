@@ -22,8 +22,10 @@ import logic.creatures.Player;
 import logic.pickaxe.Pickaxe;
 import logic.stone.HardStone;
 import logic.stone.Iron;
+import logic.stone.Mithril;
 import logic.stone.NormalStone;
 import logic.stone.Platinum;
+import logic.stone.Vibranium;
 import logic.util.ItemCounter;
 
 import java.util.*;
@@ -41,7 +43,9 @@ public class GameScene {
     static final int T_NORMAL_ROCK = 2;
     static final int T_HARD_ROCK = 3;
     static final int T_IRON_ROCK = 4;
-    static final int T_PLATINUM = 5;
+    static final int T_PLATINUM  = 5;
+    static final int T_MITHRIL   = 10;  // ใช้เลข 10 เพื่อไม่ชนกับค่าเดิม
+    static final int T_VIBRANIUM = 11;
     static final int T_SHOP = 6; // shop building tile
     static final int T_CRAFT = 7; // crafting station tile
     static final int T_BOSS_DOOR = 8; // boss room door tile
@@ -92,6 +96,18 @@ public class GameScene {
 
     private boolean leftMouseDown = false;
     private boolean rightMouseDown = false;
+
+    // ── Respawn Queues ─────────────────────────────────────────────────────────
+    // [row, col, tileType, respawnAtMs]
+    private final List<long[]> oreRespawnQueue = new ArrayList<>();
+    // [monsterType, respawnAtMs]
+    private final List<long[]> monsterRespawnQueue = new ArrayList<>();
+    private final Random spawnRng = new Random();
+
+    private static final long ORE_RESPAWN_MIN_MS  = 1_000; // 10 วินาที
+    private static final long ORE_RESPAWN_MAX_MS  = 2_000; // 20 วินาที
+    private static final long MON_RESPAWN_MIN_MS  = 1_000; // 15 วินาที
+    private static final long MON_RESPAWN_MAX_MS  = 3_000; // 30 วินาที
 
     public GameScene(Player player, Pickaxe pickaxe) {
         this.player = player;
@@ -151,7 +167,14 @@ public class GameScene {
         placeBuilding(2, COLS - 4, T_CRAFT);
         placeBuilding(ROWS - 3, COLS / 2 - 1, T_BOSS_DOOR);
 
-        int[][] rockSpecs = {{T_NORMAL_ROCK, 18}, {T_HARD_ROCK, 12}, {T_IRON_ROCK, 8}, {T_PLATINUM, 4}};
+        int[][] rockSpecs = {
+                {T_NORMAL_ROCK, 18},
+                {T_HARD_ROCK,   12},
+                {T_IRON_ROCK,    8},
+                {T_PLATINUM,     4},
+                {T_MITHRIL,      3},   // หายากกว่า
+                {T_VIBRANIUM,    2},   // หายากที่สุด
+        };
         for (int[] spec : rockSpecs)
             for (int i = 0; i < spec[1]; i++) {
                 int r = 1 + rng.nextInt(ROWS - 2);
@@ -181,9 +204,11 @@ public class GameScene {
         world[r][c] = type;
         stoneObjects[r][c] = switch (type) {
             case T_NORMAL_ROCK -> new NormalStone();
-            case T_HARD_ROCK -> new HardStone();
-            case T_IRON_ROCK -> new Iron();
-            case T_PLATINUM -> new Platinum();
+            case T_HARD_ROCK   -> new HardStone();
+            case T_IRON_ROCK   -> new Iron();
+            case T_PLATINUM    -> new Platinum();
+            case T_MITHRIL     -> new Mithril();
+            case T_VIBRANIUM   -> new Vibranium();
             default -> null;
         };
     }
@@ -194,7 +219,7 @@ public class GameScene {
 
     private void spawnMonsters() {
         Random rng = new Random(55);
-        int[][] specs = {{0, 1}, {1, 1}, {2, 1}};  // {type, count}
+        int[][] specs = {{0, 4}, {1, 2}, {2, 1}};  // {type, count}
         for (int[] spec : specs) {
             for (int i = 0; i < spec[1]; i++) {
                 double mx, my;
@@ -290,6 +315,7 @@ public class GameScene {
             if (rightMouseDown) handleMining(nowNanos);
             updateMonsters();
             updateFloatingTexts();
+            processRespawns(System.currentTimeMillis()); // ← เพิ่มบรรทัดนี้
         }
 
 
@@ -339,7 +365,7 @@ public class GameScene {
         int c = (int) (px / TILE_SIZE), r = (int) (py / TILE_SIZE);
         if (!inBounds(r, c)) return true;
         int t = world[r][c];
-        return t >= T_NORMAL_ROCK && t <= T_PLATINUM;
+        return (t >= T_NORMAL_ROCK && t <= T_PLATINUM) || t == T_MITHRIL || t == T_VIBRANIUM;
     }
 
     private void handleMining(long nowNanos) {
@@ -351,7 +377,9 @@ public class GameScene {
         int tr = ft[0], tc = ft[1];
         if (!inBounds(tr, tc)) return;
         int tile = world[tr][tc];
-        if (tile < T_NORMAL_ROCK || tile > T_PLATINUM) return;
+        boolean isOre = (tile >= T_NORMAL_ROCK && tile <= T_PLATINUM)
+                || tile == T_MITHRIL || tile == T_VIBRANIUM;
+        if (!isOre) return;
         Mineable stone = stoneObjects[tr][tc];
         if (stone == null || stone.isBroken()) return;
 
@@ -359,8 +387,14 @@ public class GameScene {
         floatingTexts.add(new FloatingText(tc * TILE_SIZE + 12, tr * TILE_SIZE, "⛏", Color.WHITE, 700));
 
         if (stone.isBroken()) {
+            int brokenTileType = tile; // บันทึก type ก่อน clear
             world[tr][tc] = T_GROUND;
             stoneObjects[tr][tc] = null;
+
+            // Queue respawn แร่ที่ตำแหน่งเดิม
+            long oreDelay = ORE_RESPAWN_MIN_MS + (long)(spawnRng.nextDouble() * (ORE_RESPAWN_MAX_MS - ORE_RESPAWN_MIN_MS));
+            oreRespawnQueue.add(new long[]{tr, tc, brokenTileType, System.currentTimeMillis() + oreDelay});
+
             if (!drops.isEmpty()) {
                 for (BaseItem item : drops) addToInventory(item);
                 String name = drops.get(0).getName();
@@ -413,6 +447,11 @@ public class GameScene {
                     floatingTexts.add(new FloatingText(me.x, me.y - 20,
                             "+" + gold + "g !", Color.GOLD, 1800));
                     showNotif("Monster defeated! +" + gold + " gold");
+
+                    // Queue respawn มอนสเตอร์ชนิดเดิม
+                    long monDelay = MON_RESPAWN_MIN_MS + (long)(spawnRng.nextDouble() * (MON_RESPAWN_MAX_MS - MON_RESPAWN_MIN_MS));
+                    monsterRespawnQueue.add(new long[]{me.type, System.currentTimeMillis() + monDelay});
+
                     it.remove();
                 }
             }
@@ -461,6 +500,81 @@ public class GameScene {
                     me.x = nx;
                     me.y = ny;
                 }
+            }
+        }
+    }
+
+    private void processRespawns(long nowMs) {
+        // ── Ore Respawns ─────────────────────────────────────────────────────
+        Iterator<long[]> oreIt = oreRespawnQueue.iterator();
+        while (oreIt.hasNext()) {
+            long[] entry = oreIt.next();
+            if (nowMs >= entry[3]) {
+                int r = (int) entry[0];
+                int c = (int) entry[1];
+                int tileType = (int) entry[2];
+                // respawn เฉพาะเมื่อช่องนั้นว่างอยู่
+                if ((world[r][c] == T_GROUND || world[r][c] == T_GRASS)
+                        && !isNearPlayer(c * TILE_SIZE, r * TILE_SIZE, TILE_SIZE)) {
+                    // สุ่มชนิดแร่ใหม่ โดยน้ำหนักตามความหายาก
+                    int[] orePool = {
+                            T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK,  // 4/10 = 40%
+                            T_HARD_ROCK,   T_HARD_ROCK,   T_HARD_ROCK,                    // 3/10 = 30%
+                            T_IRON_ROCK,   T_IRON_ROCK,                                    // 2/10 = 20%
+                            T_PLATINUM                                                     // 1/10 = 10%
+                    };
+                    // ถ้ามี Mithril และ Vibranium ให้ใช้ pool นี้แทน (ครอบคลุมทุกชนิด)
+                    int[] fullOrePool = {
+                            T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK,  // 4/12 ≈ 33%
+                            T_HARD_ROCK,   T_HARD_ROCK,   T_HARD_ROCK,                    // 3/12 = 25%
+                            T_IRON_ROCK,   T_IRON_ROCK,                                    // 2/12 ≈ 17%
+                            T_PLATINUM,                                                    // 1/12 ≈  8%
+                            T_MITHRIL,                                                     // 1/12 ≈  8%
+                            T_VIBRANIUM                                                    // 1/12 ≈  8%
+                    };
+                    int randomTile = fullOrePool[spawnRng.nextInt(fullOrePool.length)];
+                    placeRock(r, c, randomTile);
+
+                    String oreName = switch (randomTile) {
+                        case T_NORMAL_ROCK -> "Normal Stone";
+                        case T_HARD_ROCK   -> "Hard Stone";
+                        case T_IRON_ROCK   -> "Iron";
+                        case T_PLATINUM    -> "Platinum";
+                        case T_MITHRIL     -> "Mithril";
+                        case T_VIBRANIUM   -> "Vibranium";
+                        default            -> "Ore";
+                    };
+                    floatingTexts.add(new FloatingText(
+                            c * TILE_SIZE, r * TILE_SIZE - 10,
+                            "✨ " + oreName + " appeared!", Color.CYAN, 2000));
+                }
+                oreIt.remove();
+            }
+        }
+
+        // ── Monster Respawns ──────────────────────────────────────────────────
+        Iterator<long[]> monIt = monsterRespawnQueue.iterator();
+        while (monIt.hasNext()) {
+            long[] entry = monIt.next();
+            if (nowMs >= entry[1]) {
+                int type = (int) entry[0];
+                double mx, my;
+                int tries = 0;
+                do {
+                    mx = (2 + spawnRng.nextInt(COLS - 4)) * TILE_SIZE;
+                    my = (2 + spawnRng.nextInt(ROWS - 4)) * TILE_SIZE;
+                    tries++;
+                } while ((isSolid(mx + 5, my + 5) || isNearPlayer(mx, my, 200)) && tries < 30);
+
+                logic.creatures.Monster m = switch (type) {
+                    case 0 -> new EasyMonster();
+                    case 1 -> new MediumMonster();
+                    default -> new HardMonster();
+                };
+                monsters.add(new MonsterEntity(m, mx, my, type));
+                floatingTexts.add(new FloatingText(mx, my - 14,
+                        "👹 Monster appeared!", Color.web("#ff5252"), 2200));
+                monIt.remove();
             }
         }
     }
@@ -587,6 +701,10 @@ public class GameScene {
                             drawRock(gc, x, y, stoneObjects[r][c], Color.web("#bf8f5b"), Color.web("#8d6030"), "Fe");
                     case T_PLATINUM ->
                             drawRock(gc, x, y, stoneObjects[r][c], Color.web("#90caf9"), Color.web("#1976d2"), "Pt");
+                    case T_MITHRIL ->
+                            drawRock(gc, x, y, stoneObjects[r][c], Color.web("#ce93d8"), Color.web("#7b1fa2"), "Mi");
+                    case T_VIBRANIUM ->
+                            drawRock(gc, x, y, stoneObjects[r][c], Color.web("#80cbc4"), Color.web("#00695c"), "Vb");
                     case T_SHOP -> {
                         gc.setFill(Color.web("#5d4037"));
                         gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
@@ -723,7 +841,7 @@ public class GameScene {
             gc.fillRect(x + 2, y + TILE_SIZE - 8, (TILE_SIZE - 4) * pct, 5);
 
             gc.setFont(Font.font("Arial", 9));
-            String name = me.type == 0 ? "Goblin" : me.type == 1 ? "Orc" : "Troll";
+            String name = me.type == 0 ? "Rui" : me.type == 1 ? "Enmu" : "Daki";
             gc.setFill(Color.WHITE);
             gc.setTextAlign(TextAlignment.CENTER);
             gc.fillText(name + " " + hp + "/" + mhp, x + TILE_SIZE / 2.0, y + TILE_SIZE + 10);
