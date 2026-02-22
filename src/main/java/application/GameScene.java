@@ -54,6 +54,7 @@ public class GameScene {
     private static final long ATTACK_COOLDOWN = 600;
     private static final long MINE_COOLDOWN = 280;
     private static final long NOTIF_DURATION = 2200;
+
     private final int[][] world = new int[ROWS][COLS];
     private final Mineable[][] stoneObjects = new Mineable[ROWS][COLS];
     private final Player player;
@@ -72,8 +73,7 @@ public class GameScene {
     private CraftingScene craftingScene;
     private Pane inventoryLayer;
     private InventoryScene inventoryScene;
-    private Pane bossLayer;
-    private BossScene bossScene;
+
     private double playerX, playerY;
     private int facing = 2;
     private int animFrame = 0;
@@ -118,13 +118,14 @@ public class GameScene {
         craftingLayer = craftingScene.build();
         inventoryScene = new InventoryScene(player, this::closeInventory);
         inventoryLayer = inventoryScene.build();
-        imgEasyMonster = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Rui.png")));
+
+        imgEasyMonster   = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Rui.png")));
         imgMediumMonster = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Enmu.png")));
-        imgHardMonster = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Daki.png")));
+        imgHardMonster   = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Daki.png")));
 
         String[] dirs = {"up", "left", "down", "right"};
         for (int i = 0; i < 4; i++) {
-            playerWalkImgs[i] = loadImage("/images/player_walk_" + dirs[i] + ".png");
+            playerWalkImgs[i]  = loadImage("/images/player_walk_"  + dirs[i] + ".png");
             playerSlashImgs[i] = loadImage("/images/player_slash_" + dirs[i] + ".png");
         }
         generateWorld();
@@ -144,9 +145,10 @@ public class GameScene {
         }
     }
 
+    // ── World generation (unchanged) ─────────────────────────────────────────
+
     private void generateWorld() {
         Random rng = new Random(77);
-
         for (int r = 0; r < ROWS; r++)
             for (int c = 0; c < COLS; c++)
                 world[r][c] = rng.nextInt(10) < 4 ? T_GRASS : T_GROUND;
@@ -231,8 +233,8 @@ public class GameScene {
                 } while (isSolid(mx, my) || isNearPlayer(mx, my, 200) && tries < 30);
 
                 logic.creatures.Monster m = switch (spec[0]) {
-                    case 0 -> new EasyMonster();
-                    case 1 -> new MediumMonster();
+                    case 0  -> new EasyMonster();
+                    case 1  -> new MediumMonster();
                     default -> new HardMonster();
                 };
                 monsters.add(new MonsterEntity(m, mx, my, spec[0]));
@@ -244,61 +246,52 @@ public class GameScene {
         return Math.hypot(x - playerX, y - playerY) < dist;
     }
 
+    // ── Scene ────────────────────────────────────────────────────────────────
+
     public Scene buildScene() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         root.getChildren().add(canvas);
         Scene scene = new Scene(root, W, H);
+
         shopLayer.setVisible(false);
         root.getChildren().add(shopLayer);
         craftingLayer.setVisible(false);
         root.getChildren().add(craftingLayer);
         inventoryLayer.setVisible(false);
         root.getChildren().add(inventoryLayer);
+
         scene.setOnKeyPressed(e -> {
             keys.add(e.getCode());
-
-            if (e.getCode() == KeyCode.SPACE) {
-                checkBuildingEntry();
-            }
-            if (e.getCode() == KeyCode.E) {
-                toggleInventory();
-            }
+            if (e.getCode() == KeyCode.SPACE) checkBuildingEntry();
+            if (e.getCode() == KeyCode.E)     toggleInventory();
         });
-
-
         scene.setOnKeyReleased(e -> keys.remove(e.getCode()));
 
         scene.setOnMousePressed(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) leftMouseDown = true;
+            if (e.getButton() == MouseButton.PRIMARY)   leftMouseDown = true;
             if (e.getButton() == MouseButton.SECONDARY) rightMouseDown = true;
         });
 
         scene.setOnMouseReleased(e -> {
-            if (e.getButton() == MouseButton.PRIMARY) leftMouseDown = false;
+            if (e.getButton() == MouseButton.PRIMARY)   leftMouseDown = false;
             if (e.getButton() == MouseButton.SECONDARY) rightMouseDown = false;
         });
 
         gameLoop = new AnimationTimer() {
-            @Override
-            public void handle(long now) {
+            @Override public void handle(long now) {
                 update(now);
                 render(gc, now);
-                if (shopLayer.isVisible()) {
-                    shopScene.update();
-                }
-                if (craftingLayer.isVisible()) {
-                    craftingScene.update();
-                }
-                if (inventoryLayer.isVisible()) {
-                    inventoryScene.update();
-                }
+                if (shopLayer.isVisible())     shopScene.update();
+                if (craftingLayer.isVisible()) craftingScene.update();
+                if (inventoryLayer.isVisible()) inventoryScene.update();
             }
         };
         gameLoop.start();
-
         return scene;
     }
+
+    // ── Update ───────────────────────────────────────────────────────────────
 
     private void update(long nowNanos) {
         if (gameEnded) return;
@@ -311,7 +304,7 @@ public class GameScene {
         }
         if (!shopLayer.isVisible() && !inventoryLayer.isVisible() && !craftingLayer.isVisible()) {
             handleMovement();
-            if (leftMouseDown) handleAttack(nowNanos);
+            if (leftMouseDown)  handleAttack(nowNanos);
             if (rightMouseDown) handleMining(nowNanos);
             updateMonsters();
             updateFloatingTexts();
@@ -320,37 +313,18 @@ public class GameScene {
 
 
         if (playerInvincibleFrames > 0) playerInvincibleFrames--;
-
-        if (isAttackAnim && System.currentTimeMillis() > attackAnimEndMs) {
-            isAttackAnim = false;
-        }
+        if (isAttackAnim && System.currentTimeMillis() > attackAnimEndMs) isAttackAnim = false;
     }
 
     private void handleMovement() {
         double dx = 0, dy = 0;
-        if (keys.contains(KeyCode.W) || keys.contains(KeyCode.UP)) {
-            dy -= PLAYER_SPEED;
-            facing = 0;
-        }
-        if (keys.contains(KeyCode.S) || keys.contains(KeyCode.DOWN)) {
-            dy += PLAYER_SPEED;
-            facing = 2;
-        }
-        if (keys.contains(KeyCode.A) || keys.contains(KeyCode.LEFT)) {
-            dx -= PLAYER_SPEED;
-            facing = 1;
-        }
-        if (keys.contains(KeyCode.D) || keys.contains(KeyCode.RIGHT)) {
-            dx += PLAYER_SPEED;
-            facing = 3;
-        }
-        if (dx != 0 && dy != 0) {
-            dx *= 0.707;
-            dy *= 0.707;
-        }
+        if (keys.contains(KeyCode.W) || keys.contains(KeyCode.UP))    { dy -= PLAYER_SPEED; facing = 0; }
+        if (keys.contains(KeyCode.S) || keys.contains(KeyCode.DOWN))  { dy += PLAYER_SPEED; facing = 2; }
+        if (keys.contains(KeyCode.A) || keys.contains(KeyCode.LEFT))  { dx -= PLAYER_SPEED; facing = 1; }
+        if (keys.contains(KeyCode.D) || keys.contains(KeyCode.RIGHT)) { dx += PLAYER_SPEED; facing = 3; }
+        if (dx != 0 && dy != 0) { dx *= 0.707; dy *= 0.707; }
         if (dx != 0 && canMoveTo(playerX + dx, playerY)) playerX += dx;
         if (dy != 0 && canMoveTo(playerX, playerY + dy)) playerY += dy;
-
         playerX = Math.max(0, Math.min(W - TILE_SIZE, playerX));
         playerY = Math.max(0, Math.min(H - TILE_SIZE, playerY));
     }
@@ -362,7 +336,7 @@ public class GameScene {
     }
 
     private boolean isSolid(double px, double py) {
-        int c = (int) (px / TILE_SIZE), r = (int) (py / TILE_SIZE);
+        int c = (int)(px / TILE_SIZE), r = (int)(py / TILE_SIZE);
         if (!inBounds(r, c)) return true;
         int t = world[r][c];
         return (t >= T_NORMAL_ROCK && t <= T_PLATINUM) || t == T_MITHRIL || t == T_VIBRANIUM;
@@ -430,22 +404,17 @@ public class GameScene {
         Iterator<MonsterEntity> it = monsters.iterator();
         while (it.hasNext()) {
             MonsterEntity me = it.next();
-            if (!me.monster.isAlive()) {
-                it.remove();
-                continue;
-            }
+            if (!me.monster.isAlive()) { it.remove(); continue; }
             double dist = Math.hypot(playerX - me.x, playerY - me.y);
             if (dist < range) {
                 player.attack(me.monster);
                 int dmg = Math.max(1, player.getAttack() - me.monster.getDefense());
-                floatingTexts.add(new FloatingText(me.x + 8, me.y - 8,
-                        "-" + dmg, Color.web("#ff5252"), 1000));
+                floatingTexts.add(new FloatingText(me.x + 8, me.y - 8, "-" + dmg, Color.web("#ff5252"), 1000));
                 hit = true;
                 if (!me.monster.isAlive()) {
                     int gold = me.monster.dropMoney();
                     player.setGold(player.getGold() + gold);
-                    floatingTexts.add(new FloatingText(me.x, me.y - 20,
-                            "+" + gold + "g !", Color.GOLD, 1800));
+                    floatingTexts.add(new FloatingText(me.x, me.y - 20, "+" + gold + "g !", Color.GOLD, 1800));
                     showNotif("Monster defeated! +" + gold + " gold");
 
                     // Queue respawn มอนสเตอร์ชนิดเดิม
@@ -467,23 +436,20 @@ public class GameScene {
         for (MonsterEntity me : monsters) {
             if (!me.monster.isAlive()) continue;
             double dist = Math.hypot(playerX - me.x, playerY - me.y);
-
             me.aggro = dist < aggroRange;
 
             if (me.aggro) {
-                double nx = playerX - me.x;
-                double ny = playerY - me.y;
+                double nx = playerX - me.x, ny = playerY - me.y;
                 double len = Math.max(1, Math.hypot(nx, ny));
                 double spd = monSpd * (1 + me.type * 0.3);
                 me.x += (nx / len) * spd;
                 me.y += (ny / len) * spd;
 
                 if (dist < attackRange && playerInvincibleFrames <= 0) {
-                    me.monster.attack(player);  // uses Monster.attack() from your code
+                    me.monster.attack(player);
                     playerInvincibleFrames = 50;
                     int dmg = Math.max(1, me.monster.getAttack() - player.getDefense());
-                    floatingTexts.add(new FloatingText(playerX, playerY - 10,
-                            "-" + dmg + " HP", Color.web("#ff1744"), 1200));
+                    floatingTexts.add(new FloatingText(playerX, playerY - 10, "-" + dmg + " HP", Color.web("#ff1744"), 1200));
                 }
             } else {
                 me.moveTimer -= 1.0 / 60;
@@ -493,12 +459,10 @@ public class GameScene {
                     me.dx = Math.cos(angle) * 0.6;
                     me.dy = Math.sin(angle) * 0.6;
                 }
-                double nx = me.x + me.dx;
-                double ny = me.y + me.dy;
+                double nx = me.x + me.dx, ny = me.y + me.dy;
                 if (!isSolid(nx + 5, ny + 5) && !isSolid(nx + TILE_SIZE - 5, ny + 5)
                         && !isSolid(nx + 5, ny + TILE_SIZE - 5) && !isSolid(nx + TILE_SIZE - 5, ny + TILE_SIZE - 5)) {
-                    me.x = nx;
-                    me.y = ny;
+                    me.x = nx; me.y = ny;
                 }
             }
         }
@@ -582,69 +546,46 @@ public class GameScene {
     private void toggleInventory() {
         boolean opening = !inventoryLayer.isVisible();
         inventoryLayer.setVisible(opening);
-        if (opening) {
-            inventoryScene.refresh();
-        }
-
+        if (opening) inventoryScene.refresh();
     }
 
-    private void closeInventory() {
-        inventoryLayer.setVisible(false);
-    }
+    private void closeInventory()  { inventoryLayer.setVisible(false); }
+    private void closeShop()       { shopLayer.setVisible(false); }
+    private void closeCraft()      { craftingLayer.setVisible(false); }
 
     private void toggleShopVisible() {
-        if (shopLayer.isVisible()) shopLayer.setVisible(false);
-        else shopLayer.setVisible(true);
-    }
-
-    private void closeCraft() {
-        craftingLayer.setVisible(false);
-    }
-
-    private void closeShop() {
-        shopLayer.setVisible(false);
+        shopLayer.setVisible(!shopLayer.isVisible());
     }
 
     private void toggleCraftVisisble() {
-        if (craftingLayer.isVisible()) craftingLayer.setVisible(false);
-        else craftingLayer.setVisible(true);
+        craftingLayer.setVisible(!craftingLayer.isVisible());
     }
 
     private void checkBuildingEntry() {
         if (!keys.contains(KeyCode.SPACE)) return;
-        int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
-        int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
-
+        int pc = (int)((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
+        int pr = (int)((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
         for (int dr = -1; dr <= 1; dr++)
             for (int dc = -1; dc <= 1; dc++) {
                 int r = pr + dr, c = pc + dc;
                 if (!inBounds(r, c)) continue;
                 switch (world[r][c]) {
-                    case T_SHOP -> {
-                        toggleShopVisible();
-                    }
-                    case T_CRAFT -> {
-                        toggleCraftVisisble();
-                        return;
-                    }
-                    case T_BOSS_DOOR -> {
-                        gameLoop.stop();
-                        Main.sceneManager.showBossRoom(player, pickaxeHolder);
-                        return;
-                    }
+                    case T_SHOP      -> { toggleShopVisible(); return; }
+                    case T_CRAFT     -> { toggleCraftVisisble(); return; }
+                    case T_BOSS_DOOR -> { gameLoop.stop(); Main.sceneManager.showBossRoom(player, pickaxeHolder); return; }
                 }
             }
         showNotif("Nothing to enter nearby.");
     }
 
     private void updateFloatingTexts() {
-        floatingTexts.removeIf(ft -> ft.isDead());
+        floatingTexts.removeIf(FloatingText::isDead);
         for (FloatingText ft : floatingTexts) ft.y += ft.vy;
     }
 
     private int[] facingTile() {
-        int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
-        int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
+        int pc = (int)((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
+        int pr = (int)((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
         return switch (facing) {
             case 0 -> new int[]{pr - 1, pc};
             case 1 -> new int[]{pr, pc - 1};
@@ -653,16 +594,12 @@ public class GameScene {
         };
     }
 
-    private void showNotif(String msg) {
-        notifMsg = msg;
-        notifTime = System.currentTimeMillis();
-    }
+    private void showNotif(String msg) { notifMsg = msg; notifTime = System.currentTimeMillis(); }
+
+    // ── Render ───────────────────────────────────────────────────────────────
 
     private void render(GraphicsContext gc, long nowNanos) {
-        if (nowNanos - lastAnimTime > 140_000_000L) {
-            animFrame++;
-            lastAnimTime = nowNanos;
-        }
+        if (nowNanos - lastAnimTime > 140_000_000L) { animFrame++; lastAnimTime = nowNanos; }
         drawWorld(gc);
         drawMonsters(gc);
         drawPlayer(gc);
@@ -675,23 +612,15 @@ public class GameScene {
             for (int c = 0; c < COLS; c++) {
                 double x = c * TILE_SIZE, y = r * TILE_SIZE;
                 switch (world[r][c]) {
-                    case T_GROUND -> {
-                        gc.setFill(Color.web("#4a7c38"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                    }
+                    case T_GROUND -> { gc.setFill(Color.web("#4a7c38")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE); }
                     case T_GRASS -> {
-                        gc.setFill(Color.web("#3d6b2d"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        gc.setFill(Color.web("#3d6b2d")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
                         gc.setFill(Color.web("#2d5220"));
-                        gc.fillRect(x + 8, y + 10, 3, 8);
-                        gc.fillRect(x + 20, y + 6, 3, 10);
-                        gc.fillRect(x + 32, y + 12, 3, 7);
+                        gc.fillRect(x + 8, y + 10, 3, 8); gc.fillRect(x + 20, y + 6, 3, 10); gc.fillRect(x + 32, y + 12, 3, 7);
                     }
                     case T_PATH -> {
-                        gc.setFill(Color.web("#8d7b6a"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                        gc.setStroke(Color.web("#7a6a5a", 0.4));
-                        gc.strokeRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
+                        gc.setFill(Color.web("#8d7b6a")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        gc.setStroke(Color.web("#7a6a5a", 0.4)); gc.strokeRect(x + 1, y + 1, TILE_SIZE - 2, TILE_SIZE - 2);
                     }
                     case T_NORMAL_ROCK ->
                             drawRock(gc, x, y, stoneObjects[r][c], Color.web("#9e9e9e"), Color.web("#757575"), "N");
@@ -706,38 +635,25 @@ public class GameScene {
                     case T_VIBRANIUM ->
                             drawRock(gc, x, y, stoneObjects[r][c], Color.web("#80cbc4"), Color.web("#00695c"), "Vb");
                     case T_SHOP -> {
-                        gc.setFill(Color.web("#5d4037"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                        gc.setFill(Color.web("#795548"));
-                        gc.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-                        gc.setFill(Color.web("#ffd54f"));
-                        gc.setFont(Font.font("Arial", FontWeight.BOLD, 10));
+                        gc.setFill(Color.web("#5d4037")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        gc.setFill(Color.web("#795548")); gc.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                        gc.setFill(Color.web("#ffd54f")); gc.setFont(Font.font("Arial", FontWeight.BOLD, 10));
                         gc.setTextAlign(TextAlignment.CENTER);
-                        gc.fillText("SHOP", x + TILE_SIZE / 2.0, y + 28);
-                        gc.setFill(Color.web("#ffd54f"));
-                        gc.fillText("🛒", x + TILE_SIZE / 2.0, y + 18);
+                        gc.fillText("SHOP", x + TILE_SIZE / 2.0, y + 28); gc.fillText("🛒", x + TILE_SIZE / 2.0, y + 18);
                     }
                     case T_CRAFT -> {
-                        gc.setFill(Color.web("#1a237e"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                        gc.setFill(Color.web("#283593"));
-                        gc.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
-                        gc.setFill(Color.web("#80cbc4"));
-                        gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
+                        gc.setFill(Color.web("#1a237e")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        gc.setFill(Color.web("#283593")); gc.fillRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8);
+                        gc.setFill(Color.web("#80cbc4")); gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
                         gc.setTextAlign(TextAlignment.CENTER);
-                        gc.fillText("CRAFT", x + TILE_SIZE / 2.0, y + 28);
-                        gc.fillText("⚒", x + TILE_SIZE / 2.0, y + 18);
+                        gc.fillText("CRAFT", x + TILE_SIZE / 2.0, y + 28); gc.fillText("⚒", x + TILE_SIZE / 2.0, y + 18);
                     }
                     case T_BOSS_DOOR -> {
-                        gc.setFill(Color.web("#b71c1c"));
-                        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                        gc.setFill(Color.web("#c62828"));
-                        gc.fillRoundRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8, 6, 6);
-                        gc.setFill(Color.web("#ff5252"));
-                        gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
+                        gc.setFill(Color.web("#b71c1c")); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                        gc.setFill(Color.web("#c62828")); gc.fillRoundRect(x + 4, y + 4, TILE_SIZE - 8, TILE_SIZE - 8, 6, 6);
+                        gc.setFill(Color.web("#ff5252")); gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
                         gc.setTextAlign(TextAlignment.CENTER);
-                        gc.fillText("BOSS", x + TILE_SIZE / 2.0, y + 28);
-                        gc.fillText("💀", x + TILE_SIZE / 2.0, y + 18);
+                        gc.fillText("BOSS", x + TILE_SIZE / 2.0, y + 28); gc.fillText("💀", x + TILE_SIZE / 2.0, y + 18);
                     }
                 }
                 gc.setTextAlign(TextAlignment.LEFT);
@@ -745,53 +661,42 @@ public class GameScene {
 
         int[] ft = facingTile();
         if (inBounds(ft[0], ft[1]) && world[ft[0]][ft[1]] >= T_NORMAL_ROCK && world[ft[0]][ft[1]] <= T_PLATINUM) {
-            gc.setStroke(Color.YELLOW);
-            gc.setLineWidth(3);
+            gc.setStroke(Color.YELLOW); gc.setLineWidth(3);
             gc.strokeRect(ft[1] * TILE_SIZE + 2, ft[0] * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
             gc.setLineWidth(1);
         }
 
-        int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
-        int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
+        int pc = (int)((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
+        int pr = (int)((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
         for (int dr = -1; dr <= 1; dr++)
             for (int dc = -1; dc <= 1; dc++) {
                 int r = pr + dr, c = pc + dc;
                 if (!inBounds(r, c)) continue;
                 int t = world[r][c];
                 if (t == T_SHOP || t == T_CRAFT || t == T_BOSS_DOOR) {
-                    gc.setStroke(Color.CYAN);
-                    gc.setLineWidth(2.5);
+                    gc.setStroke(Color.CYAN); gc.setLineWidth(2.5);
                     gc.strokeRect(c * TILE_SIZE + 2, r * TILE_SIZE + 2, TILE_SIZE - 4, TILE_SIZE - 4);
-                    gc.setFill(Color.CYAN);
-                    gc.setFont(Font.font("Arial", FontWeight.BOLD, 10));
+                    gc.setFill(Color.CYAN); gc.setFont(Font.font("Arial", FontWeight.BOLD, 10));
                     gc.setTextAlign(TextAlignment.CENTER);
                     gc.fillText("[SPACE]", c * TILE_SIZE + TILE_SIZE / 2.0, r * TILE_SIZE - 4);
-                    gc.setTextAlign(TextAlignment.LEFT);
-                    gc.setLineWidth(1);
+                    gc.setTextAlign(TextAlignment.LEFT); gc.setLineWidth(1);
                 }
             }
     }
 
     private void drawRock(GraphicsContext gc, double x, double y,
                           Mineable stone, Color light, Color dark, String label) {
-        gc.setFill(dark);
-        gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-        gc.setFill(light);
-        gc.fillRoundRect(x + 3, y + 3, TILE_SIZE - 6, TILE_SIZE - 6, 8, 8);
-        gc.setStroke(dark.darker());
-        gc.setLineWidth(1.5);
+        gc.setFill(dark); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        gc.setFill(light); gc.fillRoundRect(x + 3, y + 3, TILE_SIZE - 6, TILE_SIZE - 6, 8, 8);
+        gc.setStroke(dark.darker()); gc.setLineWidth(1.5);
         gc.strokeLine(x + 12, y + 12, x + 20, y + 20);
         gc.strokeLine(x + 26, y + 14, x + 32, y + 24);
-        gc.setLineWidth(1);
-        gc.setFill(dark.darker());
-        gc.setFont(Font.font("Arial", FontWeight.BOLD, 10));
-        gc.setTextAlign(TextAlignment.CENTER);
-        gc.fillText(label, x + TILE_SIZE / 2.0, y + 30);
-        gc.setTextAlign(TextAlignment.LEFT);
+        gc.setLineWidth(1); gc.setFill(dark.darker());
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 10)); gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(label, x + TILE_SIZE / 2.0, y + 30); gc.setTextAlign(TextAlignment.LEFT);
         if (stone != null) {
             double pct = (double) stone.getDurability() / stone.getMaxDurability();
-            gc.setFill(Color.rgb(0, 0, 0, 0.5));
-            gc.fillRect(x + 4, y + TILE_SIZE - 8, TILE_SIZE - 8, 5);
+            gc.setFill(Color.rgb(0, 0, 0, 0.5)); gc.fillRect(x + 4, y + TILE_SIZE - 8, TILE_SIZE - 8, 5);
             gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
             gc.fillRect(x + 4, y + TILE_SIZE - 8, (TILE_SIZE - 8) * pct, 5);
         }
@@ -801,45 +706,34 @@ public class GameScene {
         for (MonsterEntity me : monsters) {
             if (!me.monster.isAlive()) continue;
             double x = me.x, y = me.y;
-
-            gc.setFill(Color.rgb(0, 0, 0, 0.2));
-            gc.fillOval(x + 6, y + 38, 36, 10);
-
+            gc.setFill(Color.rgb(0, 0, 0, 0.2)); gc.fillOval(x + 6, y + 38, 36, 10);
             Image img = switch (me.type) {
-                case 0 -> imgEasyMonster;
-                case 1 -> imgMediumMonster;
+                case 0  -> imgEasyMonster;
+                case 1  -> imgMediumMonster;
                 default -> imgHardMonster;
             };
-
             if (img != null && !img.isError()) {
                 gc.drawImage(img, x, y, TILE_SIZE, TILE_SIZE);
             } else {
-                gc.setFill(Color.RED);
-                gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
-                gc.setFill(Color.WHITE);
-                gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
+                gc.setFill(Color.RED); gc.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+                gc.setFill(Color.WHITE); gc.setFont(Font.font("Arial", FontWeight.BOLD, 9));
                 gc.setTextAlign(TextAlignment.CENTER);
                 gc.fillText("?", x + TILE_SIZE / 2.0, y + TILE_SIZE / 2.0);
                 gc.setTextAlign(TextAlignment.LEFT);
             }
-
             if (me.aggro) {
                 gc.setFill(Color.rgb(255, 50, 50, 0.4));
                 gc.fillOval(x - 4, y - 4, TILE_SIZE + 8, TILE_SIZE + 8);
-                gc.setFill(Color.RED);
-                gc.setFont(Font.font("Arial", FontWeight.BOLD, 11));
+                gc.setFill(Color.RED); gc.setFont(Font.font("Arial", FontWeight.BOLD, 11));
                 gc.setTextAlign(TextAlignment.CENTER);
                 gc.fillText("!", x + TILE_SIZE / 2.0, y);
                 gc.setTextAlign(TextAlignment.LEFT);
             }
-
             int hp = me.monster.getHealthPoint(), mhp = me.monster.getMaxHealthPoint();
             double pct = (double) hp / mhp;
-            gc.setFill(Color.web("#1a0000", 0.6));
-            gc.fillRect(x + 2, y + TILE_SIZE - 8, TILE_SIZE - 4, 5);
+            gc.setFill(Color.web("#1a0000", 0.6)); gc.fillRect(x + 2, y + TILE_SIZE - 8, TILE_SIZE - 4, 5);
             gc.setFill(pct > 0.5 ? Color.LIMEGREEN : pct > 0.25 ? Color.ORANGE : Color.RED);
             gc.fillRect(x + 2, y + TILE_SIZE - 8, (TILE_SIZE - 4) * pct, 5);
-
             gc.setFont(Font.font("Arial", 9));
             String name = me.type == 0 ? "Rui" : me.type == 1 ? "Enmu" : "Daki";
             gc.setFill(Color.WHITE);
@@ -850,18 +744,12 @@ public class GameScene {
     }
 
     private void drawPlayer(GraphicsContext gc) {
-        double px = playerX, py = playerY;
-
         if (playerInvincibleFrames > 0 && animFrame % 2 == 0) return;
-
         Image[] spriteSet = isAttackAnim ? playerSlashImgs : playerWalkImgs;
         Image sprite = spriteSet[facing];
-
         if (sprite != null && !sprite.isError()) {
-            gc.setFill(Color.rgb(0, 0, 0, 0.25));
-            gc.fillOval(px + 8, py + 38, 32, 10);
-            gc.drawImage(sprite, px, py, TILE_SIZE, TILE_SIZE);
-            return;
+            gc.setFill(Color.rgb(0, 0, 0, 0.25)); gc.fillOval(playerX + 8, playerY + 38, 32, 10);
+            gc.drawImage(sprite, playerX, playerY, TILE_SIZE, TILE_SIZE);
         }
     }
 
@@ -879,10 +767,14 @@ public class GameScene {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    // ── HUD ──────────────────────────────────────────────────────────────────
+
     private void drawHUD(GraphicsContext gc) {
+        // ── Top bar background ────────────────────────────────────────────────
         gc.setFill(Color.rgb(0, 0, 0, 0.72));
         gc.fillRect(0, 0, W, 56);
 
+        // ── HP bar ────────────────────────────────────────────────────────────
         double hpPct = (double) player.getHealth() / player.getMaxHealth();
         gc.setFill(Color.web("#7f0000"));
         gc.fillRoundRect(10, 8, 170, 16, 5, 5);
@@ -894,10 +786,10 @@ public class GameScene {
 
         gc.setFill(Color.web("#ff8a65"));
         gc.fillText("ATK: " + player.getAttack(), 14, 42);
-
         gc.setFill(Color.web("#90caf9"));
         gc.fillText("DEF: " + player.getDefense(), 80, 42);
 
+        // ── Gold & pickaxe ────────────────────────────────────────────────────
         gc.setFill(Color.web("#ffd700"));
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 13));
         gc.fillText("GOLD: " + player.getGold() + "g", 200, 23);
@@ -906,12 +798,34 @@ public class GameScene {
         gc.setFont(Font.font("Arial", 11));
         gc.fillText("⛏ " + pickaxeHolder[0].getName() + " (Pwr:" + pickaxeHolder[0].getPower() + ")", 200, 42);
 
+        // ── Equipped gear display (top-center) ────────────────────────────────
+        String weaponStr = player.getEquippedWeapon() != null
+                ? "⚔ " + player.getEquippedWeapon().getName()
+                : "⚔ None";
+        String armorStr  = player.getEquippedArmor()  != null
+                ? "🛡 " + player.getEquippedArmor().getName()
+                : "🛡 None";
+
+        gc.setFill(Color.rgb(0, 0, 0, 0.55));
+        gc.fillRoundRect(W / 2.0 - 130, 4, 260, 48, 8, 8);
+
+        gc.setFill(player.getEquippedWeapon() != null ? Color.web("#ffcc80") : Color.web("#757575"));
+        gc.setFont(Font.font("Arial", FontWeight.BOLD, 11));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(weaponStr, W / 2.0, 22);
+
+        gc.setFill(player.getEquippedArmor() != null ? Color.web("#80cbc4") : Color.web("#757575"));
+        gc.fillText(armorStr, W / 2.0, 42);
+        gc.setTextAlign(TextAlignment.LEFT);
+
+        // ── Monster count (top-right) ─────────────────────────────────────────
         long alive = monsters.stream().filter(me -> me.monster.isAlive()).count();
         gc.setFill(alive == 0 ? Color.LIMEGREEN : Color.web("#ff8a80"));
         gc.setFont(Font.font("Arial", FontWeight.BOLD, 11));
         gc.fillText("Monsters: " + alive, W - 150, 23);
         if (alive == 0) gc.fillText("✓ Area clear!", W - 150, 42);
 
+        // ── Inventory mini-panel (bottom-left) ───────────────────────────────
         gc.setFill(Color.rgb(0, 0, 0, 0.70));
         gc.fillRoundRect(6, H - 106, 220, 100, 8, 8);
         gc.setFill(Color.web("#ffd54f"));
@@ -936,6 +850,7 @@ public class GameScene {
             }
         }
 
+        // ── Controls panel (bottom-right) ─────────────────────────────────────
         gc.setFill(Color.rgb(0, 0, 0, 0.70));
         gc.fillRoundRect(W - 190, H - 116, 184, 110, 8, 8);
         gc.setFill(Color.web("#80cbc4"));
@@ -943,9 +858,11 @@ public class GameScene {
         gc.fillText("CONTROLS", W - 180, H - 100);
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", 10));
-        String[] lines = {"WASD-Move", "E-Enter building", "LMB-Attack", "RMB-Mine", "(yellow border = mine target)", "(cyan border = enter building)"};
+        String[] lines = {"WASD-Move", "E-Inventory", "LMB-Attack", "RMB-Mine",
+                "(yellow border = mine target)", "(cyan border = enter building)"};
         for (int i = 0; i < lines.length; i++) gc.fillText(lines[i], W - 180, H - 86 + i * 14);
 
+        // ── Notification banner ───────────────────────────────────────────────
         long age = System.currentTimeMillis() - notifTime;
         if (age < NOTIF_DURATION && !notifMsg.isEmpty()) {
             double a = age < 1800 ? 1.0 : 1.0 - (age - 1800) / 400.0;
@@ -959,19 +876,15 @@ public class GameScene {
         }
     }
 
+    // ── Inner classes ─────────────────────────────────────────────────────────
+
     private static class MonsterEntity {
         logic.creatures.Monster monster;
-        double x, y;
+        double x, y, moveTimer, dx, dy;
         int type;
-        double moveTimer;
-        double dx, dy;
         boolean aggro;
-
         MonsterEntity(logic.creatures.Monster m, double x, double y, int type) {
-            this.monster = m;
-            this.x = x;
-            this.y = y;
-            this.type = type;
+            this.monster = m; this.x = x; this.y = y; this.type = type;
             this.moveTimer = 1 + Math.random() * 2;
         }
     }
@@ -980,21 +893,11 @@ public class GameScene {
         double x, y, vy;
         String text;
         Color color;
-        long born;
-        long life;
-
+        long born, life;
         FloatingText(double x, double y, String text, Color c, long lifeMs) {
-            this.x = x;
-            this.y = y;
-            this.vy = -1.2;
-            this.text = text;
-            this.color = c;
-            this.born = System.currentTimeMillis();
-            this.life = lifeMs;
+            this.x = x; this.y = y; this.vy = -1.2; this.text = text;
+            this.color = c; this.born = System.currentTimeMillis(); this.life = lifeMs;
         }
-
-        boolean isDead() {
-            return System.currentTimeMillis() - born > life;
-        }
+        boolean isDead() { return System.currentTimeMillis() - born > life; }
     }
 }

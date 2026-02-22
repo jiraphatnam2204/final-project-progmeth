@@ -1,15 +1,35 @@
 package logic.creatures;
-import logic.base.BaseCreature; import logic.base.BaseItem;
+import logic.base.BaseArmor;
+import logic.base.BaseCreature;
+import logic.base.BaseItem;
+import logic.base.BaseWeapon;
 import logic.util.ItemCounter;
 import java.util.ArrayList;
+
 public class Player extends BaseCreature {
-    private int gold; private ArrayList<ItemCounter> inventory; private int speed, luck;
+    private int gold;
+    private ArrayList<ItemCounter> inventory;
+    private int speed, luck;
+
+    // ── Equipped gear tracking ───────────────────────────────────────
+    private BaseWeapon equippedWeapon = null;
+    private BaseArmor  equippedArmor  = null;
+
     public Player(int hp, int attack, int defense) {
-        super(hp, attack, defense); gold = 0; inventory = new ArrayList<>(); speed = 0; luck = 0;
+        super(hp, attack, defense);
+        gold = 0;
+        inventory = new ArrayList<>();
+        speed = 0;
+        luck = 0;
     }
+
+    // ── Gold ─────────────────────────────────────────────────────────
     public int getGold() { return gold; }
     public void setGold(int gold) { this.gold = Math.max(0, gold); }
+
+    // ── Inventory ─────────────────────────────────────────────────────
     public ArrayList<ItemCounter> getInventory() { return inventory; }
+
     public void addItem(BaseItem item, int amount) {
         for (ItemCounter i : inventory) {
             if (i.getItem().getName().equals(item.getName())) {
@@ -18,22 +38,77 @@ public class Player extends BaseCreature {
         }
         inventory.add(new ItemCounter(item, amount));
     }
-    public void addBonus(int atk, int def, int hp, int spd) {
-        attack += atk; defense += def; maxHealthPoint += hp; healthPoint += hp; speed += spd;
+
+    // ── Equipped weapon ──────────────────────────────────────────────
+    public BaseWeapon getEquippedWeapon() { return equippedWeapon; }
+
+    public void equipWeapon(BaseWeapon weapon) {
+        if (equippedWeapon != null) {
+            equippedWeapon.unequip(this);   // remove old bonus
+        }
+        equippedWeapon = weapon;
+        if (weapon != null) {
+            weapon.equip(this);              // apply new bonus
+        }
     }
+
+    public void unequipWeapon() {
+        if (equippedWeapon != null) {
+            equippedWeapon.unequip(this);
+            equippedWeapon = null;
+        }
+    }
+
+    // ── Equipped armor ───────────────────────────────────────────────
+    public BaseArmor getEquippedArmor() { return equippedArmor; }
+
+    public void equipArmor(BaseArmor armor) {
+        if (equippedArmor != null) {
+            equippedArmor.unequip(this);    // remove old bonus
+        }
+        equippedArmor = armor;
+        if (armor != null) {
+            armor.equip(this);               // apply new bonus
+        }
+    }
+
+    public void unequipArmor() {
+        if (equippedArmor != null) {
+            equippedArmor.unequip(this);
+            equippedArmor = null;
+        }
+    }
+
+    // ── Stat bonuses ─────────────────────────────────────────────────
+    public void addBonus(int atk, int def, int hp, int spd) {
+        attack += atk;
+        defense += def;
+        maxHealthPoint += hp;
+        healthPoint += hp;
+        speed += spd;
+    }
+
     public void removeBonus(int atk, int def, int hp, int spd) {
-        attack = Math.max(0, attack - atk); defense = Math.max(0, defense - def);
+        attack = Math.max(0, attack - atk);
+        defense = Math.max(0, defense - def);
         maxHealthPoint = Math.max(1, maxHealthPoint - hp);
         if (healthPoint > maxHealthPoint) healthPoint = maxHealthPoint;
         speed -= spd;
     }
-    public int getHealth() { return healthPoint; }
+
+    // ── Stat accessors ────────────────────────────────────────────────
+    public int getHealth()    { return healthPoint; }
     public int getMaxHealth() { return maxHealthPoint; }
     public void setHealth(int hp) { healthPoint = Math.max(0, Math.min(maxHealthPoint, hp)); }
-    public int getStrength() { return attack; }
+
+    public int getStrength()  { return attack; }
     public void setStrength(int v) { attack = Math.max(0, v); }
-    public int getLuck() { return luck; }
+
+    public int getLuck()  { return luck; }
     public void setLuck(int v) { luck = Math.max(0, v); }
+
     public int getDefense() { return defense; }
-    @Override public void attack(BaseCreature target) { target.takeDamage(attack); }
+
+    @Override
+    public void attack(BaseCreature target) { target.takeDamage(attack); }
 }

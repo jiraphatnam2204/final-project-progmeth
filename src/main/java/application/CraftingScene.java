@@ -9,6 +9,7 @@ import javafx.scene.text.*;
 
 import interfaces.Craftable;
 import logic.base.BaseArmor;
+import logic.base.BaseItem;
 import logic.base.BaseWeapon;
 import logic.creatures.Player;
 import logic.item.armor.*;
@@ -103,14 +104,13 @@ public class CraftingScene {
             cr.craft(player);
 
             if (cr instanceof BaseArmor arm) {
-                arm.equip(player);
                 feedbackMsg = "✓ Equipped " + ((logic.base.BaseItem)cr).getName();
             }
             else if (cr instanceof BaseWeapon wpn) {
-                player.addBonus(wpn.getDmg(), 0, 0, 0);
+
                 feedbackMsg = "✓ Crafted " + ((logic.base.BaseItem)cr).getName();
             }
-
+            player.addItem((BaseItem) cr,1);
             feedbackColor = Color.LIMEGREEN;
         } else {
             feedbackMsg = "✗ Missing materials or gold!";
