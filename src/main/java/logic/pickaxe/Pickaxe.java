@@ -16,11 +16,11 @@ public class Pickaxe {
     }
 
     public static Pickaxe createWoodenPickaxe() {
-        return new Pickaxe("Wooden Pickaxe", 1);
+        return new Pickaxe("Wooden Pickaxe", 2);
     }
 
     public static Pickaxe createNormalStonePickaxe() {
-        return new Pickaxe("Normal Stone Pickaxe", 2);
+        return new Pickaxe("Normal Stone Pickaxe", 3);
     }
 
     public static Pickaxe createHardStonePickaxe() {

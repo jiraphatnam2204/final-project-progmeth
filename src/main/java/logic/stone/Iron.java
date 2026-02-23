@@ -4,7 +4,7 @@ import logic.base.BaseItem;
 
 public class Iron extends baseStone {
     public Iron() {
-        super("Iron", 40, 3);
+        super("Iron", 36, 3);
     }
 
     @Override

@@ -19,6 +19,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import logic.creatures.Player;
+import logic.item.weapon.WoodenSword;
 import logic.pickaxe.Pickaxe;
 
 public class MainMenuView {
@@ -90,13 +91,16 @@ public class MainMenuView {
     // and then tells the SceneManager to swap the window to the actual Game Scene.
     private void startGame() {
         Player player = new Player(100, 20, 10);
-        player.setGold(20000000);
+        player.setGold(150);
+        WoodenSword starterSword = new WoodenSword();
+        player.equipWeapon(starterSword);
+        player.addItem(starterSword, 1);
 
         Pickaxe startPickaxe = Pickaxe.createWoodenPickaxe();
 
         // For testing purposes
-        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
-        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
+//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
+//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
         Main.sceneManager.showGame(player, startPickaxe);
     }
 

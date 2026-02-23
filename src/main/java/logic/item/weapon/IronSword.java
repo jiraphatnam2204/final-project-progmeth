@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class IronSword extends BaseWeapon {
     public IronSword() {
-        super("Iron Sword", 25, 0.8, 80);
+        super("Iron Sword", 30, 0.8, 100);
     }
 
     @Override

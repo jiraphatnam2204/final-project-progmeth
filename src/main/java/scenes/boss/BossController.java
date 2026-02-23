@@ -29,9 +29,9 @@ public class BossController {
     public BossController(Player player) {
         this.player = player;
         bosses = new BossInfo[]{
-                new BossInfo("Akaza", new EasyBoss(500, 35, 15, 300), Color.web("#64B5F6")),
-                new BossInfo("Kokushibo", new MediumBoss(900, 55, 22, 700), Color.web("#ce93d8")),
-                new BossInfo("Muzan", new HardBoss(1600, 85, 38, 1500), Color.web("#ef5350")),
+                new BossInfo("Akaza", new EasyBoss(500, 60, 15, 300), Color.web("#64B5F6")),
+                new BossInfo("Kokushibo", new MediumBoss(900, 80, 22, 700), Color.web("#ce93d8")),
+                new BossInfo("Muzan", new HardBoss(1600, 100, 38, 1500), Color.web("#ef5350")),
         };
         loadBoss(0);
     }

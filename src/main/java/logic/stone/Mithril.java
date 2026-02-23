@@ -4,7 +4,7 @@ import logic.base.BaseItem;
 
 public class Mithril extends baseStone {
     public Mithril() {
-        super("Mithril", 120, 1);
+        super("Mithril", 120, 3);
     }
 
     @Override

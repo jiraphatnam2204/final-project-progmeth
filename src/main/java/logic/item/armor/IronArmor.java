@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class IronArmor extends BaseArmor {
     public IronArmor() {
-        super("Iron Armor", 0, 15, 40, 0, 200);
+        super("Iron Armor", 0, 15, 40, 0, 100);
     }
 
     @Override

@@ -345,7 +345,7 @@ public class GameController {
 
                 if (dist < attackRange && playerInvincibleFrames <= 0) {
                     me.monster.attack(player);
-                    playerInvincibleFrames = 50;
+                    playerInvincibleFrames = 150;
                     int dmg = Math.max(0, me.monster.getAttack() - player.getDefense());
                     floatingTexts.add(new FloatingText(playerX, playerY - 10, "-" + dmg + " HP",
                             javafx.scene.paint.Color.web("#ff1744"), 1200));

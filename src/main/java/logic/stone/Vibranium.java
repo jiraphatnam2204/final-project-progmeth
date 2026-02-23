@@ -4,7 +4,7 @@ import logic.base.BaseItem;
 
 public class Vibranium extends baseStone {
     public Vibranium() {
-        super("Vibranium", 180, 1);
+        super("Vibranium", 210, 3);
     }
 
     @Override

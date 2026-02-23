@@ -9,13 +9,13 @@ import java.util.ArrayList;
 
 public class PlatinumSword extends BaseWeapon {
     public PlatinumSword() {
-        super("Platinum Sword", 45, 0.7, 280);
+        super("Platinum Sword", 45, 0.7, 160);
     }
 
     @Override
     public ArrayList<ItemCounter> getRecipe() {
         ArrayList<ItemCounter> r = new ArrayList<>();
-        r.add(new ItemCounter(new Iron(), 10));
+        r.add(new ItemCounter(new Iron(), 8));
         r.add(new ItemCounter(new Platinum(), 10));
         return r;
     }

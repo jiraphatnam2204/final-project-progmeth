@@ -31,11 +31,11 @@ public class ShopController {
 
     private void buildCatalogue() {
         // ── Potions ───────────────────────────────────────────────────────────────
-        items.add(new ShopItem("Small Potion", "Heals 40 HP", 25,
+        items.add(new ShopItem("Small Potion", "Heals 40 HP", 50,
                 p -> p.addItem(new SmallHealthPotion(), 1)));
-        items.add(new ShopItem("Medium Potion", "Heals 100 HP", 70,
+        items.add(new ShopItem("Medium Potion", "Heals 100 HP", 100,
                 p -> p.addItem(new MediumHealthPotion(), 1)));
-        items.add(new ShopItem("Big Potion", "Heals 200 HP", 130,
+        items.add(new ShopItem("Big Potion", "Heals 200 HP", 200,
                 p -> p.addItem(new BigHealthPotion(), 1)));
 
         // ── All Pickaxes (every tier) ─────────────────────────────────────────────
@@ -44,15 +44,15 @@ public class ShopController {
                 p -> pickaxeHolder[0] = Pickaxe.createWoodenPickaxe()));
         items.add(new ShopItem("Normal Pick", "Power: 2", 10,
                 p -> pickaxeHolder[0] = Pickaxe.createNormalStonePickaxe()));
-        items.add(new ShopItem("Hardstone Pick", "Power: 5", 60,
+        items.add(new ShopItem("Hardstone Pick", "Power: 5", 50,
                 p -> pickaxeHolder[0] = Pickaxe.createHardStonePickaxe()));
-        items.add(new ShopItem("Iron Pickaxe", "Power: 12", 150,
+        items.add(new ShopItem("Iron Pickaxe", "Power: 12", 100,
                 p -> pickaxeHolder[0] = Pickaxe.createIronPickaxe()));
-        items.add(new ShopItem("Platinum Pick", "Power: 27", 400,
+        items.add(new ShopItem("Platinum Pick", "Power: 27", 160,
                 p -> pickaxeHolder[0] = Pickaxe.createPlatinumPickaxe()));
-        items.add(new ShopItem("Mithril Pick", "Power: 45", 1000,
+        items.add(new ShopItem("Mithril Pick", "Power: 45", 230,
                 p -> pickaxeHolder[0] = Pickaxe.createMithrilPickaxe()));
-        items.add(new ShopItem("Vibranium Pick", "Power: 100", 2500,
+        items.add(new ShopItem("Vibranium Pick", "Power: 100", 310,
                 p -> pickaxeHolder[0] = Pickaxe.createVibraniumPickaxe()));
     }
 

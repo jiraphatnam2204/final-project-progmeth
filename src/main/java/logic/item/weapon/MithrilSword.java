@@ -9,14 +9,14 @@ import java.util.ArrayList;
 
 public class MithrilSword extends BaseWeapon {
     public MithrilSword() {
-        super("Mithril Sword", 70, 0.6, 700);
+        super("Mithril Sword", 70, 0.6, 230);
     }
 
     @Override
     public ArrayList<ItemCounter> getRecipe() {
         ArrayList<ItemCounter> r = new ArrayList<>();
         r.add(new ItemCounter(new Platinum(), 5));
-        r.add(new ItemCounter(new Mithril(), 20));
+        r.add(new ItemCounter(new Mithril(), 15));
         return r;
     }
 }
