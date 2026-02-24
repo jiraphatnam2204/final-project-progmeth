@@ -1,17 +1,21 @@
 package logic.creatures;
+
 import logic.base.BaseArmor;
 import logic.base.BaseCreature;
 import logic.base.BaseItem;
 import logic.base.BaseWeapon;
+import logic.base.BasePotion;
 import logic.util.ItemCounter;
+
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Player extends BaseCreature {
+
     private int gold;
     private ArrayList<ItemCounter> inventory;
     private int speed, luck;
 
-    // ── Equipped gear tracking ───────────────────────────────────────
     private BaseWeapon equippedWeapon = null;
     private BaseArmor  equippedArmor  = null;
 
@@ -23,63 +27,120 @@ public class Player extends BaseCreature {
         luck = 0;
     }
 
-    // ── Gold ─────────────────────────────────────────────────────────
+    // ───────────────── GOLD ─────────────────
     public int getGold() { return gold; }
-    public void setGold(int gold) { this.gold = Math.max(0, gold); }
 
-    // ── Inventory ─────────────────────────────────────────────────────
-    public ArrayList<ItemCounter> getInventory() { return inventory; }
+    public void setGold(int gold) {
+        this.gold = Math.max(0, gold);
+    }
+
+    // ───────────────── INVENTORY ─────────────────
+    public ArrayList<ItemCounter> getInventory() {
+        return inventory;
+    }
 
     public void addItem(BaseItem item, int amount) {
+
         for (ItemCounter i : inventory) {
+
             if (i.getItem().getName().equals(item.getName())) {
-                if (i.getItem().isStackable()) { i.addCount(amount); return; }
+
+                if (i.getItem().isStackable()) {
+                    i.addCount(amount);
+                    return;
+                }
             }
         }
+
         inventory.add(new ItemCounter(item, amount));
     }
 
-    // ── Equipped weapon ──────────────────────────────────────────────
+    // ⭐ ใช้ potion โดยตรง (เรียกจาก controller ได้เลย)
+    public boolean usePotion(Class<? extends BasePotion> type) {
+
+        Iterator<ItemCounter> iterator = inventory.iterator();
+
+        while (iterator.hasNext()) {
+
+            ItemCounter ic = iterator.next();
+
+            if (type.isInstance(ic.getItem()) && ic.getCount() > 0) {
+
+                BasePotion potion = (BasePotion) ic.getItem();
+                potion.consume(this);
+
+                ic.setCount(ic.getCount() - 1);
+
+                if (ic.getCount() <= 0) {
+                    iterator.remove();  // safe remove
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public int countItem(Class<?> type) {
+
+        for (ItemCounter ic : inventory) {
+            if (type.isInstance(ic.getItem())) {
+                return ic.getCount();
+            }
+        }
+
+        return 0;
+    }
+
+    // ───────────────── EQUIPMENT ─────────────────
     public BaseWeapon getEquippedWeapon() { return equippedWeapon; }
 
     public void equipWeapon(BaseWeapon weapon) {
+
         if (equippedWeapon != null) {
-            equippedWeapon.unequip(this);   // remove old bonus
+            equippedWeapon.unequip(this);
         }
+
         equippedWeapon = weapon;
+
         if (weapon != null) {
-            weapon.equip(this);              // apply new bonus
+            weapon.equip(this);
         }
     }
 
     public void unequipWeapon() {
+
         if (equippedWeapon != null) {
             equippedWeapon.unequip(this);
             equippedWeapon = null;
         }
     }
 
-    // ── Equipped armor ───────────────────────────────────────────────
     public BaseArmor getEquippedArmor() { return equippedArmor; }
 
     public void equipArmor(BaseArmor armor) {
+
         if (equippedArmor != null) {
-            equippedArmor.unequip(this);    // remove old bonus
+            equippedArmor.unequip(this);
         }
+
         equippedArmor = armor;
+
         if (armor != null) {
-            armor.equip(this);               // apply new bonus
+            armor.equip(this);
         }
     }
 
     public void unequipArmor() {
+
         if (equippedArmor != null) {
             equippedArmor.unequip(this);
             equippedArmor = null;
         }
     }
 
-    // ── Stat bonuses ─────────────────────────────────────────────────
+    // ───────────────── STAT BONUS ─────────────────
     public void addBonus(int atk, int def, int hp, int spd) {
         attack += atk;
         defense += def;
@@ -92,23 +153,56 @@ public class Player extends BaseCreature {
         attack = Math.max(0, attack - atk);
         defense = Math.max(0, defense - def);
         maxHealthPoint = Math.max(1, maxHealthPoint - hp);
-        if (healthPoint > maxHealthPoint) healthPoint = maxHealthPoint;
+        if (healthPoint > maxHealthPoint)
+            healthPoint = maxHealthPoint;
         speed -= spd;
     }
 
-    // ── Stat accessors ────────────────────────────────────────────────
-    public int getHealth()    { return healthPoint; }
-    public int getMaxHealth() { return maxHealthPoint; }
-    public void setHealth(int hp) { healthPoint = Math.max(0, Math.min(maxHealthPoint, hp)); }
+    // ───────────────── HEAL METHOD ─────────────────
+    public void heal(int amount) {
+        healthPoint = Math.min(maxHealthPoint, healthPoint + amount);
+    }
 
-    public int getStrength()  { return attack; }
-    public void setStrength(int v) { attack = Math.max(0, v); }
+    // ───────────────── ACCESSORS ─────────────────
+    public int getHealth() {
+        return healthPoint;
+    }
 
-    public int getLuck()  { return luck; }
-    public void setLuck(int v) { luck = Math.max(0, v); }
+    public int getMaxHealth() {
+        return maxHealthPoint;
+    }
 
-    public int getDefense() { return defense; }
+    public void setHealth(int hp) {
+        healthPoint = Math.max(0, Math.min(maxHealthPoint, hp));
+    }
 
+    public int getStrength() {
+        return attack;
+    }
+
+    public void setStrength(int v) {
+        attack = Math.max(0, v);
+    }
+
+    public int getLuck() {
+        return luck;
+    }
+
+    public void setLuck(int v) {
+        luck = Math.max(0, v);
+    }
+
+    public int getDefense() {
+        return defense;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    // ───────────────── COMBAT ─────────────────
     @Override
-    public void attack(BaseCreature target) { target.takeDamage(attack); }
+    public void attack(BaseCreature target) {
+        target.takeDamage(attack);
+    }
 }
