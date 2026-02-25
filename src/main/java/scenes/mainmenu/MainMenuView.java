@@ -90,8 +90,8 @@ public class MainMenuView {
     // it constructs a brand-new Player with base stats, hands them a starter Pickaxe,
     // and then tells the SceneManager to swap the window to the actual Game Scene.
     private void startGame() {
-        Player player = new Player(100, 20, 10);
-        player.setGold(150);
+        Player player = new Player(1000, 200, 10);
+        player.setGold(1500);
         WoodenSword starterSword = new WoodenSword();
         player.equipWeapon(starterSword);
         player.addItem(starterSword, 1);
@@ -99,8 +99,8 @@ public class MainMenuView {
         Pickaxe startPickaxe = Pickaxe.createWoodenPickaxe();
 
         // For testing purposes
-//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
-//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
         Main.sceneManager.showGame(player, startPickaxe);
     }
 
