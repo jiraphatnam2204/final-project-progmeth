@@ -171,9 +171,9 @@ public class MainMenuView {
         gc.setFont(Font.font("Georgia", 16));
         gc.setFill(Color.LIGHTGRAY);
 
-        gc.fillText("6833022221", baseX, startY);
-        gc.fillText("6833103421", baseX, startY + lineGap);
-        gc.fillText("6833009121", baseX, startY + (lineGap * 2));
+        gc.fillText("6833022221 Khetsopon Krongyhut", baseX, startY);
+        gc.fillText("6833103421 Tanakrit Soontornwetchaphong", baseX, startY + lineGap);
+        gc.fillText("6833009121 Kongpob Saengkaew", baseX, startY + (lineGap * 2));
         gc.fillText("6833029721 Jiraphat Namvong", baseX, startY + (lineGap * 3));
 
         gc.setFont(Font.font("Arial", 13));
