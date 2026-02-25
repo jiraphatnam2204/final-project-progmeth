@@ -90,8 +90,8 @@ public class MainMenuView {
     // it constructs a brand-new Player with base stats, hands them a starter Pickaxe,
     // and then tells the SceneManager to swap the window to the actual Game Scene.
     private void startGame() {
-        Player player = new Player(1000, 200, 10);
-        player.setGold(1500);
+        Player player = new Player(100, 20, 10);
+        player.setGold(150);
         WoodenSword starterSword = new WoodenSword();
         player.equipWeapon(starterSword);
         player.addItem(starterSword, 1);
