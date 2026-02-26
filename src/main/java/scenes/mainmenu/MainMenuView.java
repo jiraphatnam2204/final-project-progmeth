@@ -99,8 +99,8 @@ public class MainMenuView {
         Pickaxe startPickaxe = Pickaxe.createWoodenPickaxe();
 
         // For testing purposes
-//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
-//        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
         Main.sceneManager.showGame(player, startPickaxe);
     }
 
