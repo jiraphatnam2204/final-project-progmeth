@@ -1,5 +1,7 @@
-package application;
+package scenes.mainmenu;
 
+import application.Main;
+import application.SceneManager;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,30 +19,19 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import logic.creatures.Player;
+import logic.item.weapon.WoodenSword;
 import logic.pickaxe.Pickaxe;
 
-import java.util.Random;
-
-public class MainMenuScene {
+public class MainMenuView {
 
     private static final int W = SceneManager.W;
     private static final int H = SceneManager.H;
 
-    private final double[] starX = new double[120];
-    private final double[] starY = new double[120];
-    private final double[] starSpd = new double[120];  // falling speed
-    private final double[] starR = new double[120];  // radius
-
+    private final MainMenuController controller;
     private final Image logo;
 
-    public MainMenuScene() {
-        Random rng = new Random();
-        for (int i = 0; i < 120; i++) {
-            starX[i] = rng.nextDouble() * W;
-            starY[i] = rng.nextDouble() * H;
-            starSpd[i] = 0.3 + rng.nextDouble() * 0.8;
-            starR[i] = 1 + rng.nextDouble() * 2;
-        }
+    public MainMenuView(MainMenuController controller) {
+        this.controller = controller;
 
         Image loaded = null;
         try {
@@ -52,6 +43,12 @@ public class MainMenuScene {
         this.logo = loaded;
     }
 
+    // Assembles the visual elements and kicks off the animation loop.
+    // The AnimationTimer is the heartbeat of this screen. It acts like a movie projector,
+    // running code roughly 60 times every second.
+    // We calculate 'dt' (Delta Time), which is the exact fraction of a second since the last frame.
+    // Relying on time (dt) rather than pure frame counts ensures the animation runs at the
+    // same smooth speed on every computer, regardless of whether it's lagging or running incredibly fast!
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -59,25 +56,13 @@ public class MainMenuScene {
         Button startBtn = makeButton("PLAY GAME", "#43a047", "#66bb6a");
         Button quitBtn = makeButton("QUIT", "#c62828", "#ef5350");
 
-        startBtn.setOnAction(e -> {
-            Player player = new Player(100, 20, 10);
-            player.setGold(999999);
-
-            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.NormalStone(), 30));
-            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.HardStone(), 20));
-            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Iron(), 20));
-            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Platinum(), 15));
-            player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 15));
-
-            Pickaxe[] pickaxeHolder = {Pickaxe.createIronPickaxe()};
-            Main.sceneManager.showGame(player, pickaxeHolder[0]);
-        });
+        startBtn.setOnAction(e -> startGame());
         quitBtn.setOnAction(e -> System.exit(0));
 
         VBox buttons = new VBox(16, startBtn, quitBtn);
         buttons.setAlignment(Pos.CENTER);
         buttons.setLayoutX(W / 2.0 - 120);
-        buttons.setLayoutY(H * 0.62);
+        buttons.setLayoutY(H * 0.65);
 
         Pane root = new Pane(canvas, buttons);
         Scene scene = new Scene(root, W, H);
@@ -88,18 +73,11 @@ public class MainMenuScene {
 
             @Override
             public void handle(long now) {
-                double dt = (now - lastTime) / 1_000_000_000.0;
+                double dt = lastTime == 0 ? 0 : (now - lastTime) / 1_000_000_000.0;
                 lastTime = now;
                 titleBob += dt * 1.8;
 
-                for (int i = 0; i < 120; i++) {
-                    starY[i] += starSpd[i];
-                    if (starY[i] > H) {
-                        starY[i] = 0;
-                        starX[i] = Math.random() * W;
-                    }
-                }
-
+                controller.update(dt);
                 drawBackground(gc, titleBob);
             }
         }.start();
@@ -107,6 +85,29 @@ public class MainMenuScene {
         return scene;
     }
 
+    // The bridge between the main menu and the actual gameplay.
+    // When the user clicks "Play", this method acts like a factory line:
+    // it constructs a brand-new Player with base stats, hands them a starter Pickaxe,
+    // and then tells the SceneManager to swap the window to the actual Game Scene.
+    private void startGame() {
+        Player player = new Player(100, 20, 10);
+        player.setGold(150);
+        WoodenSword starterSword = new WoodenSword();
+        player.equipWeapon(starterSword);
+        player.addItem(starterSword, 1);
+
+        Pickaxe startPickaxe = Pickaxe.createWoodenPickaxe();
+
+        // For testing purposes
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Mithril(), 300));
+        player.getInventory().add(new logic.util.ItemCounter(new logic.stone.Vibranium(), 300));
+        Main.sceneManager.showGame(player, startPickaxe);
+    }
+
+    // Renders every visual element on the screen from back to front.
+    // This uses the "Painter's Algorithm"—just like painting on a real canvas, whatever
+    // you draw first gets covered up by what you draw next.
+    // It draws the sky -> then the stars -> then the mountains -> and finally the text on top.
     private void drawBackground(GraphicsContext gc, double titleBob) {
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0a0a1a")),
@@ -114,10 +115,13 @@ public class MainMenuScene {
         gc.setFill(bg);
         gc.fillRect(0, 0, W, H);
 
-        for (int i = 0; i < 120; i++) {
-            double alpha = 0.4 + starR[i] * 0.2;
-            gc.setFill(Color.rgb(255, 255, 255, Math.min(1.0, alpha)));
-            gc.fillOval(starX[i], starY[i], starR[i], starR[i]);
+        double[] sx = controller.getStarX();
+        double[] sy = controller.getStarY();
+        double[] sr = controller.getStarR();
+        for (int i = 0; i < controller.getStarCount(); i++) {
+            double alpha = Math.min(1.0, 0.4 + sr[i] * 0.2);
+            gc.setFill(Color.rgb(255, 255, 255, alpha));
+            gc.fillOval(sx[i], sy[i], sr[i], sr[i]);
         }
 
         gc.setFill(Color.web("#0d1b2a"));
@@ -131,61 +135,67 @@ public class MainMenuScene {
         drawTorch(gc, W * 0.25, H - 115, titleBob);
         drawTorch(gc, W * 0.75, H - 115, titleBob + 1.3);
 
+        // We use Math.sin() on the 'titleBob' variable to create a smooth, oscillating wave
+        // between -1 and 1. Multiplying it scales the wave up, creating a gentle hovering
+        // effect for the logo and text over time.
         double bobY = Math.sin(titleBob) * 6;
-
         drawLogo(gc, bobY);
+
+        double baseX = W / 2.0;
+        double baseY = H * 0.38 + bobY;
 
         gc.setFont(Font.font("Georgia", FontWeight.BOLD, 52));
         gc.setTextAlign(TextAlignment.CENTER);
         for (int d = 8; d >= 1; d--) {
             gc.setFill(Color.rgb(255, 160, 0, 0.04 * d));
-            gc.fillText("Tanjiro: The Swordsmith", W / 2.0 + d, H * 0.38 + bobY + d);
+            gc.fillText("Tanjiro: The Swordsmith", baseX + d, baseY + bobY + d);
         }
 
         gc.setFill(Color.web("#3a1a00"));
-        gc.fillText("Tanjiro: The Swordsmith", W / 2.0 + 4, H * 0.38 + bobY + 4);
-
+        gc.fillText("Tanjiro: The Swordsmith", baseX + 4, baseY + bobY + 4);
         LinearGradient titleGrad = new LinearGradient(0, 0.2, 0, 0.8, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#ffd700")),
                 new Stop(0.5, Color.web("#ff8c00")),
                 new Stop(1, Color.web("#ffd700")));
         gc.setFill(titleGrad);
-        gc.fillText("Tanjiro: The Swordsmith", W / 2.0, H * 0.38 + bobY);
+        gc.fillText("Tanjiro: The Swordsmith", baseX, baseY + bobY);
 
         gc.setFont(Font.font("Georgia", 22));
         gc.setFill(Color.rgb(180, 210, 255, 0.85));
-        gc.fillText("Mine, Craft, Fight, Survive", W / 2.0, H * 0.47 + bobY * 0.5);
+        double subtitleY = H * 0.46 + bobY * 0.5;
+        gc.fillText("Mine, Craft, Fight, Survive", baseX, subtitleY);
+
+        double startY = (H * 0.46 + bobY * 0.5) + 40;
+        int lineGap = 25;
+
+        gc.setFont(Font.font("Georgia", 16));
+        gc.setFill(Color.LIGHTGRAY);
+
+        gc.fillText("6833022221 Khetsopon Krongyhut", baseX, startY);
+        gc.fillText("6833103421 Tanakrit Soontornwetchaphong", baseX, startY + lineGap);
+        gc.fillText("6833009121 Kongpob Saengkaew", baseX, startY + (lineGap * 2));
+        gc.fillText("6833029721 Jiraphat Namvong", baseX, startY + (lineGap * 3));
 
         gc.setFont(Font.font("Arial", 13));
         gc.setFill(Color.rgb(140, 160, 180, 0.7));
-        gc.fillText("WASD: Move   |   E: Inventory   |   LMB: Attack   |   RMB: Mine   ", W / 2.0, H * 0.90);
+        gc.fillText("WASD: Move   |   E: Inventory   |   LMB: Attack   |   RMB: Mine",
+                W / 2.0, H * 0.90);
     }
 
     private void drawLogo(GraphicsContext gc, double bobY) {
         if (logo == null || logo.isError()) return;
 
-        double logoSize = 175;
+        double logoSize = 250;
         double cx = W / 2.0;
-        double cy = H * 0.15 + bobY;
-
-        gc.setFill(Color.rgb(255, 200, 50, 0.18));
-        gc.fillOval(cx - logoSize / 2.0 - 12, cy - logoSize / 2.0 - 12,
-                logoSize + 24, logoSize + 24);
+        double cy = H * 0.17 + bobY;
 
         gc.save();
         gc.beginPath();
         gc.arc(cx, cy, logoSize / 2.0, logoSize / 2.0, 0, 360);
         gc.closePath();
         gc.clip();
-
         gc.drawImage(logo, cx - logoSize / 2.0, cy - logoSize / 2.0, logoSize, logoSize);
-
         gc.restore();
-
-        gc.setStroke(Color.web("#ffd700"));
-        gc.setLineWidth(3);
-        gc.strokeOval(cx - logoSize / 2.0, cy - logoSize / 2.0, logoSize, logoSize);
-        gc.setLineWidth(1);
     }
 
     private void drawTorch(GraphicsContext gc, double x, double y, double t) {
@@ -208,18 +218,12 @@ public class MainMenuScene {
         Button btn = new Button(text);
         btn.setPrefWidth(240);
         btn.setPrefHeight(48);
-        String base = "-fx-background-color:" + colorHex + ";" +
-                "-fx-text-fill:white;" +
-                "-fx-font-size:15px;" +
-                "-fx-font-weight:bold;" +
-                "-fx-background-radius:8;" +
-                "-fx-cursor:hand;";
-        String hover = "-fx-background-color:" + hoverHex + ";" +
-                "-fx-text-fill:white;" +
-                "-fx-font-size:15px;" +
-                "-fx-font-weight:bold;" +
-                "-fx-background-radius:8;" +
-                "-fx-cursor:hand;";
+        String base = "-fx-background-color:" + colorHex + ";-fx-text-fill:white;"
+                + "-fx-font-size:15px;-fx-font-weight:bold;"
+                + "-fx-background-radius:8;-fx-cursor:hand;";
+        String hover = "-fx-background-color:" + hoverHex + ";-fx-text-fill:white;"
+                + "-fx-font-size:15px;-fx-font-weight:bold;"
+                + "-fx-background-radius:8;-fx-cursor:hand;";
         btn.setStyle(base);
         btn.setOnMouseEntered(e -> btn.setStyle(hover));
         btn.setOnMouseExited(e -> btn.setStyle(base));
