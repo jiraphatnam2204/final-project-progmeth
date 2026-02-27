@@ -40,19 +40,30 @@ public class Player extends BaseCreature {
     }
 
     public void addItem(BaseItem item, int amount) {
-
-        for (ItemCounter i : inventory) {
-
-            if (i.getItem().getName().equals(item.getName())) {
-
-                if (i.getItem().isStackable()) {
-                    i.addCount(amount);
-                    return;
+        if (item.isStackable()) {
+            int remaining = amount;
+            for (ItemCounter i : inventory) {
+                if (i.getItem().getName().equals(item.getName())) {
+                    int space = item.getMaxStack() - i.getCount();
+                    if (space <= 0) continue;
+                    int add = Math.min(space, remaining);
+                    i.addCount(add);
+                    remaining -= add;
+                    if (remaining <= 0) return;
                 }
             }
+            // ยังเหลืออยู่ → สร้าง slot ใหม่ไปเรื่อยๆ จนหมด
+            while (remaining > 0) {
+                int add = Math.min(item.getMaxStack(), remaining);
+                inventory.add(new ItemCounter(item, add));
+                remaining -= add;
+            }
+        } else {
+            // ไม่ stackable → เพิ่มแยก slot ทุกชิ้น
+            for (int i = 0; i < amount; i++) {
+                inventory.add(new ItemCounter(item, 1));
+            }
         }
-
-        inventory.add(new ItemCounter(item, amount));
     }
 
     // ⭐ ใช้ potion โดยตรง (เรียกจาก controller ได้เลย)
