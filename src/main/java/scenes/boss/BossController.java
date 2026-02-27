@@ -29,9 +29,9 @@ public class BossController {
     public BossController(Player player) {
         this.player = player;
         bosses = new BossInfo[]{
-                new BossInfo("Akaza", new EasyBoss(500, 60, 15, 300), Color.web("#64B5F6")),
-                new BossInfo("Kokushibo", new MediumBoss(900, 80, 22, 700), Color.web("#ce93d8")),
-                new BossInfo("Muzan", new HardBoss(1600, 100, 38, 1500), Color.web("#ef5350")),
+                new BossInfo("Akaza", new EasyBoss(), Color.web("#64B5F6")),
+                new BossInfo("Kokushibo", new MediumBoss(), Color.web("#ce93d8")),
+                new BossInfo("Muzan", new HardBoss(), Color.web("#ef5350")),
         };
         loadBoss(0);
     }
@@ -62,7 +62,7 @@ public class BossController {
                 + "  ATK:" + player.getAttack() + "  DEF:" + player.getDefense());
     }
 
-    // Normal Attack
+    // ── Normal Attack ─────────────────────────────────────────────────────────
     public ActionResult doPlayerAttack() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         menuCtrl.close();
@@ -76,9 +76,7 @@ public class BossController {
         return advanceAfterPlayerAction();
     }
 
-    // Skills
-    // แทน doSkill() เดิมทั้งหมด
-
+    // ── Skills ────────────────────────────────────────────────────────────────
     public ActionResult doSkill(int idx) {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         if (!menuCtrl.isReady(idx)) return ActionResult.NONE;
@@ -88,28 +86,34 @@ public class BossController {
         pendingBossShake = true;
 
         switch (idx) {
-            case 0 -> { // Kagura Dance
-                Player.SkillResult r = player.skillKaguraDance(currentBoss);
-                log.add("Kagura Dance! Hit " + bossName + " for " + r.damage() + " dmg!");
+            case 0 -> { // Power Strike: 2x damage
+                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                int dmg = base * 2;
+                currentBoss.takeDamage(player.getAttack() * 2);
+                log.add("Power Strike! Hit " + bossName + " for " + dmg + " dmg!");
                 menuCtrl.setCooldown(0, BattleMenuController.SKILL_MAX_CD[0]);
             }
-            case 1 -> { // Dead Calm
-                Player.SkillResult r = player.skillDeadCalm();
-                menuCtrl.setShieldWall(r.shieldWall());
-                log.add("Dead Calm! Incoming damage halved this turn.");
+            case 1 -> { // Shield Wall
+                menuCtrl.setShieldWall(true);
+                log.add("Shield Wall raised! Incoming damage halved this turn.");
                 pendingAttackAnim = false;
                 pendingBossShake = false;
                 menuCtrl.setCooldown(1, BattleMenuController.SKILL_MAX_CD[1]);
             }
-            case 2 -> { // Constant Flux
-                Player.SkillResult r = player.skillConstantFlux(currentBoss);
-                menuCtrl.setBerserkDebuff(r.berserkDebuff());
-                log.add("Constant Flux! 3 rapid hits for " + r.damage() + " total dmg! DEF -50% next turn.");
+            case 2 -> { // Berserk: 3 hits, debuff self
+                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                int total = base * 3;
+                for (int h = 0; h < 3; h++) currentBoss.takeDamage(player.getAttack());
+                menuCtrl.setBerserkDebuff(true);
+                log.add("Berserk! 3 rapid hits for " + total + " total dmg! DEF -50% next turn.");
                 menuCtrl.setCooldown(2, BattleMenuController.SKILL_MAX_CD[2]);
             }
-            case 3 -> { // Water Wheel
-                Player.SkillResult r = player.skillWaterWheel(currentBoss);
-                log.add("Water Wheel: dealt " + r.damage() + " dmg, healed " + r.heal() + " HP!");
+            case 3 -> { // Soul Drain
+                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                currentBoss.takeDamage(player.getAttack());
+                int heal = Math.max(1, (int) (base * 0.30));
+                player.heal(heal);
+                log.add("Soul Drain: dealt " + base + " dmg, healed " + heal + " HP!");
                 menuCtrl.setCooldown(3, BattleMenuController.SKILL_MAX_CD[3]);
             }
         }
