@@ -163,43 +163,6 @@ public class Player extends BaseCreature {
         healthPoint = Math.min(maxHealthPoint, healthPoint + amount);
     }
 
-    // เพิ่มที่ท้าย Player.java ก่อน closing brace
-
-    // ─── SKILL RESULT ───────────────────────────────────────────────────────────
-    public record SkillResult(int damage, int heal, boolean shieldWall, boolean berserkDebuff) {}
-
-// ─── SKILLS ─────────────────────────────────────────────────────────────────
-
-
-    public SkillResult skillKaguraDance(BaseCreature target) {
-        int dmg = Math.max(1, attack - target.getDefense()) * 2;
-        target.takeDamage(attack * 2);
-        return new SkillResult(dmg, 0, false, false);
-    }
-
-
-    public SkillResult skillDeadCalm() {
-        return new SkillResult(0, 0, true, false);
-    }
-
-
-    public SkillResult skillConstantFlux(BaseCreature target) {
-        int base = Math.max(1, attack - target.getDefense());
-        int total = base * 3;
-        for (int i = 0; i < 3; i++) target.takeDamage(attack);
-        return new SkillResult(total, 0, false, true);
-    }
-
-
-    public SkillResult skillWaterWheel(BaseCreature target) {
-        int base = Math.max(1, attack - target.getDefense());
-        target.takeDamage(attack);
-        int healAmt = Math.max(1, (int) (base * 0.30));
-        heal(healAmt);
-        return new SkillResult(base, healAmt, false, false);
-    }
-
-
     // ───────────────── ACCESSORS ─────────────────
     public int getHealth() {
         return healthPoint;
