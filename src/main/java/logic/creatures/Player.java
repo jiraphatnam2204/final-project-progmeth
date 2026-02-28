@@ -1,10 +1,6 @@
 package logic.creatures;
 
-import logic.base.BaseArmor;
-import logic.base.BaseCreature;
-import logic.base.BaseItem;
-import logic.base.BaseWeapon;
-import logic.base.BasePotion;
+import logic.base.*;
 import logic.util.ItemCounter;
 
 import java.util.ArrayList;
@@ -17,7 +13,7 @@ public class Player extends BaseCreature {
     private int speed, luck;
 
     private BaseWeapon equippedWeapon = null;
-    private BaseArmor  equippedArmor  = null;
+    private BaseArmor equippedArmor = null;
 
     public Player(int hp, int attack, int defense) {
         super(hp, attack, defense);
@@ -28,7 +24,9 @@ public class Player extends BaseCreature {
     }
 
     // ───────────────── GOLD ─────────────────
-    public int getGold() { return gold; }
+    public int getGold() {
+        return gold;
+    }
 
     public void setGold(int gold) {
         this.gold = Math.max(0, gold);
@@ -52,14 +50,14 @@ public class Player extends BaseCreature {
                     if (remaining <= 0) return;
                 }
             }
-            // ยังเหลืออยู่ → สร้าง slot ใหม่ไปเรื่อยๆ จนหมด
+
             while (remaining > 0) {
                 int add = Math.min(item.getMaxStack(), remaining);
                 inventory.add(new ItemCounter(item, add));
                 remaining -= add;
             }
         } else {
-            // ไม่ stackable → เพิ่มแยก slot ทุกชิ้น
+
             for (int i = 0; i < amount; i++) {
                 inventory.add(new ItemCounter(item, 1));
             }
@@ -105,7 +103,9 @@ public class Player extends BaseCreature {
     }
 
     // ───────────────── EQUIPMENT ─────────────────
-    public BaseWeapon getEquippedWeapon() { return equippedWeapon; }
+    public BaseWeapon getEquippedWeapon() {
+        return equippedWeapon;
+    }
 
     public void equipWeapon(BaseWeapon weapon) {
 
@@ -128,7 +128,9 @@ public class Player extends BaseCreature {
         }
     }
 
-    public BaseArmor getEquippedArmor() { return equippedArmor; }
+    public BaseArmor getEquippedArmor() {
+        return equippedArmor;
+    }
 
     public void equipArmor(BaseArmor armor) {
 
@@ -174,17 +176,46 @@ public class Player extends BaseCreature {
         healthPoint = Math.min(maxHealthPoint, healthPoint + amount);
     }
 
+    // เพิ่มที่ท้าย Player.java ก่อน closing brace
+
+    public SkillResult skillKaguraDance(BaseCreature target) {
+        int dmg = Math.max(1, attack - target.getDefense()) * 2;
+        target.takeDamage(attack * 2);
+        return new SkillResult(dmg, 0, false, false);
+    }
+
+// ─── SKILLS ─────────────────────────────────────────────────────────────────
+
+    public SkillResult skillDeadCalm() {
+        return new SkillResult(0, 0, true, false);
+    }
+
+    public SkillResult skillConstantFlux(BaseCreature target) {
+        int base = Math.max(1, attack - target.getDefense());
+        int total = base * 3;
+        for (int i = 0; i < 3; i++) target.takeDamage(attack);
+        return new SkillResult(total, 0, false, true);
+    }
+
+    public SkillResult skillWaterWheel(BaseCreature target) {
+        int base = Math.max(1, attack - target.getDefense());
+        target.takeDamage(attack);
+        int healAmt = Math.max(1, (int) (base * 0.30));
+        heal(healAmt);
+        return new SkillResult(base, healAmt, false, false);
+    }
+
     // ───────────────── ACCESSORS ─────────────────
     public int getHealth() {
         return healthPoint;
     }
 
-    public int getMaxHealth() {
-        return maxHealthPoint;
-    }
-
     public void setHealth(int hp) {
         healthPoint = Math.max(0, Math.min(maxHealthPoint, hp));
+    }
+
+    public int getMaxHealth() {
+        return maxHealthPoint;
     }
 
     public int getStrength() {
@@ -215,5 +246,9 @@ public class Player extends BaseCreature {
     @Override
     public void attack(BaseCreature target) {
         target.takeDamage(attack);
+    }
+
+    // ─── SKILL RESULT ───────────────────────────────────────────────────────────
+    public record SkillResult(int damage, int heal, boolean shieldWall, boolean berserkDebuff) {
     }
 }
