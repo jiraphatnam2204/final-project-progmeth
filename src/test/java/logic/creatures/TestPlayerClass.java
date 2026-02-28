@@ -1,28 +1,20 @@
 package logic.creatures;
 
-import logic.base.BaseCreature;
 import logic.item.potion.HealPotion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestPlayerClass {
-
-    // Dummy Monster สำหรับทดสอบ skill โดยไม่ต้อง import JavaFX
-    static class Dummy extends BaseCreature {
-        public Dummy(int hp, int atk, int def) { super(hp, atk, def); }
-        @Override
-        public void attack(BaseCreature t) { t.takeDamage(attack); }
-    }
+class TestPlayerClass {
 
     private Player player;
-    private Dummy boss;
+    private EasyBoss boss;
 
     @BeforeEach
     void setUp() {
         player = new Player(100, 30, 10);
-        boss   = new Dummy(500, 60, 5);
+        boss   = new EasyBoss(500, 60, 5, 0);
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────────
@@ -170,7 +162,7 @@ public class TestPlayerClass {
 
     @Test
     void skills_minDamageAlwaysAtLeastOne() {
-        Dummy tank = new Dummy(500, 10, 9999);
+        EasyBoss tank = new EasyBoss(500, 10, 9999, 0);
         assertTrue(player.skillKaguraDance(tank).damage() >= 1);
         assertTrue(player.skillConstantFlux(tank).damage() >= 3);
         assertTrue(player.skillWaterWheel(tank).heal() >= 1);
