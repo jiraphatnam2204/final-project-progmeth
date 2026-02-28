@@ -1,7 +1,6 @@
-package grader;
+package logic.creatures;
 
 import logic.base.BaseCreature;
-import logic.creatures.Player;
 import logic.item.potion.HealPotion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
