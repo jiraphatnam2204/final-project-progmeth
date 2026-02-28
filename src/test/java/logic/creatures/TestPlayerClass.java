@@ -1,6 +1,5 @@
 package logic.creatures;
 
-import logic.base.BaseCreature;
 import logic.item.potion.HealPotion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,20 +8,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TestPlayerClass {
 
-    // Dummy Monster สำหรับทดสอบ skill โดยไม่ต้อง import JavaFX
-    static class Dummy extends BaseCreature {
-        public Dummy(int hp, int atk, int def) { super(hp, atk, def); }
-        @Override
-        public void attack(BaseCreature t) { t.takeDamage(attack); }
-    }
-
     private Player player;
-    private Dummy boss;
+    private EasyBoss boss;
 
     @BeforeEach
     void setUp() {
-        player = new Player(100, 30, 10);
-        boss   = new Dummy(500, 60, 5);
+        player = new Player(100, 20, 10);
+        boss = new EasyBoss();
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────────
@@ -31,7 +23,7 @@ class TestPlayerClass {
     void initialStats() {
         assertEquals(100, player.getHealth());
         assertEquals(100, player.getMaxHealth());
-        assertEquals(30, player.getAttack());
+        assertEquals(20, player.getAttack());
         assertEquals(10, player.getDefense());
         assertEquals(0, player.getGold());
     }
@@ -39,11 +31,11 @@ class TestPlayerClass {
     @Test
     void addAndRemoveBonus() {
         player.addBonus(10, 5, 0, 0);
-        assertEquals(40, player.getAttack());
+        assertEquals(30, player.getAttack());
         assertEquals(15, player.getDefense());
 
         player.removeBonus(10, 5, 0, 0);
-        assertEquals(30, player.getAttack());
+        assertEquals(20, player.getAttack());
         assertEquals(10, player.getDefense());
     }
 
@@ -170,7 +162,7 @@ class TestPlayerClass {
 
     @Test
     void skills_minDamageAlwaysAtLeastOne() {
-        Dummy tank = new Dummy(500, 10, 9999);
+        EasyBoss tank = new EasyBoss();
         assertTrue(player.skillKaguraDance(tank).damage() >= 1);
         assertTrue(player.skillConstantFlux(tank).damage() >= 3);
         assertTrue(player.skillWaterWheel(tank).heal() >= 1);
