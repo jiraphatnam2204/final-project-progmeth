@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestPlayerClass {
+public class TestPlayerClass {
 
     // Dummy Monster สำหรับทดสอบ skill โดยไม่ต้อง import JavaFX
     static class Dummy extends BaseCreature {
