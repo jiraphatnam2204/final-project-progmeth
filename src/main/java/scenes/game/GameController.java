@@ -19,7 +19,7 @@ public class GameController {
     public static final int ROWS = 15;
     public static final int W = TILE_SIZE * COLS;
     public static final int H = TILE_SIZE * ROWS;
-    public static final double PLAYER_SPEED = 3.2;
+    public static final double PLAYER_SPEED = 7.5;
 
     // Tile type constants
     public static final int T_GROUND = 0;

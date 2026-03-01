@@ -51,3 +51,11 @@ run {
             '--enable-native-access=javafx.media',
     ]
 }
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'application.Main'
+        )
+    }
+}
