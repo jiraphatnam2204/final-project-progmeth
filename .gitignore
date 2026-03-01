@@ -36,3 +36,5 @@ Thumbs.db
 # Claude AI
 .claude/
 CLAUDE.md
+
+.mailmap
