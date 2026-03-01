@@ -1,0 +1,1458 @@
+@startuml
+class scenes.game.GameView {
+- {static} int W
+- {static} int H
+- GameController controller
+- Image[] playerWalkImgs
+- Image[] playerSlashImgs
+- ShopController shopController
+- ShopView shopView
+- CraftingController craftController
+- CraftingView craftView
+- InventoryController invController
+- InventoryView invView
+- Pane shopLayer
+- StackPane root
+- Image imgEasyMonster
+- AnimationTimer gameLoop
++ <<Create>> GameView(GameController)
+- void loadImages()
+- Image loadImage(String)
+- void buildSubScenes()
++ Scene buildScene()
+- void handleBuildingEntry()
+- void toggleShop()
+- void toggleCraft()
+- void toggleInventory()
+- void closeShop()
+- void closeCraft()
+- void closeInventory()
+- void render(GraphicsContext,long)
+- void drawWorld(GraphicsContext)
+- void drawRock(GraphicsContext,double,double,interfaces.Mineable,Color,Color,String)
+- void drawMonsters(GraphicsContext)
+- void drawPlayer(GraphicsContext)
+- void drawFloatingTexts(GraphicsContext)
+- void drawHUD(GraphicsContext)
+}
+
+
+interface interfaces.Equipable {
+~ void equip(Player)
+~ void unequip(Player)
+}
+
+class logic.base.BaseItem {
+- String name
+- boolean stackable
+- int maxStack
++ <<Create>> BaseItem(String,boolean,int)
++ <<Create>> BaseItem(String)
++ String getName()
++ boolean isStackable()
++ int getMaxStack()
++ String toString()
++ boolean equals(Object)
++ int hashCode()
+}
+
+
+class scenes.shop.ShopView {
+- {static} int W
+- {static} int H
+- {static} int COLS
+- {static} int CARD_W
+- {static} int CARD_H
+- {static} int START_X
+- {static} int START_Y
+- {static} int GAP_X
+- {static} int GAP_Y
+- {static} Color[] CARD_COLORS
+- ShopController controller
+- Runnable onClose
+- GraphicsContext gc
+- String feedbackMsg
+- Color feedbackColor
++ <<Create>> ShopView(ShopController,Runnable)
++ Pane build()
+- void handleBuyClick(ShopController.ShopItem)
++ void update()
+- void redraw()
+- Button makeBtn(String)
+}
+
+
+class logic.creatures.Player {
+- int gold
+- ArrayList<ItemCounter> inventory
+- int speed
+- BaseWeapon equippedWeapon
+- BaseArmor equippedArmor
++ <<Create>> Player(int,int,int)
++ int getGold()
++ void setGold(int)
++ ArrayList<ItemCounter> getInventory()
++ void addItem(BaseItem,int)
++ boolean usePotion(Class<? extends BasePotion>)
++ int countItem(Class<?>)
++ BaseWeapon getEquippedWeapon()
++ void equipWeapon(BaseWeapon)
++ void unequipWeapon()
++ BaseArmor getEquippedArmor()
++ void equipArmor(BaseArmor)
++ void unequipArmor()
++ void addBonus(int,int,int,int)
++ void removeBonus(int,int,int,int)
++ void heal(int)
++ SkillResult skillKaguraDance(BaseCreature)
++ SkillResult skillDeadCalm()
++ SkillResult skillConstantFlux(BaseCreature)
++ SkillResult skillWaterWheel(BaseCreature)
++ int getHealth()
++ void setHealth(int)
++ int getMaxHealth()
++ int getStrength()
++ void setStrength(int)
++ int getLuck()
++ void setLuck(int)
++ int getDefense()
++ int getSpeed()
++ void attack(BaseCreature)
+}
+
+
+class logic.creatures.Player$SkillResult {
+- int damage
+- int heal
+- boolean shieldWall
+- boolean berserkDebuff
++ <<Create>> SkillResult(int,int,boolean,boolean)
++ boolean berserkDebuff()
++ int damage()
++ int heal()
++ boolean shieldWall()
+}
+
+
+class scenes.boss.BossController {
+- Player player
+- BossInfo[] bosses
+- List<String> log
+- int bossIndex
+- Monster currentBoss
+- String bossName
+- Color bossColor
+- BattleState state
+- boolean pendingAttackAnim
+- boolean pendingBossShake
+- boolean pendingPlayerShake
+- long lastEnemyActionMs
+- int pendingDefenseReset
+- BattleMenuController menuCtrl
++ <<Create>> BossController(Player)
++ ActionResult doDefend()
++ void loadBoss(int)
++ ActionResult doPlayerAttack()
++ ActionResult doSkill(int)
++ ActionResult usePotion(BattleMenuController.PotionEntry)
++ ActionResult doRestHeal()
++ ActionResult doEnemyTurn()
+- ActionResult advanceAfterPlayerAction()
++ void advanceToNextBoss()
+- void trimLog()
++ Player getPlayer()
++ Monster getCurrentBoss()
++ String getBossName()
++ Color getBossColor()
++ int getBossIndex()
++ BattleState getState()
++ List<String> getLog()
++ long getLastEnemyActionMs()
++ boolean hasNextBoss()
++ BattleMenuController getMenuCtrl()
++ boolean isPendingAttackAnim()
++ boolean isPendingBossShake()
++ boolean isPendingPlayerShake()
++ void clearAttackAnimFlag()
++ void clearBossShakeFlag()
++ void clearPlayerShakeFlag()
+}
+
+
+enum scenes.boss.BattleState {
++  PLAYER_TURN
++  ENEMY_TURN
++  VICTORY
++  DEFEAT
++  ALL_CLEAR
+}
+
+enum scenes.boss.ActionResult {
++  NONE
++  ENEMY_TURN
++  PLAYER_TURN
++  BOSS_DEFEATED
++  ALL_CLEAR
++  PLAYER_DEFEATED
+}
+
+class scenes.boss.BossController$BossInfo {
+- String name
+- Monster monster
+- Color color
++ <<Create>> BossInfo(String,Monster,Color)
++ Color color()
++ Monster monster()
++ String name()
+}
+
+
+abstract class logic.base.BaseWeapon {
+- int dmg
+- double cd
++ <<Create>> BaseWeapon(String,int,double,int)
++ boolean canCraft(Player)
++ void equip(Player)
++ void unequip(Player)
++ void craft(Player)
++ int getCraftingPrice()
++ void setCraftingPrice(int)
++ int getDmg()
++ void setDmg(int)
++ double getCd()
++ void setCd(double)
+}
+
+
+class logic.item.armor.ArmorTest {
+- Player player
+~ void setup()
+}
+
+
+class logic.item.armor.ArmorTest$StoneArmorTests {
+~ StoneArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContent()
+~ void equip_increasesDefAndMaxHp()
+~ void equip_increasesCurrentHp()
+~ void unequip_restoresDefAndMaxHp()
+~ void canCraft_trueWhenHasGoldAndMaterials()
+~ void canCraft_falseWhenNotEnoughGold()
+~ void canCraft_falseWhenNotEnoughMaterials()
+~ void canCraft_falseWhenNoMaterials()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+~ void craft_doesNothingWhenCannotCraft()
+}
+
+
+class logic.item.armor.ArmorTest$HardstoneArmorTests {
+~ HardstoneArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContainsNormalStone()
+~ void recipeContainsHardStone()
+~ void equip_increasesDefAndMaxHp()
+~ void canCraft_trueWhenHasAllMaterials()
+~ void canCraft_falseWhenNotEnoughHardStone()
+~ void canCraft_falseWhenNotEnoughNormalStone()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+}
+
+
+class logic.item.armor.ArmorTest$IronArmorTests {
+~ IronArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContainsNormalStone()
+~ void recipeContainsIron()
+~ void equip_increasesDefAndMaxHp()
+~ void canCraft_trueWhenHasAllMaterials()
+~ void canCraft_falseWhenNotEnoughGold()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+}
+
+
+class logic.item.armor.ArmorTest$PlatinumArmorTests {
+~ PlatinumArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContainsIron()
+~ void recipeContainsPlatinum()
+~ void equip_increasesDefAndMaxHp()
+~ void canCraft_trueWhenHasAllMaterials()
+~ void canCraft_falseWhenNotEnoughPlatinum()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+}
+
+
+class logic.item.armor.ArmorTest$MithrilArmorTests {
+~ MithrilArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContainsPlatinum()
+~ void recipeContainsMithril()
+~ void equip_increasesDefAndMaxHp()
+~ void canCraft_trueWhenHasAllMaterials()
+~ void canCraft_falseWhenNotEnoughMithril()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+}
+
+
+class logic.item.armor.ArmorTest$VibraniumArmorTests {
+~ VibraniumArmor armor
+~ void init()
+~ void name()
+~ void def()
+~ void hp()
+~ void atk()
+~ void spd()
+~ void craftingPrice()
+~ void recipeSize()
+~ void recipeContainsMithril()
+~ void recipeContainsVibranium()
+~ void equip_increasesDefAndMaxHp()
+~ void canCraft_trueWhenHasAllMaterials()
+~ void canCraft_falseWhenNotEnoughVibranium()
+~ void canCraft_falseWhenNotEnoughGold()
+~ void craft_deductsGold()
+~ void craft_consumesMaterials()
+~ void craft_doesNothingWhenCannotCraft()
+}
+
+
+class logic.creatures.MediumBoss {
++ <<Create>> MediumBoss()
+}
+
+class logic.stone.StoneTest {
+- Player player
+~ void setUp()
+~ void normalStone_initialDurability_isFive()
+~ void normalStone_isNotBrokenInitially()
+~ void normalStone_mine_reducesDurability()
+~ void normalStone_mine_withExactDurability_breaks()
+~ void normalStone_mine_returnsDropsOnBreak()
+~ void normalStone_mine_returnsEmptyBeforeBreak()
+~ void normalStone_mine_whenBroken_returnsEmpty()
+~ void normalStone_minePowerZeroOrNegative_treatedAsOne()
+~ void hardStone_initialDurability_isFifteen()
+~ void hardStone_isNotBrokenInitially()
+~ void hardStone_mine_reducesDurability()
+~ void hardStone_mine_returnsDropsOnBreak()
+~ void iron_initialDurability_isThirtySix()
+~ void iron_isNotBrokenInitially()
+~ void iron_mine_returnsDropsOnBreak()
+~ void platinum_initialDurability_isEighty()
+~ void platinum_isNotBrokenInitially()
+~ void platinum_mine_returnsDropsOnBreak()
+~ void mithril_initialDurability_is135()
+~ void mithril_isNotBrokenInitially()
+~ void mithril_mine_returnsDropsOnBreak()
+~ void vibranium_initialDurability_is210()
+~ void vibranium_isNotBrokenInitially()
+~ void vibranium_mine_returnsDropsOnBreak()
+~ void vibranium_mine_partial_doesNotBreak()
+~ void mine_dropsAddedToPlayerInventory()
+}
+
+
+class logic.stone.NormalStone {
++ <<Create>> NormalStone()
+# BaseItem createItem()
+}
+
+class scenes.crafting.CraftingView {
+- {static} int W
+- {static} int H
+- {static} int COLS
+- {static} int CARD_W
+- {static} int CARD_H
+- {static} int START_X
+- {static} int START_Y
+- {static} int GAP_X
+- {static} int GAP_Y
+- CraftingController controller
+- Runnable onClose
+- Canvas canvas
+- GraphicsContext gc
+- String feedbackMsg
+- Color feedbackColor
++ <<Create>> CraftingView(CraftingController,Runnable)
++ Pane build()
+- void handleCraftClick(int)
++ void update()
+- void redraw()
+- Button makeBtn(String)
+}
+
+
+class application.SceneManager {
++ {static} int W
++ {static} int H
+- Stage stage
++ <<Create>> SceneManager(Stage)
++ void showMainMenu()
++ void showGame(Player,Pickaxe)
++ void showBossRoom(Player,Pickaxe[])
++ void showGameOver(boolean,Player)
+}
+
+
+class scenes.crafting.CraftingController {
+- Player player
+- List<Craftable> recipes
++ <<Create>> CraftingController(Player)
+- void buildRecipeList()
++ List<Craftable> getRecipes()
++ Player getPlayer()
++ CraftResult craft(int)
+}
+
+
+class scenes.crafting.CraftingController$CraftResult {
+- boolean success
+- String message
++ <<Create>> CraftResult(boolean,String)
++ boolean success()
++ String message()
+}
+
+
+class logic.stone.Vibranium {
++ <<Create>> Vibranium()
+# BaseItem createItem()
+}
+
+class logic.item.weapon.MithrilSword {
++ <<Create>> MithrilSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.item.armor.PlatinumArmor {
++ <<Create>> PlatinumArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.item.potion.MediumHealthPotion {
++ <<Create>> MediumHealthPotion()
+}
+
+class logic.pickaxe.Pickaxe {
+- String name
+- int power
++ <<Create>> Pickaxe(String,int)
++ {static} Pickaxe createWoodenPickaxe()
++ {static} Pickaxe createNormalStonePickaxe()
++ {static} Pickaxe createHardStonePickaxe()
++ {static} Pickaxe createIronPickaxe()
++ {static} Pickaxe createPlatinumPickaxe()
++ {static} Pickaxe createMithrilPickaxe()
++ {static} Pickaxe createVibraniumPickaxe()
++ List<BaseItem> use(Mineable,Player)
++ String getName()
++ int getPower()
++ void setPower(int)
+}
+
+
+class logic.creatures.TestPlayerClass {
+- Player player
+- EasyBoss boss
+~ void setUp()
+~ void initialStats()
+~ void addAndRemoveBonus()
+~ void bonusNeverGoesNegative()
+~ void goldNotNegative()
+~ void healNormal()
+~ void healCappedAtMaxHp()
+~ void setHealthClamped()
+~ void addItemStacksCorrectly()
+~ void usePotionHealsAndDecrements()
+~ void usePotionRemovesEntryWhenEmpty()
+~ void usePotionReturnsFalseWhenNoItem()
+~ void kaguraDance_doubleDamage()
+~ void deadCalm_setsShieldWallFlag()
+~ void constantFlux_threeHitsAndBerserkDebuff()
+~ void waterWheel_damageAndHeal()
+~ void skills_minDamageAlwaysAtLeastOne()
+}
+
+
+abstract class logic.base.BaseCreature {
+# int healthPoint
++ <<Create>> BaseCreature(int,int,int)
++ boolean isAlive()
++ void takeDamage(int)
++ void heal(int)
++ int getHealthPoint()
++ void setHealthPoint(int)
++ int getMaxHealthPoint()
++ void setMaxHealthPoint(int)
++ int getAttack()
++ void setAttack(int)
++ int getDefense()
++ void setDefense(int)
++ {abstract}void attack(BaseCreature)
+}
+
+
+class logic.stone.HardStone {
++ <<Create>> HardStone()
+# BaseItem createItem()
+}
+
+class logic.item.armor.IronArmor {
++ <<Create>> IronArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.stone.Iron {
++ <<Create>> Iron()
+# BaseItem createItem()
+}
+
+class logic.item.weapon.PlatinumSword {
++ <<Create>> PlatinumSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.base.Material {
++ <<Create>> Material(String)
+}
+
+class logic.item.weapon.HardstoneSword {
++ <<Create>> HardstoneSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class scenes.shop.ShopController {
+- Player player
+- Pickaxe[] pickaxeHolder
+- List<ShopItem> items
++ <<Create>> ShopController(Player,Pickaxe[])
+- void buildCatalogue()
++ List<ShopItem> getItems()
++ Player getPlayer()
++ Pickaxe[] getPickaxeHolder()
++ BuyResult buy(ShopItem)
+}
+
+
+class scenes.shop.ShopController$ShopItem {
+- String name
+- String description
+- int price
+- Consumer<Player> onBuy
++ <<Create>> ShopItem(String,String,int,Consumer<Player>)
++ int price()
++ String description()
++ String name()
++ Consumer<Player> onBuy()
+}
+
+
+class scenes.shop.ShopController$BuyResult {
+- boolean success
+- String message
++ <<Create>> BuyResult(boolean,String)
++ boolean success()
++ String message()
+}
+
+
+interface interfaces.Buyable {
+~ int getPrice()
+}
+
+class logic.item.potion.HealPotion {
++ <<Create>> HealPotion()
++ void consume(Player)
+}
+
+interface interfaces.Lootable {
+~ int dropMoney()
+}
+
+interface interfaces.Stackable {
+~ {static} int maxStack
+}
+
+class logic.item.potion.BigHealthPotion {
++ <<Create>> BigHealthPotion()
+}
+
+class scenes.gameover.GameOverController {
+- {static} int W
+- {static} int H
+- {static} int PARTICLE_COUNT
+- boolean won
+- Player player
+- double[] px
+- double[] py
+- double[] pvx
+- double[] pvy
+- double[] pr
++ <<Create>> GameOverController(boolean,Player)
+- void initParticles()
++ void updateParticles()
++ boolean isWon()
++ Player getPlayer()
++ double[] getPx()
++ double[] getPy()
++ double[] getPr()
++ int getParticleCount()
+}
+
+
+class logic.item.weapon.VibraniumSword {
++ <<Create>> VibraniumSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class application.Main {
++ {static} SceneManager sceneManager
++ {static} void main(String[])
++ void start(Stage)
+}
+
+
+class logic.PotionTest {
+- Player player
+~ void setUp()
+~ void smallPotion_heals40HP()
+~ void smallPotion_doesNotExceedMaxHP()
+~ void mediumPotion_TestHealMoreThanMaxHP()
+~ void mediumPotion_doesNotExceedMaxHP()
+~ void bigPotion_heals200HP()
+~ void bigPotion_doesNotExceedMaxHP()
+~ void smallPotion_statIs40()
+~ void mediumPotion_statIs100()
+~ void bigPotion_statIs200()
+~ void potion_consumeReducesCountInInventory()
+~ void potion_MaxStackTest()
+}
+
+
+class scenes.boss.BattleMenuController {
++ {static} int SKILL_COUNT
++ {static} String[] SKILL_NAMES
++ {static} String[] SKILL_ICONS
++ {static} String[] SKILL_DESCS
++ {static} int[] SKILL_MAX_CD
+- int[] cooldowns
+- MenuState menuState
+- boolean shieldWallActive
+- boolean berserkDebuffActive
++ MenuState getMenuState()
++ void openSkills()
++ void openHeal()
++ void close()
++ int getCooldown(int)
++ boolean isReady(int)
++ void setCooldown(int,int)
++ void tickCooldowns()
++ boolean isShieldWallActive()
++ boolean isBerserkDebuffActive()
++ void setShieldWall(boolean)
++ void setBerserkDebuff(boolean)
++ List<PotionEntry> getPotions(Player)
+}
+
+
+enum scenes.boss.MenuState {
++  NONE
++  SKILLS
++  HEAL
+}
+
+class scenes.boss.BattleMenuController$PotionEntry {
+- ItemCounter counter
++ <<Create>> PotionEntry(ItemCounter)
++ String name()
++ int count()
++ boolean hasStock()
++ ItemCounter counter()
+}
+
+
+class logic.stone.Platinum {
++ <<Create>> Platinum()
+# BaseItem createItem()
+}
+
+class logic.util.ItemCounter {
+- BaseItem item
+- int count
++ <<Create>> ItemCounter(BaseItem,int)
++ boolean equals(Object)
++ int hashCode()
++ BaseItem getItem()
++ void setItem(BaseItem)
++ int getCount()
++ void setCount(int)
++ void addCount(int)
+}
+
+
+class logic.creatures.HardMonster {
++ <<Create>> HardMonster()
+}
+
+class scenes.mainmenu.MainMenuController {
+- {static} int W
+- {static} int H
+- {static} int STAR_COUNT
+- double[] starX
+- double[] starY
+- double[] starSpd
+- double[] starR
++ <<Create>> MainMenuController()
++ void update(double)
++ double[] getStarX()
++ double[] getStarY()
++ double[] getStarR()
++ int getStarCount()
+}
+
+
+class scenes.boss.BossView {
+- {static} int W
+- {static} int H
+- {static} long ANIM_DURATION
+- BossController controller
+- Pickaxe[] pickaxeHolder
+- Image[] imgPlayerSkills
+- BossController.ActionResult r
+- Image imgBoss1
+- Image imgPlayerIdle
+- double animTime
+- boolean showAttackAnim
+- boolean showSkillAnim
+- int activeSkillIdx
+- long attackAnimEndMs
+- double bossShakeX
+- double playerShakeX
+- AnimationTimer GameLoop
+- Button attackBtn
+- SkillMenuView skillMenuView
+- HealMenuView healMenuView
+- Pane skillPane
++ <<Create>> BossView(BossController,Pickaxe[])
+- void loadImages()
+- Image loadImg(String)
++ Scene build()
+- void handleDefense()
+- void handleAttack()
+- void openSkillMenu()
+- void openHealMenu()
+- void handleEnemyTurn()
+- void handleNextBoss()
+- void applyResult(BossController.ActionResult)
+- void updateVisualState()
+- void render(GraphicsContext)
+- void drawBoss(GraphicsContext)
+- void drawPlayerChar(GraphicsContext)
+- void drawBossHPBar(GraphicsContext)
+- void drawPlayerHPBar(GraphicsContext)
+- void drawLog(GraphicsContext)
+- void drawTurnIndicator(GraphicsContext)
+- void drawBottomBar(GraphicsContext)
+- void setButtonsEnabled(boolean)
+- void showVictoryButtons()
+- Button makeBtn(String,String,String)
+}
+
+
+class logic.item.armor.StoneArmor {
++ <<Create>> StoneArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.item.armor.VibraniumArmor {
++ <<Create>> VibraniumArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class logic.creatures.CreaturesTest {
+}
+class logic.creatures.CreaturesTest$EasyMonsterTests {
+~ EasyMonster monster
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_zeroDamage()
+~ void takeDamage_clampsToZero()
+~ void isAlive_falseAfterLethalDamage()
+~ void heal_restoresHp()
+~ void heal_cappedAtMaxHp()
+~ void attack_dealsDamageToTarget()
+~ void attack_blockedByTargetDefense()
+}
+
+
+class logic.creatures.CreaturesTest$MediumMonsterTests {
+~ MediumMonster monster
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void heal_restoresHp()
+~ void heal_cappedAtMaxHp()
+~ void attack_dealsDamageToTarget()
+}
+
+
+class logic.creatures.CreaturesTest$HardMonsterTests {
+~ HardMonster monster
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void heal_cappedAtMaxHp()
+~ void attack_dealsDamageToTarget()
+}
+
+
+class logic.creatures.CreaturesTest$EasyBossTests {
+~ EasyBoss boss
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void heal_afterDamage()
+~ void heal_cappedAtMaxHp()
+~ void attack_dealsDamageToTarget()
+}
+
+
+class logic.creatures.CreaturesTest$MediumBossTests {
+~ MediumBoss boss
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void attack_dealsDamageToTarget()
+}
+
+
+class logic.creatures.CreaturesTest$HardBossTests {
+~ HardBoss boss
+~ void init()
+~ void initialHp()
+~ void maxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void isAlive_trueInitially()
+~ void dropMoney()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void attack_dealsDamageToTarget()
+}
+
+
+class logic.creatures.CreaturesTest$PlayerTests {
+~ Player player
+~ void init()
+~ void initialHp()
+~ void initialMaxHp()
+~ void initialAttack()
+~ void initialDefense()
+~ void initialSpeed()
+~ void initialLuck()
+~ void initialGold()
+~ void isAlive_trueInitially()
+~ void setGold_positive()
+~ void setGold_negativeClampedToZero()
+~ void addItem_countItem()
+~ void addItem_stackable_addsToExisting()
+~ void countItem_returnsZeroForMissing()
+~ void usePotion_healsPlayer()
+~ void usePotion_cappedAtMaxHp()
+~ void usePotion_consumesOneItem()
+~ void usePotion_returnsFalseWhenNone()
+~ void equipWeapon_increasesAttack()
+~ void unequipWeapon_restoresAttack()
+~ void equipWeapon_replacesExisting()
+~ void getEquippedWeapon_nullByDefault()
+~ void getEquippedWeapon_afterEquip()
+~ void equipArmor_increasesDefenseAndMaxHp()
+~ void unequipArmor_restoresStats()
+~ void getEquippedArmor_nullByDefault()
+~ void addBonus_updatesStats()
+~ void removeBonus_updatesStats()
+~ void removeBonus_clampsHpToMaxHp()
+~ void attack_dealsDamageToTarget()
+~ void takeDamage_reducesHp()
+~ void takeDamage_blockedByDefense()
+~ void takeDamage_clampsToZero()
+~ void heal_restoresHp()
+~ void heal_cappedAtMaxHp()
+~ void setHealth_setsCorrectly()
+~ void setHealth_clampsAboveMax()
+~ void setHealth_clampsToZero()
+~ void setStrength_positive()
+~ void setStrength_negativeClampedToZero()
+~ void setLuck_setsCorrectly()
+}
+
+
+class logic.creatures.MediumMonster {
++ <<Create>> MediumMonster()
+}
+
+class scenes.game.GameController {
++ {static} int TILE_SIZE
++ {static} int COLS
++ {static} int ROWS
++ {static} int W
++ {static} int H
++ {static} double PLAYER_SPEED
++ {static} int T_GROUND
++ {static} int T_GRASS
++ {static} int T_NORMAL_ROCK
++ {static} int T_HARD_ROCK
++ {static} int T_IRON_ROCK
++ {static} int T_PLATINUM
++ {static} int T_MITHRIL
++ {static} int T_VIBRANIUM
++ {static} int T_SHOP
++ {static} int T_CRAFT
++ {static} int T_BOSS_DOOR
++ {static} int T_PATH
++ {static} long NOTIF_DURATION
+- {static} long ATTACK_COOLDOWN
+- {static} long MINE_COOLDOWN
+- {static} long ORE_RESPAWN_MIN
+- {static} long ORE_RESPAWN_MAX
+- {static} long MON_RESPAWN_MIN
+- {static} long MON_RESPAWN_MAX
+- int[][] world
+- Mineable[][] stoneObjects
+- Player player
+- Pickaxe[] pickaxeHolder
+- List<MonsterEntity> monsters
+- List<FloatingText> floatingTexts
+- Set<KeyCode> keys
+- List<long[]> oreRespawnQueue
+- List<long[]> monsterRespawnQueue
+- Random spawnRng
+- boolean leftMouseDown
+- boolean rightMouseDown
+- double playerX
+- int facing
+- int animFrame
+- long lastAnimTime
+- int playerInvincibleFrames
+- boolean isAttackAnim
+- long attackAnimEndMs
+- long lastAttackTime
+- long lastMineTime
+- String notifMsg
+- long notifTime
+- boolean gameEnded
++ <<Create>> GameController(Player,Pickaxe)
+- void generateWorld()
+- void placeBuilding(int,int,int)
+- boolean isProtectedArea(int,int)
++ void placeRock(int,int,int)
+- void spawnMonsters()
++ boolean update(long,AnimationTimer)
+- void handleMovement()
+- void handleAttack(long)
+- void handleMining(long)
+- void addToInventory(BaseItem)
+- void updateMonsters()
+- void processRespawns(long)
++ BuildingType checkBuildingEntry()
+- void updateFloatingTexts()
+- boolean canMoveTo(double,double)
++ boolean isSolid(double,double)
++ boolean inBounds(int,int)
+- boolean isNearPlayer(double,double,double)
++ int[] facingTile()
+- void showNotif(String)
+- javafx.scene.paint.Color floatingRed()
++ void keyPressed(KeyCode)
++ void keyReleased(KeyCode)
++ void setLeftMouse(boolean)
++ void setRightMouse(boolean)
++ Player getPlayer()
++ Pickaxe[] getPickaxeHolder()
++ int[][] getWorld()
++ Mineable[][] getStoneObjects()
++ List<MonsterEntity> getMonsters()
++ List<FloatingText> getFloatingTexts()
++ double getPlayerX()
++ double getPlayerY()
++ int getFacing()
++ int getAnimFrame()
++ boolean isAttackAnim()
++ int getInvincibleFrames()
++ String getNotifMsg()
++ long getNotifTime()
+}
+
+
+enum scenes.game.BuildingType {
++  NONE
++  SHOP
++  CRAFT
++  BOSS
+}
+
+class scenes.game.GameController$MonsterEntity {
++ Monster monster
++ double x
++ int type
++ boolean aggro
++ <<Create>> MonsterEntity(Monster,double,double,int)
+}
+
+
+class scenes.game.GameController$FloatingText {
++ double x
++ String text
++ javafx.scene.paint.Color color
++ long born
++ <<Create>> FloatingText(double,double,String,javafx.scene.paint.Color,long)
++ boolean isDead()
+}
+
+
+class audio.AudioManager {
+- {static} MediaPlayer mediaPlayer
++ {static} void playBGM(String,double)
++ {static} void stopBGM()
++ {static} void setVolume(double)
+}
+
+
+class logic.creatures.EasyBoss {
++ <<Create>> EasyBoss()
+}
+
+abstract class logic.base.BasePotion {
+- int stat
++ <<Create>> BasePotion(String,int)
++ void consume(Player)
++ int getStat()
++ void setStat(int)
+}
+
+
+class scenes.boss.SkillMenuView {
+- {static} int W
+- {static} int H
+- {static} double PX
+- {static} double PY
+- {static} double PW
+- {static} double CW
+- {static} double PH
+- {static} double CH
+- {static} Color[] SKILL_COLORS
+- BattleMenuController menuCtrl
+- IntConsumer onSkillSelected
+- Runnable onClose
+- Button[] skillBtns
+- Canvas canvas
+- GraphicsContext gc
+- Button backBtn
++ <<Create>> SkillMenuView(BattleMenuController,IntConsumer,Runnable)
+- {static} String toHex(Color)
++ Pane build()
++ void update()
+- void redraw()
+- void updateButtonStates()
+- Button makeSkillBtn(int)
+- Button makeBackBtn()
+}
+
+
+abstract class logic.creatures.Monster {
+# int moneyDrop
++ <<Create>> Monster(int,int,int,int)
++ void attack(BaseCreature)
++ int dropMoney()
+}
+
+
+class logic.WeaponTest {
+- Player player
+~ void setUp()
+~ void woodenSword_equip_increasesATK()
+~ void woodenSword_unequip_restoresATK()
+~ void woodenSword_stats()
+~ void stoneSword_equip_increasesATK()
+~ void stoneSword_stats()
+~ void stoneSword_canCraft_withEnoughMaterials()
+~ void stoneSword_cannotCraft_withoutMaterials()
+~ void hardstoneSword_stats()
+~ void hardstoneSword_canCraft_withEnoughMaterials()
+~ void ironSword_stats()
+~ void ironSword_canCraft_withEnoughMaterials()
+~ void platinumSword_stats()
+~ void platinumSword_canCraft_withEnoughMaterials()
+~ void mithrilSword_stats()
+~ void mithrilSword_canCraft_withEnoughMaterials()
+~ void vibraniumSword_stats()
+~ void vibraniumSword_canCraft_withEnoughMaterials()
+~ void equippingNewWeapon_replacesOldWeapon()
+~ void weapon_isNotStackable()
+~ void weapon_cannotCraft_withoutGold()
+~ void weapon_craftDeductsGold()
+~ void weapon_craftDeductsMaterials()
+}
+
+
+class logic.stone.Mithril {
++ <<Create>> Mithril()
+# BaseItem createItem()
+}
+
+class logic.item.potion.SmallHealthPotion {
++ <<Create>> SmallHealthPotion()
+}
+
+class scenes.inventory.InventoryController {
++ {static} int ITEMS_PER_PAGE
+- Player player
+- int currentPage
++ <<Create>> InventoryController(Player)
++ int getCurrentPage()
++ Player getPlayer()
++ int getTotalPages()
++ void nextPage()
++ void prevPage()
++ List<ItemCounter> getPageItems()
++ void clampPage()
++ void equipWeapon(BaseWeapon)
++ void equipArmor(BaseArmor)
++ void unequipWeapon()
++ void unequipArmor()
++ void usePotion(ItemCounter)
++ String buildStatSuffix(BaseItem)
++ boolean isWeaponEquipped(BaseWeapon)
++ boolean isArmorEquipped(BaseArmor)
+}
+
+
+interface interfaces.Mineable {
+~ List<BaseItem> mine(int,Player)
+~ boolean isBroken()
+~ int getDurability()
+~ int getMaxDurability()
+}
+
+abstract class logic.stone.baseStone {
+# int durability
+# int maxDurability
+# int dropAmount
+# <<Create>> baseStone(String,int,int)
++ List<BaseItem> mine(int,Player)
+# List<BaseItem> dropItems()
+# {abstract}BaseItem createItem()
++ boolean isBroken()
++ int getDurability()
++ int getMaxDurability()
+}
+
+
+class scenes.inventory.InventoryView {
+- InventoryController controller
+- Runnable onClose
+- VBox itemListBox
+- Text goldText
+- Text statText
+- Text equippedText
+- Text pageLabel
+- Button prevBtn
++ <<Create>> InventoryView(InventoryController,Runnable)
++ Pane build()
++ void update()
++ void refresh()
+- HBox buildItemRow(ItemCounter,int,boolean)
+- void addActionButton(HBox,BaseItem,ItemCounter)
+- Button makeBtn(String,String)
+- Button makeBtn(String)
+}
+
+
+class logic.item.armor.HardstoneArmor {
++ <<Create>> HardstoneArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class scenes.gameover.GameOverView {
+- {static} int W
+- {static} int H
+- GameOverController controller
++ <<Create>> GameOverView(GameOverController)
++ Scene build()
+- void draw(GraphicsContext,double)
+- void drawVictory(GraphicsContext,double)
+- void drawDefeat(GraphicsContext,double)
+- void drawStatsBox(GraphicsContext)
+- Button makeBtn(String,String,String)
+}
+
+
+class logic.item.weapon.IronSword {
++ <<Create>> IronSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+class scenes.mainmenu.MainMenuView {
+- {static} int W
+- {static} int H
+- MainMenuController controller
+- Image logo
++ <<Create>> MainMenuView(MainMenuController)
++ Scene build()
+- void startGame()
+- void drawBackground(GraphicsContext,double)
+- void drawLogo(GraphicsContext,double)
+- void drawTorch(GraphicsContext,double,double,double)
+- Button makeButton(String,String,String)
+}
+
+
+interface interfaces.Consumable {
+~ void consume(Player)
+}
+
+class scenes.boss.HealMenuView {
+- {static} int W
+- {static} int H
+- {static} double PX
+- {static} double PY
+- {static} double PW
+- {static} double ROW_H
+- BattleMenuController menuCtrl
+- Consumer<BattleMenuController.PotionEntry> onUsePotion
+- Runnable onRest
+- Runnable onClose
+- Canvas canvas
+- GraphicsContext gc
+- List<Button> dynamicBtns
+- Pane root
+- List<BattleMenuController.PotionEntry> lastPotions
++ <<Create>> HealMenuView(BattleMenuController,Consumer<BattleMenuController.PotionEntry>,Runnable,Runnable)
++ Pane build()
++ void refresh(List<BattleMenuController.PotionEntry>)
++ void update(List<BattleMenuController.PotionEntry>)
+- void redraw(List<BattleMenuController.PotionEntry>)
+- Color getPotionColor(String)
+- Button makePotionBtn(BattleMenuController.PotionEntry)
+- Button makeRestBtn()
+- Button makeBackBtn()
+- {static} String toHex(Color)
+}
+
+
+class logic.item.weapon.WoodenSword {
++ <<Create>> WoodenSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+interface interfaces.Craftable {
+~ int getCraftingPrice()
+~ ArrayList<ItemCounter> getRecipe()
+~ boolean canCraft(Player)
+~ void craft(Player)
+}
+
+class logic.creatures.HardBoss {
++ <<Create>> HardBoss()
+}
+
+class logic.creatures.EasyMonster {
++ <<Create>> EasyMonster()
+}
+
+class logic.pickaxe.PickaxeTest {
+- Player player
+~ void setUp()
+~ void constructor_setsNameAndPower()
+~ void constructor_powerBelowOne_clampsToOne()
+~ void constructor_negativePower_clampsToOne()
+~ void createWoodenPickaxe_hasCorrectNameAndPower()
+~ void createNormalStonePickaxe_hasCorrectNameAndPower()
+~ void createHardStonePickaxe_hasCorrectNameAndPower()
+~ void createIronPickaxe_hasCorrectNameAndPower()
+~ void createPlatinumPickaxe_hasCorrectNameAndPower()
+~ void createMithrilPickaxe_hasCorrectNameAndPower()
+~ void createVibraniumPickaxe_hasCorrectNameAndPower()
+~ void setPower_updatesPickaxePower()
+~ void use_onUnminedStone_returnsEmptyList()
+~ void use_repeatedUntilBroken_returnsDrops()
+~ void use_onBrokenStone_returnsEmptyList()
+~ void use_weakPickaxeRequiresMultipleHitsToBreakHardStone()
+}
+
+
+class logic.item.armor.MithrilArmor {
++ <<Create>> MithrilArmor()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+abstract class logic.base.BaseArmor {
+# int def
++ <<Create>> BaseArmor(String,int,int,int,int,int)
++ void setCraftingPrice(int)
++ int getCraftingPrice()
++ void equip(Player)
++ void unequip(Player)
++ boolean canCraft(Player)
++ void craft(Player)
++ int getDef()
++ void setDef(int)
++ int getAtk()
++ void setAtk(int)
++ int getHp()
++ void setHp(int)
++ int getSpd()
++ void setSpd(int)
+}
+
+
+class logic.item.weapon.StoneSword {
++ <<Create>> StoneSword()
++ ArrayList<ItemCounter> getRecipe()
+}
+
+
+
+logic.creatures.BaseCreature <|-- logic.creatures.Player
+logic.creatures.Player +.. logic.creatures.Player$SkillResult
+scenes.boss.BossController +.. scenes.boss.BossController$BossInfo
+interfaces.Craftable <|.. logic.base.BaseWeapon
+interfaces.Equipable <|.. logic.base.BaseWeapon
+logic.base.BaseItem <|-- logic.base.BaseWeapon
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$StoneArmorTests
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$HardstoneArmorTests
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$IronArmorTests
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$PlatinumArmorTests
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$MithrilArmorTests
+logic.item.armor.ArmorTest +.. logic.item.armor.ArmorTest$VibraniumArmorTests
+logic.creatures.Monster <|-- logic.creatures.MediumBoss
+logic.stone.baseStone <|-- logic.stone.NormalStone
+scenes.crafting.CraftingController +.. scenes.crafting.CraftingController$CraftResult
+logic.stone.baseStone <|-- logic.stone.Vibranium
+logic.base.BaseWeapon <|-- logic.item.weapon.MithrilSword
+logic.base.BaseArmor <|-- logic.item.armor.PlatinumArmor
+logic.base.BasePotion <|-- logic.item.potion.MediumHealthPotion
+logic.stone.baseStone <|-- logic.stone.HardStone
+logic.base.BaseArmor <|-- logic.item.armor.IronArmor
+logic.stone.baseStone <|-- logic.stone.Iron
+logic.base.BaseWeapon <|-- logic.item.weapon.PlatinumSword
+logic.base.BaseItem <|-- logic.base.Material
+logic.base.BaseWeapon <|-- logic.item.weapon.HardstoneSword
+scenes.shop.ShopController +.. scenes.shop.ShopController$ShopItem
+scenes.shop.ShopController +.. scenes.shop.ShopController$BuyResult
+logic.base.BasePotion <|-- logic.item.potion.HealPotion
+logic.base.BasePotion <|-- logic.item.potion.BigHealthPotion
+logic.base.BaseWeapon <|-- logic.item.weapon.VibraniumSword
+javafx.application.Application <|-- application.Main
+scenes.boss.BattleMenuController +.. scenes.boss.BattleMenuController$PotionEntry
+logic.stone.baseStone <|-- logic.stone.Platinum
+logic.creatures.Monster <|-- logic.creatures.HardMonster
+logic.base.BaseArmor <|-- logic.item.armor.StoneArmor
+logic.base.BaseArmor <|-- logic.item.armor.VibraniumArmor
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$EasyMonsterTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$MediumMonsterTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$HardMonsterTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$EasyBossTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$MediumBossTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$HardBossTests
+logic.creatures.CreaturesTest +.. logic.creatures.CreaturesTest$PlayerTests
+logic.creatures.Monster <|-- logic.creatures.MediumMonster
+scenes.game.GameController +.. scenes.game.GameController$MonsterEntity
+scenes.game.GameController +.. scenes.game.GameController$FloatingText
+logic.creatures.Monster <|-- logic.creatures.EasyBoss
+interfaces.Consumable <|.. logic.base.BasePotion
+logic.base.BaseItem <|-- logic.base.BasePotion
+interfaces.Lootable <|.. logic.creatures.Monster
+logic.base.BaseCreature <|-- logic.creatures.Monster
+logic.stone.baseStone <|-- logic.stone.Mithril
+logic.base.BasePotion <|-- logic.item.potion.SmallHealthPotion
+interfaces.Mineable <|.. logic.stone.baseStone
+logic.base.BaseItem <|-- logic.stone.baseStone
+logic.base.BaseArmor <|-- logic.item.armor.HardstoneArmor
+logic.base.BaseWeapon <|-- logic.item.weapon.IronSword
+logic.base.BaseWeapon <|-- logic.item.weapon.WoodenSword
+logic.creatures.Monster <|-- logic.creatures.HardBoss
+logic.creatures.Monster <|-- logic.creatures.EasyMonster
+logic.base.BaseArmor <|-- logic.item.armor.MithrilArmor
+interfaces.Equipable <|.. logic.base.BaseArmor
+interfaces.Craftable <|.. logic.base.BaseArmor
+logic.base.BaseItem <|-- logic.base.BaseArmor
+logic.base.BaseWeapon <|-- logic.item.weapon.StoneSword
+@enduml
