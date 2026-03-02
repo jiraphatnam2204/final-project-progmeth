@@ -1,18 +1,11 @@
 ### Java ###
 *.class
 *.log
-*.jar
-*.war
-*.ear
-*.zip
-*.tar.gz
-*.rar
+# *.jar
 
 ### Gradle ###
 .gradle/
 build/
-
-# Ignore Gradle Wrapper backup files
 gradle-app.setting
 
 ### IntelliJ IDEA ###
@@ -22,19 +15,6 @@ gradle-app.setting
 *.ipr
 out/
 
-# If you want to share project-specific run configurations, 
-# you can comment out the .idea/ line and use this instead:
-# .idea/*
-# !.idea/runConfigurations
-# !.idea/copyright
-# !.idea/scopes
-
 ### OS Files ###
 .DS_Store
 Thumbs.db
-
-# Claude AI
-.claude/
-CLAUDE.md
-
-.mailmap
