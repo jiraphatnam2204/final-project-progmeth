@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(java:*)",
-      "Bash(javac:*)"
-    ]
-  }
-}
