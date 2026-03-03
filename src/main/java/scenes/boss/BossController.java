@@ -86,34 +86,34 @@ public class BossController {
         pendingBossShake = true;
 
         switch (idx) {
-            case 0 -> { // Power Strike: 2x damage
+            case 0 -> {
                 int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
                 int dmg = base * 2;
                 currentBoss.takeDamage(player.getAttack() * 2);
-                log.add("Power Strike! Hit " + bossName + " for " + dmg + " dmg!");
+                log.add("Kagura Dance! Hit " + bossName + " for " + dmg + " dmg!");
                 menuCtrl.setCooldown(0, BattleMenuController.SKILL_MAX_CD[0]);
             }
-            case 1 -> { // Shield Wall
+            case 1 -> {
                 menuCtrl.setShieldWall(true);
-                log.add("Shield Wall raised! Incoming damage halved this turn.");
+                log.add("Dead Calm! Incoming damage halved this turn.");
                 pendingAttackAnim = false;
                 pendingBossShake = false;
                 menuCtrl.setCooldown(1, BattleMenuController.SKILL_MAX_CD[1]);
             }
-            case 2 -> { // Berserk: 3 hits, debuff self
+            case 2 -> {
                 int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
                 int total = base * 3;
                 for (int h = 0; h < 3; h++) currentBoss.takeDamage(player.getAttack());
                 menuCtrl.setBerserkDebuff(true);
-                log.add("Berserk! 3 rapid hits for " + total + " total dmg! DEF -50% next turn.");
+                log.add("Constant Flux! 3 rapid hits for " + total + " total dmg! DEF -50% next turn.");
                 menuCtrl.setCooldown(2, BattleMenuController.SKILL_MAX_CD[2]);
             }
-            case 3 -> { // Soul Drain
+            case 3 -> {
                 int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
                 currentBoss.takeDamage(player.getAttack());
                 int heal = Math.max(1, (int) (base * 0.30));
                 player.heal(heal);
-                log.add("Soul Drain: dealt " + base + " dmg, healed " + heal + " HP!");
+                log.add("Water Wheel: dealt " + base + " dmg, healed " + heal + " HP!");
                 menuCtrl.setCooldown(3, BattleMenuController.SKILL_MAX_CD[3]);
             }
         }
