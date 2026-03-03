@@ -115,6 +115,15 @@ Bosses have a 20% critical hit chance (1.6× damage).
 ./gradlew test
 ```
 
+## Javadoc
+
+The generated API documentation is available at [`build/docs/javadoc/index.html`](build/docs/javadoc/index.html).
+
+To regenerate:
+```bash
+./gradlew javadoc
+```
+
 ## Project Structure
 
 ```

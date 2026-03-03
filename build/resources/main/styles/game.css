@@ -1,0 +1,267 @@
+/* ═══════════════════════════════════════════════════════
+   ADVENTURE RPG – JAVAFX STYLESHEET
+   A dark fantasy theme with clean, readable UI elements
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Root / Background ────────────────────────────────── */
+.root-pane {
+    -fx-background-color: #1a1a2e;
+}
+
+/* ── Top Bar ──────────────────────────────────────────── */
+.top-bar {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 0 0 2 0;
+}
+
+.game-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e94560;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.game-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #a8a8b3;
+}
+
+/* ── Stats Sidebar ────────────────────────────────────── */
+.stats-panel {
+    -fx-background-color: #16213e;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 0 2 0 0;
+}
+
+.section-heading {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e94560;
+}
+
+.sub-heading {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f5a623;
+}
+
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #c9d6df;
+}
+
+.equip-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #a8a8b3;
+    -fx-wrap-text: true;
+}
+
+/* HP Bar colors */
+.hp-bar > .bar { -fx-background-color: #4ade80; }
+.hp-bar.hp-mid > .bar { -fx-background-color: #facc15; }
+.hp-bar.hp-low > .bar { -fx-background-color: #ef4444; }
+.hp-bar > .track { -fx-background-color: #374151; }
+
+/* Monster bar */
+.monster-bar > .bar { -fx-background-color: #e94560; }
+.monster-bar > .track { -fx-background-color: #374151; }
+
+/* Stone bar */
+.stone-bar > .bar { -fx-background-color: #a78bfa; }
+.stone-bar > .track { -fx-background-color: #374151; }
+
+/* ── Tab Pane ─────────────────────────────────────────── */
+.tab-pane {
+    -fx-background-color: #1a1a2e;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #16213e;
+}
+
+.tab-pane .tab {
+    -fx-background-color: #0f3460;
+    -fx-padding: 6 14;
+}
+
+.tab-pane .tab:selected {
+    -fx-background-color: #e94560;
+}
+
+.tab-pane .tab .tab-label {
+    -fx-text-fill: #c9d6df;
+    -fx-font-size: 12px;
+}
+
+.tab-pane .tab:selected .tab-label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+/* ── Tab Content ──────────────────────────────────────── */
+.tab-content {
+    -fx-background-color: #1a1a2e;
+}
+
+.scroll-pane {
+    -fx-background-color: #1a1a2e;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: #1a1a2e;
+}
+
+/* ── Buttons ──────────────────────────────────────────── */
+.button {
+    -fx-cursor: hand;
+    -fx-font-size: 12px;
+    -fx-padding: 7 14;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-font-family: "Segoe UI", sans-serif;
+}
+
+.btn-primary {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: #c9d6df;
+    -fx-border-color: #1a6faf;
+    -fx-border-width: 1;
+}
+.btn-primary:hover { -fx-background-color: #1a6faf; }
+
+.btn-danger {
+    -fx-background-color: #7f1d1d;
+    -fx-text-fill: #fca5a5;
+    -fx-border-color: #e94560;
+    -fx-border-width: 1;
+}
+.btn-danger:hover { -fx-background-color: #991b1b; }
+
+.btn-success {
+    -fx-background-color: #14532d;
+    -fx-text-fill: #86efac;
+    -fx-border-color: #4ade80;
+    -fx-border-width: 1;
+}
+.btn-success:hover { -fx-background-color: #166534; }
+
+.btn-warning {
+    -fx-background-color: #78350f;
+    -fx-text-fill: #fde68a;
+    -fx-border-color: #f59e0b;
+    -fx-border-width: 1;
+}
+.btn-warning:hover { -fx-background-color: #92400e; }
+
+.btn-secondary {
+    -fx-background-color: #374151;
+    -fx-text-fill: #d1d5db;
+}
+.btn-secondary:hover { -fx-background-color: #4b5563; }
+
+/* Crafting buttons – taller, multi-line */
+.craft-btn {
+    -fx-background-color: #1e3a5f;
+    -fx-text-fill: #c9d6df;
+    -fx-border-color: #2563eb;
+    -fx-border-width: 1;
+    -fx-pref-width: 170px;
+    -fx-pref-height: 55px;
+    -fx-text-alignment: center;
+    -fx-font-size: 11px;
+}
+.craft-btn:hover { -fx-background-color: #2563eb; }
+
+.shop-btn {
+    -fx-background-color: #3b2a0a;
+    -fx-text-fill: #fde68a;
+    -fx-border-color: #d97706;
+    -fx-border-width: 1;
+    -fx-pref-width: 200px;
+    -fx-pref-height: 55px;
+    -fx-text-alignment: center;
+    -fx-font-size: 11px;
+}
+.shop-btn:hover { -fx-background-color: #4d3b15; }
+
+/* ── Labels (general) ─────────────────────────────────── */
+.label {
+    -fx-text-fill: #c9d6df;
+}
+
+.monster-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #fca5a5;
+}
+
+/* ── ListView ─────────────────────────────────────────── */
+.list-view {
+    -fx-background-color: #0f172a;
+    -fx-border-color: #1e3a5f;
+    -fx-border-radius: 4;
+}
+
+.list-cell {
+    -fx-background-color: #0f172a;
+    -fx-text-fill: #c9d6df;
+    -fx-font-size: 12px;
+}
+
+.list-cell:selected {
+    -fx-background-color: #0f3460;
+    -fx-text-fill: white;
+}
+
+/* ── ComboBox ─────────────────────────────────────────── */
+.combo-box {
+    -fx-background-color: #0f3460;
+    -fx-border-color: #1a6faf;
+    -fx-border-radius: 4;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #c9d6df;
+    -fx-background-color: #0f3460;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #16213e;
+}
+
+/* ── Separator ────────────────────────────────────────── */
+.separator .line {
+    -fx-border-color: #0f3460;
+}
+
+/* ── Log Panel ────────────────────────────────────────── */
+.log-panel {
+    -fx-background-color: #0f172a;
+    -fx-border-color: #0f3460;
+    -fx-border-width: 2 0 0 0;
+}
+
+.log-heading {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #a8a8b3;
+}
+
+.log-area {
+    -fx-control-inner-background: #0f172a;
+    -fx-text-fill: #86efac;
+    -fx-font-family: "Consolas", "Courier New", monospace;
+    -fx-font-size: 11px;
+    -fx-border-color: #1e3a5f;
+}
+
+/* ── ProgressBar (general track) ─────────────────────── */
+.progress-bar > .track {
+    -fx-background-color: #374151;
+    -fx-background-radius: 3;
+}
+
+.progress-bar > .bar {
+    -fx-background-radius: 3;
+}
