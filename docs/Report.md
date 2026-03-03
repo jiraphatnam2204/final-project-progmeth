@@ -1,7 +1,5 @@
 # Report
 
-![Main Menu](images/main-menu.png)
-
 ## Table of Contents
 
 1. [Member](#1-member)
