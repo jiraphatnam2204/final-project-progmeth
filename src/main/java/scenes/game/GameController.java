@@ -12,8 +12,14 @@ import logic.util.ItemCounter;
 
 import java.util.*;
 
+/**
+ * Controller for the main game world scene.
+ * Manages the tile-based world map, player movement, combat, mining,
+ * monster AI, ore/monster respawning, and floating text notifications.
+ */
 public class GameController {
 
+    /** Width in pixels of a single world tile. */
     public static final int TILE_SIZE = 48;
     public static final int COLS = 20;
     public static final int ROWS = 15;
@@ -77,6 +83,13 @@ public class GameController {
 
     private boolean gameEnded = false;
 
+    /**
+     * Creates a new GameController, generates the world, spawns monsters,
+     * and positions the player at the centre of the map.
+     *
+     * @param player  the player character
+     * @param pickaxe the player's starting pickaxe
+     */
     public GameController(Player player, Pickaxe pickaxe) {
         this.player = player;
         this.pickaxeHolder = new Pickaxe[]{pickaxe};
@@ -140,6 +153,13 @@ public class GameController {
         return false;
     }
 
+    /**
+     * Places a rock/ore tile at the given grid position and creates the matching stone object.
+     *
+     * @param r    the row index
+     * @param c    the column index
+     * @param type the tile type constant (e.g. {@link #T_NORMAL_ROCK})
+     */
     public void placeRock(int r, int c, int type) {
         world[r][c] = type;
         stoneObjects[r][c] = switch (type) {
@@ -177,6 +197,13 @@ public class GameController {
             }
     }
 
+    /**
+     * Advances the game state by one frame.
+     *
+     * @param nowNanos the current time in nanoseconds (from {@link AnimationTimer#handle})
+     * @param gameLoop the animation timer, stopped automatically on player death
+     * @return {@code false} if the game has ended, {@code true} otherwise
+     */
     public boolean update(long nowNanos, AnimationTimer gameLoop) {
         if (gameEnded) return false;
 
@@ -421,6 +448,12 @@ public class GameController {
         });
     }
 
+    /**
+     * Checks whether the player is standing adjacent to a building and returns its type.
+     * Displays a "nothing nearby" notification if no building is found.
+     *
+     * @return the {@link BuildingType} of the nearby building, or {@link BuildingType#NONE}
+     */
     public BuildingType checkBuildingEntry() {
         int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
         int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
@@ -452,6 +485,13 @@ public class GameController {
                 && !isSolid(nx + m, ny + TILE_SIZE - m) && !isSolid(nx + TILE_SIZE - m, ny + TILE_SIZE - m);
     }
 
+    /**
+     * Returns whether the world position {@code (px, py)} is inside a solid tile (rock/ore).
+     *
+     * @param px the x pixel coordinate
+     * @param py the y pixel coordinate
+     * @return {@code true} if the tile is solid or out-of-bounds
+     */
     public boolean isSolid(double px, double py) {
         int c = (int) (px / TILE_SIZE), r = (int) (py / TILE_SIZE);
         if (!inBounds(r, c)) return true;
@@ -459,6 +499,13 @@ public class GameController {
         return (t >= T_NORMAL_ROCK && t <= T_PLATINUM) || t == T_MITHRIL || t == T_VIBRANIUM;
     }
 
+    /**
+     * Returns whether the grid position {@code (r, c)} is within the world bounds.
+     *
+     * @param r the row index
+     * @param c the column index
+     * @return {@code true} if the position is valid
+     */
     public boolean inBounds(int r, int c) {
         return r >= 0 && r < ROWS && c >= 0 && c < COLS;
     }
@@ -467,6 +514,11 @@ public class GameController {
         return Math.hypot(x - playerX, y - playerY) < dist;
     }
 
+    /**
+     * Returns the grid coordinates {@code [row, col]} of the tile the player is currently facing.
+     *
+     * @return a two-element array {@code {row, col}}
+     */
     public int[] facingTile() {
         int pc = (int) ((playerX + TILE_SIZE / 2.0) / TILE_SIZE);
         int pr = (int) ((playerY + TILE_SIZE / 2.0) / TILE_SIZE);
@@ -487,18 +539,38 @@ public class GameController {
         return javafx.scene.paint.Color.web("#ff5252");
     }
 
+    /**
+     * Registers that the given key has been pressed.
+     *
+     * @param key the pressed key
+     */
     public void keyPressed(KeyCode key) {
         keys.add(key);
     }
 
+    /**
+     * Registers that the given key has been released.
+     *
+     * @param key the released key
+     */
     public void keyReleased(KeyCode key) {
         keys.remove(key);
     }
 
+    /**
+     * Sets whether the left mouse button (attack) is held down.
+     *
+     * @param on {@code true} if pressed
+     */
     public void setLeftMouse(boolean on) {
         leftMouseDown = on;
     }
 
+    /**
+     * Sets whether the right mouse button (mine) is held down.
+     *
+     * @param on {@code true} if pressed
+     */
     public void setRightMouse(boolean on) {
         rightMouseDown = on;
     }
@@ -559,14 +631,27 @@ public class GameController {
         return notifTime;
     }
 
+    /** The type of building the player is adjacent to on the game world map. */
     public enum BuildingType {NONE, SHOP, CRAFT, BOSS}
 
+    /**
+     * Represents a live monster entity on the world map, including its position,
+     * AI state, and movement variables.
+     */
     public static class MonsterEntity {
         public Monster monster;
         public double x, y, moveTimer, dx, dy;
         public int type;
         public boolean aggro;
 
+        /**
+         * Creates a new MonsterEntity.
+         *
+         * @param m    the underlying monster logic object
+         * @param x    the initial x pixel position
+         * @param y    the initial y pixel position
+         * @param type the difficulty tier (0=easy, 1=medium, 2=hard)
+         */
         public MonsterEntity(Monster m, double x, double y, int type) {
             this.monster = m;
             this.x = x;
@@ -576,12 +661,25 @@ public class GameController {
         }
     }
 
+    /**
+     * A short piece of text that floats upward from a world position and fades out over time.
+     * Used for damage numbers, item pickups, and event notifications.
+     */
     public static class FloatingText {
         public double x, y, vy;
         public String text;
         public javafx.scene.paint.Color color;
         public long born, life;
 
+        /**
+         * Creates a new FloatingText at the given world position.
+         *
+         * @param x      the initial x pixel position
+         * @param y      the initial y pixel position
+         * @param text   the string to display
+         * @param c      the text colour
+         * @param lifeMs how long (in milliseconds) the text should remain visible
+         */
         public FloatingText(double x, double y, String text,
                             javafx.scene.paint.Color c, long lifeMs) {
             this.x = x;
@@ -593,6 +691,11 @@ public class GameController {
             this.life = lifeMs;
         }
 
+        /**
+         * Returns whether this floating text has exceeded its lifetime.
+         *
+         * @return {@code true} if the text should be removed
+         */
         public boolean isDead() {
             return System.currentTimeMillis() - born > life;
         }

@@ -14,6 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Overlay panel displayed when the player opens the BAG menu during a boss battle.
+ * Shows all potions in the player's inventory and a Rest option.
+ * Delegates purchase/use logic to callbacks supplied at construction time.
+ */
 public class HealMenuView {
 
     private static final int W = SceneManager.W;
@@ -34,6 +39,14 @@ public class HealMenuView {
     private Pane root;
     private List<BattleMenuController.PotionEntry> lastPotions = new ArrayList<>();
 
+    /**
+     * Creates a new HealMenuView.
+     *
+     * @param menuCtrl     the battle menu controller providing potion data
+     * @param onUsePotion  callback invoked when the player selects a potion to use
+     * @param onRest       callback invoked when the player selects the Rest option
+     * @param onClose      callback invoked when the player presses the Back button
+     */
     public HealMenuView(BattleMenuController menuCtrl,
                         Consumer<BattleMenuController.PotionEntry> onUsePotion,
                         Runnable onRest,
@@ -44,6 +57,11 @@ public class HealMenuView {
         this.onClose     = onClose;
     }
 
+    /**
+     * Builds the overlay {@link Pane} containing the canvas and dynamic buttons.
+     *
+     * @return the constructed pane (initially empty — call {@link #refresh} to populate)
+     */
     public Pane build() {
         canvas = new Canvas(W, H);
         gc = canvas.getGraphicsContext2D();
@@ -51,6 +69,12 @@ public class HealMenuView {
         return root;
     }
 
+    /**
+     * Rebuilds the menu buttons and canvas for the given list of potions.
+     * Must be called before the panel becomes visible.
+     *
+     * @param potions the current list of potions in the player's inventory
+     */
     public void refresh(List<BattleMenuController.PotionEntry> potions) {
         lastPotions = potions;
 
@@ -92,6 +116,12 @@ public class HealMenuView {
         redraw(potions);
     }
 
+    /**
+     * Redraws the panel and updates button states for the given potion list.
+     * Called every frame while the heal panel is visible.
+     *
+     * @param potions the current list of potions in the player's inventory
+     */
     public void update(List<BattleMenuController.PotionEntry> potions) {
         redraw(potions);
         // update button disabled states

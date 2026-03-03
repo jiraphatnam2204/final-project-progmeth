@@ -17,6 +17,12 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 import logic.util.ItemCounter;
 
+/**
+ * JavaFX view for the game-over / victory scene.
+ * Renders an animated particle effect (confetti on victory, falling ash on defeat),
+ * the result headline, final player stats, and navigation buttons.
+ * Delegates particle animation logic to {@link GameOverController}.
+ */
 public class GameOverView {
 
     private static final int W = SceneManager.W;
@@ -24,12 +30,22 @@ public class GameOverView {
 
     private final GameOverController controller;
 
+    /**
+     * Creates a new GameOverView.
+     *
+     * @param controller the game-over controller providing particle and player data
+     */
     public GameOverView(GameOverController controller) {
         this.controller = controller;
     }
 
-    // Sets up the main Scene, acting like a stage crew preparing before the curtain opens.
-    // It creates the layout, places the buttons, and starts the infinite animation loop.
+    /**
+     * Builds and returns the game-over {@link Scene}, including the animated canvas,
+     * result headline, stats panel, and "Main Menu" / "Quit" buttons.
+     * Starts an {@link javafx.animation.AnimationTimer} that drives the animation loop.
+     *
+     * @return the fully constructed game-over scene
+     */
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();

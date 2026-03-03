@@ -22,6 +22,11 @@ import logic.creatures.Player;
 import logic.item.weapon.WoodenSword;
 import logic.pickaxe.Pickaxe;
 
+/**
+ * JavaFX view for the main menu scene.
+ * Renders the animated starfield background, game title, logo, and navigation buttons.
+ * Delegates star animation logic to {@link MainMenuController}.
+ */
 public class MainMenuView {
 
     private static final int W = SceneManager.W;
@@ -30,6 +35,12 @@ public class MainMenuView {
     private final MainMenuController controller;
     private final Image logo;
 
+    /**
+     * Creates a new MainMenuView and attempts to load the game logo image from resources.
+     * If the logo resource is not found, drawing the logo is silently skipped.
+     *
+     * @param controller the main-menu controller providing star animation data
+     */
     public MainMenuView(MainMenuController controller) {
         this.controller = controller;
 
@@ -43,12 +54,13 @@ public class MainMenuView {
         this.logo = loaded;
     }
 
-    // Assembles the visual elements and kicks off the animation loop.
-    // The AnimationTimer is the heartbeat of this screen. It acts like a movie projector,
-    // running code roughly 60 times every second.
-    // We calculate 'dt' (Delta Time), which is the exact fraction of a second since the last frame.
-    // Relying on time (dt) rather than pure frame counts ensures the animation runs at the
-    // same smooth speed on every computer, regardless of whether it's lagging or running incredibly fast!
+    /**
+     * Builds and returns the main-menu {@link Scene}, including the animated
+     * starfield canvas, game title, and "Play" / "Quit" buttons.
+     * Starts an {@link javafx.animation.AnimationTimer} that drives the animation loop.
+     *
+     * @return the fully constructed main-menu scene
+     */
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();

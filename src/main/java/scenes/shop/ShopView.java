@@ -16,12 +16,10 @@ import javafx.scene.text.TextAlignment;
 import java.util.List;
 
 /**
- * ShopView — the "face" of the shop screen.
- * <p>
- * Responsibility: ONLY drawing and layout. No purchase logic.
- * - Renders item cards on a Canvas
- * - Creates Buy buttons and wires them to ShopController
- * - Displays feedback messages received from the controller
+ * JavaFX view for the shop screen.
+ * Responsible for drawing item cards on a Canvas and creating "Buy" buttons
+ * wired to {@link ShopController}. Displays success/failure feedback messages
+ * after each purchase attempt.
  */
 public class ShopView {
 
@@ -51,6 +49,12 @@ public class ShopView {
     private String feedbackMsg = "";
     private Color feedbackColor = Color.YELLOW;
 
+    /**
+     * Creates a new ShopView.
+     *
+     * @param controller the shop controller providing item and player data
+     * @param onClose    callback invoked when the player presses "Back to World"
+     */
     public ShopView(ShopController controller, Runnable onClose) {
         this.controller = controller;
         this.onClose = onClose;
@@ -59,7 +63,9 @@ public class ShopView {
     // ── Build ─────────────────────────────────────────────────────────────────
 
     /**
-     * Builds and returns the complete shop overlay Pane.
+     * Builds and returns the complete shop overlay {@link Pane}.
+     *
+     * @return the constructed pane ready to be added to the scene graph
      */
     public Pane build() {
         Canvas canvas = new Canvas(W, H);

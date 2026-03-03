@@ -17,6 +17,11 @@ import logic.util.ItemCounter;
 
 import java.util.List;
 
+/**
+ * JavaFX view for the inventory overlay.
+ * Builds a paginated item list and provides equip/use buttons for each entry.
+ * Delegates all game-logic operations to {@link InventoryController}.
+ */
 public class InventoryView {
 
     private final InventoryController controller;
@@ -29,14 +34,23 @@ public class InventoryView {
     private Text pageLabel;
     private Button prevBtn, nextBtn;
 
+    /**
+     * Creates a new InventoryView.
+     *
+     * @param controller the inventory controller providing player and item data
+     * @param onClose    callback invoked when the player closes the inventory
+     */
     public InventoryView(InventoryController controller, Runnable onClose) {
         this.controller = controller;
         this.onClose = onClose;
     }
 
-    // Assembles the foundational layout of the inventory window.
-    // This acts like building the physical dashboard of a car. You only do this once
-    // to put the dials and screens in place. Later methods will update what those dials actually say.
+    /**
+     * Builds and returns the complete inventory overlay {@link Pane}.
+     * Constructs the layout once; call {@link #refresh()} to update dynamic content.
+     *
+     * @return the constructed pane ready to be added to the scene graph
+     */
     public Pane build() {
         StackPane overlay = new StackPane();
         overlay.setPrefSize(960, 720);
@@ -127,9 +141,10 @@ public class InventoryView {
         return overlay;
     }
 
-    // Refreshes the simple text values (HP, Gold, currently equipped gear).
-    // This is like updating the digital numbers on a scoreboard. It doesn't tear down
-    // the stadium, it just changes the fast-moving data.
+    /**
+     * Refreshes the player stats display (gold, HP, ATK, DEF, equipped items)
+     * without rebuilding the item list.
+     */
     public void update() {
         Player player = controller.getPlayer();
         goldText.setText("💰 Gold: " + player.getGold());
@@ -145,9 +160,10 @@ public class InventoryView {
         equippedText.setText("Equipped:  " + w + "   |   " + a);
     }
 
-    // Completely wipes the visible items and redraws them based on the current page.
-    // If you drink a potion or flip the page, this acts like wiping a whiteboard clean
-    // and re-writing the newly updated list from scratch so it stays perfectly accurate.
+    /**
+     * Fully redraws the item list for the current page and updates the page navigation
+     * controls. Also calls {@link #update()} to sync the stats display.
+     */
     public void refresh() {
         update();
         itemListBox.getChildren().clear();

@@ -25,6 +25,11 @@ import scenes.shop.ShopView;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * JavaFX view for the main game world scene.
+ * Renders the tile map, player character, monsters, floating texts, and HUD onto a canvas.
+ * Also manages the shop, crafting, and inventory overlay panels.
+ */
 public class GameView {
 
     private static final int W = GameController.W;
@@ -45,6 +50,11 @@ public class GameView {
 
     private AnimationTimer gameLoop;
 
+    /**
+     * Creates a new GameView and pre-loads all images and sub-scene overlays.
+     *
+     * @param controller the game controller providing the world state
+     */
     public GameView(GameController controller) {
         this.controller = controller;
         loadImages();
@@ -90,6 +100,11 @@ public class GameView {
         invLayer.setVisible(false);
     }
 
+    /**
+     * Builds and returns the main game {@link Scene} with all input handlers and the game loop.
+     *
+     * @return the ready-to-display JavaFX scene
+     */
     public Scene buildScene() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();

@@ -8,6 +8,11 @@ import logic.util.ItemCounter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for the sequential boss battle system.
+ * Manages turn state, player and enemy actions, skill cooldowns,
+ * and progression through the three boss encounters (Akaza → Kokushibo → Muzan).
+ */
 public class BossController {
 
     private final Player player;
@@ -26,6 +31,11 @@ public class BossController {
     private long lastEnemyActionMs = 0;
     private int pendingDefenseReset = 0;
 
+    /**
+     * Creates a new BossController for the given player and initialises the first boss.
+     *
+     * @param player the player entering the boss room
+     */
     public BossController(Player player) {
         this.player = player;
         bosses = new BossInfo[]{
@@ -36,6 +46,11 @@ public class BossController {
         loadBoss(0);
     }
 
+    /**
+     * Performs the player's Defend action, doubling DEF for the enemy's next turn.
+     *
+     * @return {@link ActionResult#ENEMY_TURN} if successful, {@link ActionResult#NONE} if not the player's turn
+     */
     public ActionResult doDefend() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
 
@@ -50,6 +65,11 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
+    /**
+     * Loads the boss at the given index and resets the battle log.
+     *
+     * @param index the boss index (0 = Akaza, 1 = Kokushibo, 2 = Muzan)
+     */
     public void loadBoss(int index) {
         bossIndex = index;
         BossInfo bi = bosses[index];
@@ -62,7 +82,11 @@ public class BossController {
                 + "  ATK:" + player.getAttack() + "  DEF:" + player.getDefense());
     }
 
-    // Normal Attack
+    /**
+     * Performs the player's normal attack against the current boss.
+     *
+     * @return the resulting {@link ActionResult} after the attack
+     */
     public ActionResult doPlayerAttack() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         menuCtrl.close();
@@ -76,7 +100,12 @@ public class BossController {
         return advanceAfterPlayerAction();
     }
 
-    // Skills
+    /**
+     * Activates the player skill at the given index if it is ready and it is the player's turn.
+     *
+     * @param idx the skill index (0=Kagura Dance, 1=Dead Calm, 2=Constant Flux, 3=Water Wheel)
+     * @return the resulting {@link ActionResult}, or {@link ActionResult#NONE} if the skill is on cooldown
+     */
     public ActionResult doSkill(int idx) {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         if (!menuCtrl.isReady(idx)) return ActionResult.NONE;
@@ -121,7 +150,14 @@ public class BossController {
         return advanceAfterPlayerAction();
     }
 
-    // ── Use Potion ────────────────────────────────────────────────────────────
+    // Use Potion from Heal Menu
+
+    /**
+     * Consumes the selected potion from the player's inventory.
+     *
+     * @param entry the potion entry selected from the heal menu
+     * @return {@link ActionResult#ENEMY_TURN} after consuming, or {@link ActionResult#NONE} if not the player's turn
+     */
     public ActionResult usePotion(BattleMenuController.PotionEntry entry) {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         menuCtrl.close();
@@ -140,7 +176,13 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
-    // ── Rest Heal (no potions fallback) ──────────────────────────────────────
+    // Rest Heal
+
+    /**
+     * Performs the Rest action, recovering 10% of the player's max HP without using an item.
+     *
+     * @return {@link ActionResult#ENEMY_TURN} after resting, or {@link ActionResult#NONE} if not the player's turn
+     */
     public ActionResult doRestHeal() {
         if (state != BattleState.PLAYER_TURN) return ActionResult.NONE;
         menuCtrl.close();
@@ -154,7 +196,13 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
-    // ── Enemy Turn ────────────────────────────────────────────────────────────
+    // Enemy Turn
+
+    /**
+     * Executes the enemy's turn: applies attack (with possible crit), berserk debuff, and shield wall.
+     *
+     * @return the resulting {@link ActionResult} after the enemy acts
+     */
     public ActionResult doEnemyTurn() {
         if (state != BattleState.ENEMY_TURN) return ActionResult.NONE;
 
@@ -205,7 +253,7 @@ public class BossController {
         return ActionResult.PLAYER_TURN;
     }
 
-    // ── Internal helpers ──────────────────────────────────────────────────────
+    // Victory Check
     private ActionResult advanceAfterPlayerAction() {
         if (!currentBoss.isAlive()) {
             int gold = currentBoss.dropMoney() * 3;
@@ -230,6 +278,10 @@ public class BossController {
         return ActionResult.ENEMY_TURN;
     }
 
+    /**
+     * Advances the battle to the next boss if one exists.
+     * Resets the battle state to {@link BattleState#PLAYER_TURN}.
+     */
     public void advanceToNextBoss() {
         if (bossIndex + 1 < bosses.length) {
             loadBoss(bossIndex + 1);
@@ -241,80 +293,143 @@ public class BossController {
         while (log.size() > 8) log.remove(0);
     }
 
-    // ── Getters ───────────────────────────────────────────────────────────────
+    // Getters
+
+    /**
+     * @return the player participating in the battle
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * @return the currently active boss monster
+     */
     public Monster getCurrentBoss() {
         return currentBoss;
     }
 
+    /**
+     * @return the display name of the current boss
+     */
     public String getBossName() {
         return bossName;
     }
 
+    /**
+     * @return the theme colour of the current boss
+     */
     public Color getBossColor() {
         return bossColor;
     }
 
+    /**
+     * @return the index of the current boss (0–2)
+     */
     public int getBossIndex() {
         return bossIndex;
     }
 
+    /**
+     * @return the current {@link BattleState}
+     */
     public BattleState getState() {
         return state;
     }
 
+    /**
+     * @return the live battle log (up to 8 most-recent lines)
+     */
     public List<String> getLog() {
         return log;
     }
 
+    /**
+     * @return the system-time (ms) when the enemy last acted
+     */
     public long getLastEnemyActionMs() {
         return lastEnemyActionMs;
     }
 
+    /**
+     * @return {@code true} if there is another boss after the current one
+     */
     public boolean hasNextBoss() {
         return bossIndex + 1 < bosses.length;
     }
 
+    /**
+     * @return the {@link BattleMenuController} managing menus and cooldowns
+     */
     public BattleMenuController getMenuCtrl() {
         return menuCtrl;
     }
 
+    /**
+     * @return {@code true} if an attack animation should play this frame
+     */
     public boolean isPendingAttackAnim() {
         return pendingAttackAnim;
     }
 
+    /**
+     * @return {@code true} if the boss shake animation should trigger
+     */
     public boolean isPendingBossShake() {
         return pendingBossShake;
     }
 
+    /**
+     * @return {@code true} if the player shake animation should trigger
+     */
     public boolean isPendingPlayerShake() {
         return pendingPlayerShake;
     }
 
+    /**
+     * Clears the pending attack animation flag after the view has consumed it.
+     */
     public void clearAttackAnimFlag() {
         pendingAttackAnim = false;
     }
 
+    /**
+     * Clears the pending boss shake flag after the view has consumed it.
+     */
     public void clearBossShakeFlag() {
         pendingBossShake = false;
     }
 
+    /**
+     * Clears the pending player shake flag after the view has consumed it.
+     */
     public void clearPlayerShakeFlag() {
         pendingPlayerShake = false;
     }
 
-    // ── Enums ─────────────────────────────────────────────────────────────────
+    // Enums
+
+    /**
+     * Represents the current phase of the turn-based battle.
+     */
     public enum BattleState {
         PLAYER_TURN, ENEMY_TURN, VICTORY, DEFEAT, ALL_CLEAR
     }
 
+    /**
+     * Represents the outcome of a player or enemy action for the view to react to.
+     */
     public enum ActionResult {
         NONE, ENEMY_TURN, PLAYER_TURN, BOSS_DEFEATED, ALL_CLEAR, PLAYER_DEFEATED
     }
 
+    /**
+     * Immutable data holder for a boss entry (name, monster instance, and theme colour).
+     *
+     * @param name    the display name of the boss
+     * @param monster the monster instance
+     * @param color   the theme colour used in the UI
+     */
     public record BossInfo(String name, Monster monster, Color color) {
     }
 }
