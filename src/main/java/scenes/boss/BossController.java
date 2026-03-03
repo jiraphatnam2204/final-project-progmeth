@@ -116,7 +116,7 @@ public class BossController {
 
         switch (idx) {
             case 0 -> {
-                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                int base = Math.max(0, player.getAttack() - currentBoss.getDefense());
                 int dmg = base * 2;
                 currentBoss.takeDamage(player.getAttack() * 2);
                 log.add("Kagura Dance! Hit " + bossName + " for " + dmg + " dmg!");
@@ -130,7 +130,7 @@ public class BossController {
                 menuCtrl.setCooldown(1, BattleMenuController.SKILL_MAX_CD[1]);
             }
             case 2 -> {
-                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                int base = Math.max(0, player.getAttack() - currentBoss.getDefense());
                 int total = base * 3;
                 for (int h = 0; h < 3; h++) currentBoss.takeDamage(player.getAttack());
                 menuCtrl.setBerserkDebuff(true);
@@ -138,7 +138,7 @@ public class BossController {
                 menuCtrl.setCooldown(2, BattleMenuController.SKILL_MAX_CD[2]);
             }
             case 3 -> {
-                int base = Math.max(1, player.getAttack() - currentBoss.getDefense());
+                int base = Math.max(0, player.getAttack() - currentBoss.getDefense());
                 currentBoss.takeDamage(player.getAttack());
                 int heal = Math.max(1, (int) (base * 0.30));
                 player.heal(heal);
@@ -256,7 +256,7 @@ public class BossController {
     // Victory Check
     private ActionResult advanceAfterPlayerAction() {
         if (!currentBoss.isAlive()) {
-            int gold = currentBoss.dropMoney() * 3;
+            int gold = currentBoss.dropMoney();
             player.setGold(player.getGold() + gold);
             log.add(bossName + " defeated! +" + gold + "g");
             if (bossIndex + 1 < bosses.length) {
