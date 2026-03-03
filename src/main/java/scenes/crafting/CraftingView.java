@@ -16,6 +16,11 @@ import javafx.scene.text.TextAlignment;
 import logic.base.BaseItem;
 import logic.util.ItemCounter;
 
+/**
+ * JavaFX view for the crafting station overlay.
+ * Renders recipe cards on a canvas and creates "Craft" buttons for each recipe.
+ * Displays success/failure feedback messages after each crafting attempt.
+ */
 public class CraftingView {
 
     private static final int W = SceneManager.W;
@@ -38,11 +43,22 @@ public class CraftingView {
     private String feedbackMsg = "";
     private Color feedbackColor = Color.YELLOW;
 
+    /**
+     * Creates a new CraftingView.
+     *
+     * @param controller the crafting controller providing recipe and player data
+     * @param onClose    callback invoked when the player presses "Back to World"
+     */
     public CraftingView(CraftingController controller, Runnable onClose) {
         this.controller = controller;
         this.onClose = onClose;
     }
 
+    /**
+     * Builds and returns the complete crafting overlay {@link Pane}.
+     *
+     * @return the constructed pane ready to be added to the scene graph
+     */
     public Pane build() {
         canvas = new Canvas(W, H);
         gc = canvas.getGraphicsContext2D();
@@ -84,6 +100,10 @@ public class CraftingView {
         redraw();
     }
 
+    /**
+     * Refreshes the canvas to reflect the current player stats and recipe availability.
+     * Called every frame while this overlay is visible.
+     */
     public void update() {
         redraw();
     }

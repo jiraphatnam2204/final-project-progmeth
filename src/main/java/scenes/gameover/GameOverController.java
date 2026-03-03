@@ -5,6 +5,11 @@ import logic.creatures.Player;
 
 import java.util.Random;
 
+/**
+ * Controller for the game-over / victory scene.
+ * Manages an array of animated particles: confetti rising upward on victory,
+ * falling ash drifting downward on defeat.
+ */
 public class GameOverController {
 
     private static final int W = SceneManager.W;
@@ -20,6 +25,13 @@ public class GameOverController {
     private final double[] pvy = new double[PARTICLE_COUNT]; // velocity Y
     private final double[] pr = new double[PARTICLE_COUNT]; // radius
 
+    /**
+     * Creates a new GameOverController and initialises particle positions and velocities.
+     * Particles rise for a victory result and fall for a defeat result.
+     *
+     * @param won    {@code true} if the player defeated all bosses; {@code false} on defeat
+     * @param player the player whose final stats are displayed on the game-over screen
+     */
     public GameOverController(boolean won, Player player) {
         this.won = won;
         this.player = player;
@@ -42,6 +54,10 @@ public class GameOverController {
         }
     }
 
+    /**
+     * Advances every particle's position by its velocity for one frame.
+     * Particles that leave the screen are wrapped back to the opposite edge.
+     */
     public void updateParticles() {
         for (int i = 0; i < PARTICLE_COUNT; i++) {
             px[i] += pvx[i];
@@ -60,26 +76,56 @@ public class GameOverController {
     }
 
 
+    /**
+     * Returns whether the player won the game.
+     *
+     * @return {@code true} if all bosses were defeated
+     */
     public boolean isWon() {
         return won;
     }
 
+    /**
+     * Returns the player associated with this game-over session.
+     *
+     * @return the player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the X-coordinate array for all particles.
+     *
+     * @return particle X positions
+     */
     public double[] getPx() {
         return px;
     }
 
+    /**
+     * Returns the Y-coordinate array for all particles.
+     *
+     * @return particle Y positions
+     */
     public double[] getPy() {
         return py;
     }
 
+    /**
+     * Returns the radius array for all particles.
+     *
+     * @return particle radii
+     */
     public double[] getPr() {
         return pr;
     }
 
+    /**
+     * Returns the total number of particles managed by this controller.
+     *
+     * @return the particle count
+     */
     public int getParticleCount() {
         return PARTICLE_COUNT;
     }

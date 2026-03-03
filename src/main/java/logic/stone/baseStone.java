@@ -1,8 +1,21 @@
 package logic.stone;
 import interfaces.Mineable; import logic.base.BaseItem; import logic.creatures.Player;
 import java.util.ArrayList; import java.util.List;
+/**
+ * Abstract base class for all mineable ore and stone nodes in the game world.
+ * Each node has a fixed durability that is reduced each time it is mined.
+ * When durability reaches zero the node is broken and drops items to the player.
+ */
 public abstract class baseStone extends BaseItem implements Mineable {
     protected int durability; protected final int maxDurability; protected final int dropAmount;
+
+    /**
+     * Creates a new stone node with the given name, durability, and drop amount.
+     *
+     * @param name          the display name of this ore type
+     * @param maxDurability the number of mining hits required to break this node
+     * @param dropAmount    the number of item drops produced when the node breaks
+     */
     protected baseStone(String name, int maxDurability, int dropAmount) {
         super(name); this.maxDurability = maxDurability; durability = maxDurability; this.dropAmount = dropAmount;
     }
@@ -16,11 +29,21 @@ public abstract class baseStone extends BaseItem implements Mineable {
         }
         return List.of();
     }
+    /**
+     * Generates the list of items dropped when this node is fully mined.
+     *
+     * @return a list containing {@code dropAmount} items created by {@link #createItem()}
+     */
     protected List<BaseItem> dropItems() {
         List<BaseItem> drops = new ArrayList<>();
         for (int i = 0; i < dropAmount; i++) drops.add(createItem());
         return drops;
     }
+    /**
+     * Factory method that creates one instance of the ore item dropped by this node.
+     *
+     * @return a new {@link BaseItem} representing the ore
+     */
     protected abstract BaseItem createItem();
     @Override public boolean isBroken() { return durability <= 0; }
     @Override public int getDurability() { return durability; }

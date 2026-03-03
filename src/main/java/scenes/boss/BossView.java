@@ -22,6 +22,11 @@ import logic.pickaxe.Pickaxe;
 
 import java.util.Objects;
 
+/**
+ * JavaFX view for the boss battle scene.
+ * Renders the animated battle arena on a {@link javafx.scene.canvas.Canvas},
+ * manages all UI buttons and sub-menu overlays, and drives the game loop.
+ */
 public class BossView {
 
     private static final int W = SceneManager.W;
@@ -46,6 +51,13 @@ public class BossView {
     private HealMenuView healMenuView;
     private Pane skillPane, healPane;
 
+    /**
+     * Creates a new BossView.
+     *
+     * @param controller    the boss battle controller providing game state
+     * @param pickaxeHolder a single-element array holding the player's current pickaxe,
+     *                      used to return to the game world via the Flee button
+     */
     public BossView(BossController controller, Pickaxe[] pickaxeHolder) {
         this.controller = controller;
         this.pickaxeHolder = pickaxeHolder;
@@ -60,11 +72,11 @@ public class BossView {
         imgPlayerAttack = loadImg("/images/player_slash_right.png");
 
         // One image per skill:
-        // 0 = Power Strike, 1 = Shield Wall, 2 = Berserk, 3 = Soul Drain
+        // 0: Hinokami Kagura, 1: Dead Calm, 2: Constant Flux 3: Water Wheel
         imgPlayerSkills[0] = loadImg("/images/player-skill-hinokamikagura.png");
         imgPlayerSkills[1] = loadImg("/images/player-skill-deadcalm.png");
-        imgPlayerSkills[2] = loadImg("/images/player-skill-waterdragon.png");
-        imgPlayerSkills[3] = loadImg("/images/player-skill-strikingtide.png");
+        imgPlayerSkills[2] = loadImg("/resources/images/player-skill-constantflux.png");
+        imgPlayerSkills[3] = loadImg("/resources/images/player-skill-waterwheel.png");
     }
 
     private Image loadImg(String p) {
@@ -76,6 +88,12 @@ public class BossView {
         }
     }
 
+    /**
+     * Builds and returns the complete boss battle {@link Scene}.
+     * Starts the animation/game loop which runs until the battle ends.
+     *
+     * @return the ready-to-display JavaFX scene
+     */
     public Scene build() {
         Canvas canvas = new Canvas(W, H);
         GraphicsContext gc = canvas.getGraphicsContext2D();
@@ -347,7 +365,7 @@ public class BossView {
         gc.setFill(Color.rgb(0, 0, 0, 0.25));
         gc.fillOval(px + sw * 0.15, py + sh - 10, sw * 0.7, 20);
 
-        // Pick sprite: skill image → attack image → idle image
+        // Pick the correct sprite based on current action/animation state
         Image sprite = imgPlayerIdle;
         if (showAttackAnim) {
             if (showSkillAnim && activeSkillIdx >= 0 && activeSkillIdx < 4

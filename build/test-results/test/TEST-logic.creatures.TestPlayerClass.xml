@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="logic.creatures.TestPlayerClass" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-03-02T11:43:08.171Z" hostname="JAMES" time="0.005">
+  <properties/>
+  <testcase name="kaguraDance_doubleDamage()" classname="logic.creatures.TestPlayerClass" time="0.001"/>
+  <testcase name="setHealthClamped()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="healCappedAtMaxHp()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="skills_minDamageAlwaysAtLeastOne()" classname="logic.creatures.TestPlayerClass" time="0.001"/>
+  <testcase name="usePotionHealsAndDecrements()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="initialStats()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="addAndRemoveBonus()" classname="logic.creatures.TestPlayerClass" time="0.001"/>
+  <testcase name="addItemStacksCorrectly()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="healNormal()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="bonusNeverGoesNegative()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="deadCalm_setsShieldWallFlag()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="constantFlux_threeHitsAndBerserkDebuff()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="usePotionRemovesEntryWhenEmpty()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="goldNotNegative()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="waterWheel_damageAndHeal()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <testcase name="usePotionReturnsFalseWhenNoItem()" classname="logic.creatures.TestPlayerClass" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

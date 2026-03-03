@@ -13,10 +13,9 @@ import javafx.scene.text.TextAlignment;
 import java.util.function.IntConsumer;
 
 /**
- * SkillMenuView
- * <p>
- * Pokemon-style 2x2 skill grid rendered over the battle scene.
- * Each cell shows: skill name, description, type color, and cooldown status.
+ * Overlay panel that displays the player's four combat skills during a boss battle.
+ * Renders a Pokémon-style 2×2 grid showing each skill's name, description,
+ * type colour, cooldown bar, and a "Use" button.
  */
 public class SkillMenuView {
 
@@ -48,6 +47,13 @@ public class SkillMenuView {
     private GraphicsContext gc;
     private Button backBtn;
 
+    /**
+     * Creates a new SkillMenuView.
+     *
+     * @param menuCtrl         the battle menu controller providing cooldown state
+     * @param onSkillSelected  callback invoked with the chosen skill index (0–3)
+     * @param onClose          callback invoked when the player presses Back
+     */
     public SkillMenuView(BattleMenuController menuCtrl,
                          IntConsumer onSkillSelected,
                          Runnable onClose) {

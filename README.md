@@ -3,7 +3,9 @@
 A 2D top-down action RPG built with Java and JavaFX, inspired by *Demon Slayer: Kimetsu no Yaiba*. Mine ores, craft
 gear, and battle iconic demon bosses.
 
-> For detailed gameplay instructions, see the **[Game Manual](docs/MANUAL.md)**.
+![Main Menu](docs/images/main-menu.png)
+
+> For detailed gameplay instructions, see the **[Our Report](docs/Report.md)**.
 
 ## Gameplay Loop
 
@@ -113,6 +115,16 @@ Bosses have a 20% critical hit chance (1.6× damage).
 
 ```bash
 ./gradlew test
+```
+
+## Javadoc
+
+The generated API documentation is available at [`build/docs/javadoc/index.html`](build/docs/javadoc/index.html).
+
+To regenerate:
+
+```bash
+./gradlew javadoc
 ```
 
 ## Project Structure

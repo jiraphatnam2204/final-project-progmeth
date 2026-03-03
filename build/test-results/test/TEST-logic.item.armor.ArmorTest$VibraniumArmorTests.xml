@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="logic.item.armor.ArmorTest$VibraniumArmorTests" tests="16" skipped="0" failures="0" errors="0" timestamp="2026-03-02T11:43:08.178Z" hostname="JAMES" time="0.006">
+  <properties/>
+  <testcase name="craftingPrice()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.001"/>
+  <testcase name="recipeSize()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="hp()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="atk()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.001"/>
+  <testcase name="def()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="spd()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="name()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="recipeContainsVibranium()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.001"/>
+  <testcase name="craft_doesNothingWhenCannotCraft()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.001"/>
+  <testcase name="canCraft_falseWhenNotEnoughGold()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="canCraft_falseWhenNotEnoughVibranium()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="equip_increasesDefAndMaxHp()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="canCraft_trueWhenHasAllMaterials()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.0"/>
+  <testcase name="recipeContainsMithril()" classname="logic.item.armor.ArmorTest$VibraniumArmorTests" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
