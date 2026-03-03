@@ -3,6 +3,8 @@
 A 2D top-down action RPG built with Java and JavaFX, inspired by *Demon Slayer: Kimetsu no Yaiba*. Mine ores, craft
 gear, and battle iconic demon bosses.
 
+> For detailed gameplay instructions, see the **[Game Manual](docs/MANUAL.md)**.
+
 ## Gameplay Loop
 
 ```
