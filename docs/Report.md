@@ -5,6 +5,7 @@
 1. [Member](#1-member)
 2. [Game Manual](#2-game-manual)
 3. [Javadoc](#3-javadoc)
+4. [Class Diagram](#4-class-diagram)
 
 ---
 
