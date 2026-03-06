@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.item.armor.ArmorTest$MithrilArmorTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.207Z" hostname="JAMES" time="0.005">
+<testsuite name="logic.item.armor.ArmorTest$MithrilArmorTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:49:09.913Z" hostname="JAMES" time="0.011">
   <properties/>
-  <testcase name="canCraft_falseWhenNotEnoughMithril()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
+  <testcase name="canCraft_falseWhenNotEnoughMithril()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
   <testcase name="craftingPrice()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
   <testcase name="recipeContainsPlatinum()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
-  <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
-  <testcase name="recipeSize()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
-  <testcase name="hp()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
-  <testcase name="atk()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
-  <testcase name="def()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
+  <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
+  <testcase name="recipeSize()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
+  <testcase name="hp()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
+  <testcase name="atk()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
+  <testcase name="def()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
   <testcase name="spd()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
   <testcase name="name()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
-  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
+  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
   <testcase name="equip_increasesDefAndMaxHp()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
   <testcase name="canCraft_trueWhenHasAllMaterials()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
-  <testcase name="recipeContainsMithril()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.0"/>
+  <testcase name="recipeContainsMithril()" classname="logic.item.armor.ArmorTest$MithrilArmorTests" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

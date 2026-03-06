@@ -12,7 +12,13 @@ import java.util.ArrayList;
  */
 public abstract class BaseWeapon extends BaseItem implements Craftable, Equipable {
 
-    private int dmg, craftingPrice;
+    /** The damage bonus granted to the player when this weapon is equipped. */
+    private int dmg;
+
+    /** The gold cost required to craft this weapon. */
+    private int craftingPrice;
+
+    /** The cooldown of this weapon in seconds between uses. */
     private double cd;
 
     /**

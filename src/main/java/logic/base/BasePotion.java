@@ -10,6 +10,7 @@ import logic.creatures.Player;
  */
 public abstract class BasePotion extends BaseItem implements Consumable {
 
+    /** The amount of health restored when this potion is consumed. */
     private int stat;
 
     /**

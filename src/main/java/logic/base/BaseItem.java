@@ -8,8 +8,13 @@ import java.util.Objects;
  */
 public class BaseItem {
 
+    /** The name of this item. */
     private final String name;
+
+    /** Whether this item can be stacked in the inventory. */
     private final boolean stackable;
+
+    /** The maximum number of this item allowed per inventory slot. */
     private final int maxStack;
 
     /**

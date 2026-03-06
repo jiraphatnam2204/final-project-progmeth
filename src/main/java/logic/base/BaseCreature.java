@@ -6,7 +6,17 @@ package logic.base;
  */
 public abstract class BaseCreature {
 
-    protected int healthPoint, maxHealthPoint, attack, defense;
+    /** Current health points of this creature. */
+    protected int healthPoint;
+
+    /** Maximum health points of this creature. */
+    protected int maxHealthPoint;
+
+    /** Base attack power of this creature. */
+    protected int attack;
+
+    /** Base defense value used to reduce incoming damage. */
+    protected int defense;
 
     /**
      * Creates a new creature with the given stats.

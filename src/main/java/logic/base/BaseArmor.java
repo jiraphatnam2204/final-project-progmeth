@@ -12,7 +12,20 @@ import java.util.ArrayList;
  */
 public abstract class BaseArmor extends BaseItem implements Equipable, Craftable {
 
-    protected int def = 0, atk = 0, spd = 0, hp = 0, craftingPrice = 0;
+    /** Defense bonus granted to the player when this armor is equipped. */
+    protected int def = 0;
+
+    /** Attack bonus granted to the player when this armor is equipped. */
+    protected int atk = 0;
+
+    /** Speed bonus granted to the player when this armor is equipped. */
+    protected int spd = 0;
+
+    /** Max HP bonus granted to the player when this armor is equipped. */
+    protected int hp = 0;
+
+    /** Gold cost required to craft this armor. */
+    protected int craftingPrice = 0;
 
     /**
      * Creates a new armor with the given stat bonuses and crafting cost.

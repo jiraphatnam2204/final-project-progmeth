@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.item.armor.ArmorTest$PlatinumArmorTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.213Z" hostname="JAMES" time="0.004">
+<testsuite name="logic.item.armor.ArmorTest$PlatinumArmorTests" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:49:09.925Z" hostname="JAMES" time="0.011">
   <properties/>
   <testcase name="craftingPrice()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
-  <testcase name="recipeContainsPlatinum()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
-  <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
-  <testcase name="recipeContainsIron()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
+  <testcase name="recipeContainsPlatinum()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
+  <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
+  <testcase name="recipeContainsIron()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
   <testcase name="recipeSize()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
-  <testcase name="hp()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
+  <testcase name="hp()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
   <testcase name="atk()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
-  <testcase name="def()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
+  <testcase name="def()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
   <testcase name="spd()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
   <testcase name="name()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
-  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
+  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.001"/>
   <testcase name="equip_increasesDefAndMaxHp()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
   <testcase name="canCraft_falseWhenNotEnoughPlatinum()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
   <testcase name="canCraft_trueWhenHasAllMaterials()" classname="logic.item.armor.ArmorTest$PlatinumArmorTests" time="0.0"/>
