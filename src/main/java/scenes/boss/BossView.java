@@ -29,27 +29,86 @@ import java.util.Objects;
  */
 public class BossView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
+
+    /** Duration in milliseconds of the attack/skill animation. */
     private static final long ANIM_DURATION = 600;
+
+    /** The battle controller providing game state. */
     private final BossController controller;
+
+    /** Single-element array holding the player's current pickaxe (for the Flee button). */
     private final Pickaxe[] pickaxeHolder;
-    private final Image[] imgPlayerSkills = new Image[4]; // one image per skill
+
+    /** Sprite images for each of the four player skills (indexed 0–3). */
+    private final Image[] imgPlayerSkills = new Image[4];
+
+    /** The most recent action result returned by the controller. */
     private BossController.ActionResult r;
-    private Image imgBoss1, imgBoss2, imgBoss3;
-    private Image imgPlayerIdle, imgPlayerAttack;
+
+    /** Sprite image for the first boss (Akaza). */
+    private Image imgBoss1;
+
+    /** Sprite image for the second boss (Kokushibo). */
+    private Image imgBoss2;
+
+    /** Sprite image for the third boss (Muzan). */
+    private Image imgBoss3;
+
+    /** Player idle sprite image. */
+    private Image imgPlayerIdle;
+
+    /** Player attack sprite image (used during normal attacks). */
+    private Image imgPlayerAttack;
+
+    /** Accumulated animation time in seconds, driving idle bobbing effects. */
     private double animTime = 0;
+
+    /** {@code true} while an attack or skill animation is playing. */
     private boolean showAttackAnim = false;
-    private boolean showSkillAnim = false;   // true when a SKILL is animating
-    private int activeSkillIdx = -1;      // which skill (0-3) is animating
+
+    /** {@code true} when the current animation is a skill (vs. a normal attack). */
+    private boolean showSkillAnim = false;
+
+    /** Index of the skill currently animating (0–3), or {@code -1} for a normal attack. */
+    private int activeSkillIdx = -1;
+
+    /** System time (ms) when the current attack animation should end. */
     private long attackAnimEndMs = 0;
-    private double bossShakeX = 0, lastShakeTime = 0;
-    private double playerShakeX = 0, lastPlayerShake = 0;
+
+    /** Current horizontal shake offset for the boss sprite in pixels. */
+    private double bossShakeX = 0;
+
+    /** System time (ms) of the last boss shake trigger. */
+    private double lastShakeTime = 0;
+
+    /** Current horizontal shake offset for the player sprite in pixels. */
+    private double playerShakeX = 0;
+
+    /** System time (ms) of the last player shake trigger. */
+    private double lastPlayerShake = 0;
+
+    /** The main game loop animation timer. */
     private AnimationTimer GameLoop;
+
+    /** Battle action buttons shown at the bottom of the screen. */
     private Button attackBtn, skillBtn, bagBtn, fleeBtn, nextBtn, defenseBtn;
+
+    /** The skill selection sub-menu view. */
     private SkillMenuView skillMenuView;
+
+    /** The heal/bag sub-menu view. */
     private HealMenuView healMenuView;
-    private Pane skillPane, healPane;
+
+    /** The pane containing the skill sub-menu overlay. */
+    private Pane skillPane;
+
+    /** The pane containing the heal sub-menu overlay. */
+    private Pane healPane;
 
     /**
      * Creates a new BossView.
@@ -64,6 +123,9 @@ public class BossView {
         loadImages();
     }
 
+    /**
+     * Loads all boss, player, and skill sprite images from the classpath resources.
+     */
     private void loadImages() {
         imgBoss1 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Akaza.png")));
         imgBoss2 = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Kokushibo.png")));
@@ -79,6 +141,12 @@ public class BossView {
         imgPlayerSkills[3] = loadImg("/resources/images/player-skill-waterwheel.png");
     }
 
+    /**
+     * Attempts to load an image from the given classpath resource path.
+     *
+     * @param p the classpath-relative resource path
+     * @return the loaded {@link Image}, or {@code null} if the resource could not be found or loaded
+     */
     private Image loadImg(String p) {
         try {
             var s = getClass().getResourceAsStream(p);
@@ -191,11 +259,17 @@ public class BossView {
         return new Scene(root, W, H);
     }
 
+    /**
+     * Handles the DEFENSE button click: delegates to the controller and applies the result.
+     */
     private void handleDefense() {
         BossController.ActionResult r = controller.doDefend();
         applyResult(r);
     }
 
+    /**
+     * Handles the ATTACK button click: triggers the player attack and starts the attack animation.
+     */
     private void handleAttack() {
         if (controller.getState() != BossController.BattleState.PLAYER_TURN) return;
         skillPane.setVisible(false);
@@ -216,12 +290,18 @@ public class BossView {
         applyResult(r);
     }
 
+    /**
+     * Opens the skill selection sub-menu overlay if it is the player's turn.
+     */
     private void openSkillMenu() {
         if (controller.getState() != BossController.BattleState.PLAYER_TURN) return;
         healPane.setVisible(false);
         skillPane.setVisible(true);
     }
 
+    /**
+     * Opens the heal/bag sub-menu overlay if it is the player's turn.
+     */
     private void openHealMenu() {
         if (controller.getState() != BossController.BattleState.PLAYER_TURN) return;
         skillPane.setVisible(false);
@@ -229,6 +309,9 @@ public class BossView {
         healPane.setVisible(true);
     }
 
+    /**
+     * Executes the enemy's turn and triggers the player shake animation if damage was dealt.
+     */
     private void handleEnemyTurn() {
         r = controller.doEnemyTurn();
         if (controller.isPendingPlayerShake()) {
@@ -239,6 +322,9 @@ public class BossView {
         applyResult(r);
     }
 
+    /**
+     * Handles the "Next Boss" button click: advances to the next boss or shows the game-over screen.
+     */
     private void handleNextBoss() {
         if (controller.hasNextBoss()) {
             controller.advanceToNextBoss();
@@ -254,6 +340,11 @@ public class BossView {
         }
     }
 
+    /**
+     * Reacts to the given action result by enabling/disabling buttons or transitioning the UI.
+     *
+     * @param r the action result from the controller
+     */
     private void applyResult(BossController.ActionResult r) {
         switch (r) {
             case ENEMY_TURN -> setButtonsEnabled(false);
@@ -276,6 +367,9 @@ public class BossView {
         }
     }
 
+    /**
+     * Updates transient visual states (shake offsets, attack animation timeout) each frame.
+     */
     private void updateVisualState() {
         if (System.currentTimeMillis() - lastShakeTime > 80) bossShakeX = 0;
         if (System.currentTimeMillis() - lastPlayerShake > 80) playerShakeX = 0;
@@ -286,6 +380,11 @@ public class BossView {
         }
     }
 
+    /**
+     * Renders the full battle scene: background, boss, player character, HP bars, log, and turn indicator.
+     *
+     * @param gc the {@link GraphicsContext} to draw onto
+     */
     private void render(GraphicsContext gc) {
 
         Color bossColor = controller.getBossColor();
@@ -314,6 +413,11 @@ public class BossView {
         drawTurnIndicator(gc);
     }
 
+    /**
+     * Draws the current boss sprite, aura, and name plate.
+     *
+     * @param gc the graphics context
+     */
     private void drawBoss(GraphicsContext gc) {
         Color bossColor = controller.getBossColor();
         double bx = W * 0.62 + bossShakeX, by = H * 0.12;
@@ -345,6 +449,11 @@ public class BossView {
         gc.fillText(controller.getBossName(), npX + 120, H * 0.08 + 21);
     }
 
+    /**
+     * Draws the player character sprite, status effect glows, and status badges.
+     *
+     * @param gc the graphics context
+     */
     private void drawPlayerChar(GraphicsContext gc) {
         double sw = 300, sh = 320;
         double px = W * 0.06 + playerShakeX, py = (r == BossController.ActionResult.PLAYER_DEFEATED) ? H * 0.3 : H * 0.12;
@@ -411,6 +520,11 @@ public class BossView {
         }
     }
 
+    /**
+     * Draws the boss HP bar with percentage-based colour coding.
+     *
+     * @param gc the graphics context
+     */
     private void drawBossHPBar(GraphicsContext gc) {
         var boss = controller.getCurrentBoss();
         double bx = W * 0.55;
@@ -426,6 +540,11 @@ public class BossView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Draws the player HP bar with percentage-based colour coding and current stats.
+     *
+     * @param gc the graphics context
+     */
     private void drawPlayerHPBar(GraphicsContext gc) {
         Player player = controller.getPlayer();
         double pct = (double) player.getHealth() / player.getMaxHealth();
@@ -441,6 +560,11 @@ public class BossView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Draws the battle log panel with the most recent messages.
+     *
+     * @param gc the graphics context
+     */
     private void drawLog(GraphicsContext gc) {
         var log = controller.getLog();
         double lx = 20, ly = H * 0.67, lw = W * 0.52, lh = H * 0.21;
@@ -459,6 +583,11 @@ public class BossView {
         }
     }
 
+    /**
+     * Draws the turn-state indicator label (e.g. "YOUR TURN" or "Enemy acting...").
+     *
+     * @param gc the graphics context
+     */
     private void drawTurnIndicator(GraphicsContext gc) {
         String ind = switch (controller.getState()) {
             case PLAYER_TURN -> "YOUR TURN";
@@ -481,6 +610,11 @@ public class BossView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Draws the context-sensitive hint bar at the bottom of the screen.
+     *
+     * @param gc the graphics context
+     */
     private void drawBottomBar(GraphicsContext gc) {
         // Pokemon-style bottom panel description
         double bx = 20, by = H - 60, bw = W / 2.0 - 30, bh = 50;
@@ -501,6 +635,11 @@ public class BossView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Enables or disables the four main battle action buttons.
+     *
+     * @param on {@code true} to enable, {@code false} to disable
+     */
     private void setButtonsEnabled(boolean on) {
         attackBtn.setDisable(!on);
         skillBtn.setDisable(!on);
@@ -508,6 +647,9 @@ public class BossView {
         bagBtn.setDisable(!on);
     }
 
+    /**
+     * Hides the normal battle buttons and shows the "Next Boss" button after a boss is defeated.
+     */
     private void showVictoryButtons() {
         attackBtn.setVisible(false);
         skillBtn.setVisible(false);
@@ -517,6 +659,14 @@ public class BossView {
         nextBtn.setVisible(true);
     }
 
+    /**
+     * Creates a styled action button with hover colour transition.
+     *
+     * @param text  the button label text
+     * @param bg    the default background colour hex string
+     * @param hover the hover background colour hex string
+     * @return the configured button
+     */
     private Button makeBtn(String text, String bg, String hover) {
         Button b = new Button(text);
         b.setPrefWidth(140);

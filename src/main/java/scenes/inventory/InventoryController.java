@@ -18,7 +18,11 @@ public class InventoryController {
 
     /** Number of items shown on a single inventory page. */
     public static final int ITEMS_PER_PAGE = 8;
+
+    /** The player whose inventory is being managed. */
     private final Player player;
+
+    /** Zero-based index of the currently displayed inventory page. */
     private int currentPage = 0;
 
     /**

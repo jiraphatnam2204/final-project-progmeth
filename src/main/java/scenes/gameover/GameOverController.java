@@ -12,18 +12,35 @@ import java.util.Random;
  */
 public class GameOverController {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
+
+    /** Total number of animated particles (confetti or ash). */
     private static final int PARTICLE_COUNT = 80;
 
+    /** {@code true} if the player defeated all bosses; {@code false} on defeat. */
     private final boolean won;
+
+    /** The player whose final stats are displayed. */
     private final Player player;
 
+    /** X-coordinate of each particle. */
     private final double[] px = new double[PARTICLE_COUNT];
+
+    /** Y-coordinate of each particle. */
     private final double[] py = new double[PARTICLE_COUNT];
-    private final double[] pvx = new double[PARTICLE_COUNT]; // velocity X
-    private final double[] pvy = new double[PARTICLE_COUNT]; // velocity Y
-    private final double[] pr = new double[PARTICLE_COUNT]; // radius
+
+    /** Horizontal velocity of each particle in pixels per frame. */
+    private final double[] pvx = new double[PARTICLE_COUNT];
+
+    /** Vertical velocity of each particle in pixels per frame (negative = upward on victory). */
+    private final double[] pvy = new double[PARTICLE_COUNT];
+
+    /** Radius of each particle in pixels. */
+    private final double[] pr = new double[PARTICLE_COUNT];
 
     /**
      * Creates a new GameOverController and initialises particle positions and velocities.
@@ -39,6 +56,10 @@ public class GameOverController {
     }
 
 
+    /**
+     * Initialises all particle positions, velocities, and radii with random values.
+     * Velocity direction depends on {@link #won}: rising for victory, falling for defeat.
+     */
     private void initParticles() {
         Random rng = new Random();
         for (int i = 0; i < PARTICLE_COUNT; i++) {

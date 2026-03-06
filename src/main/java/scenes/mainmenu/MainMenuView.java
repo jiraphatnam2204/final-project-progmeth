@@ -29,10 +29,16 @@ import logic.pickaxe.Pickaxe;
  */
 public class MainMenuView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
 
+    /** The controller providing animated star data. */
     private final MainMenuController controller;
+
+    /** The game logo image displayed in the title area, or {@code null} if unavailable. */
     private final Image logo;
 
     /**
@@ -97,10 +103,10 @@ public class MainMenuView {
         return scene;
     }
 
-    // The bridge between the main menu and the actual gameplay.
-    // When the user clicks "Play", this method acts like a factory line:
-    // it constructs a brand-new Player with base stats, hands them a starter Pickaxe,
-    // and then tells the SceneManager to swap the window to the actual Game Scene.
+    /**
+     * Initialises a new game session with default player stats and equipment,
+     * then transitions to the game world scene.
+     */
     private void startGame() {
         Player player = new Player(100, 20, 10);
         player.setGold(150);
@@ -116,10 +122,13 @@ public class MainMenuView {
         Main.sceneManager.showGame(player, startPickaxe);
     }
 
-    // Renders every visual element on the screen from back to front.
-    // This uses the "Painter's Algorithm"—just like painting on a real canvas, whatever
-    // you draw first gets covered up by what you draw next.
-    // It draws the sky -> then the stars -> then the mountains -> and finally the text on top.
+    /**
+     * Renders all visual elements from back to front (Painter's Algorithm):
+     * sky gradient, animated stars, mountain silhouette, torches, bobbing title and logo.
+     *
+     * @param gc       the graphics context to draw onto
+     * @param titleBob accumulated time value used to compute the sine-based bob effect
+     */
     private void drawBackground(GraphicsContext gc, double titleBob) {
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0a0a1a")),
@@ -194,6 +203,12 @@ public class MainMenuView {
                 W / 2.0, H * 0.90);
     }
 
+    /**
+     * Draws the circular-clipped game logo at the centre-top of the screen.
+     *
+     * @param gc   the graphics context
+     * @param bobY the current vertical bob offset in pixels
+     */
     private void drawLogo(GraphicsContext gc, double bobY) {
         if (logo == null || logo.isError()) return;
 
@@ -210,6 +225,14 @@ public class MainMenuView {
         gc.restore();
     }
 
+    /**
+     * Draws an animated flickering torch at the given position.
+     *
+     * @param gc the graphics context
+     * @param x  the torch base X pixel position
+     * @param y  the torch base Y pixel position
+     * @param t  accumulated time value driving the flicker animation
+     */
     private void drawTorch(GraphicsContext gc, double x, double y, double t) {
         gc.setFill(Color.web("#5d3a1a"));
         gc.fillRoundRect(x - 4, y, 8, 30, 4, 4);
@@ -226,6 +249,14 @@ public class MainMenuView {
         gc.fillOval(x - 40, y - 40, 80, 80);
     }
 
+    /**
+     * Creates a styled navigation button with a hover colour transition.
+     *
+     * @param text      the button label text
+     * @param colorHex  the default background colour hex string
+     * @param hoverHex  the hover background colour hex string
+     * @return the configured button
+     */
     private Button makeButton(String text, String colorHex, String hoverHex) {
         Button btn = new Button(text);
         btn.setPrefWidth(240);

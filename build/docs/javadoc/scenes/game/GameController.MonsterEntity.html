@@ -117,28 +117,44 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>boolean</code></div>
 <div class="col-second even-row-color"><code><a href="#aggro" class="member-name-link">aggro</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block"><code>true</code> when the monster is chasing the player.</div>
+</div>
 <div class="col-first odd-row-color"><code>double</code></div>
 <div class="col-second odd-row-color"><code><a href="#dx" class="member-name-link">dx</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">Current X component of the wander movement velocity.</div>
+</div>
 <div class="col-first even-row-color"><code>double</code></div>
 <div class="col-second even-row-color"><code><a href="#dy" class="member-name-link">dy</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Current Y component of the wander movement velocity.</div>
+</div>
 <div class="col-first odd-row-color"><code><a href="../../logic/creatures/Monster.html" title="class in logic.creatures">Monster</a></code></div>
 <div class="col-second odd-row-color"><code><a href="#monster" class="member-name-link">monster</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">The underlying monster logic object (stats, health, etc.).</div>
+</div>
 <div class="col-first even-row-color"><code>double</code></div>
 <div class="col-second even-row-color"><code><a href="#moveTimer" class="member-name-link">moveTimer</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Timer (seconds) until the monster picks a new random wander direction.</div>
+</div>
 <div class="col-first odd-row-color"><code>int</code></div>
 <div class="col-second odd-row-color"><code><a href="#type" class="member-name-link">type</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">Difficulty tier: 0=easy, 1=medium, 2=hard.</div>
+</div>
 <div class="col-first even-row-color"><code>double</code></div>
 <div class="col-second even-row-color"><code><a href="#x" class="member-name-link">x</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-last even-row-color">
+<div class="block">Current X pixel position on the world map.</div>
+</div>
 <div class="col-first odd-row-color"><code>double</code></div>
 <div class="col-second odd-row-color"><code><a href="#y" class="member-name-link">y</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-last odd-row-color">
+<div class="block">Current Y pixel position on the world map.</div>
+</div>
 </div>
 </section>
 </li>
@@ -183,6 +199,7 @@ loadScripts(document, 'script');</script>
 <h3>monster</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../logic/creatures/Monster.html" title="class in logic.creatures">Monster</a></span>&nbsp;<span class="element-name">monster</span></div>
+<div class="block">The underlying monster logic object (stats, health, etc.).</div>
 </div>
 </section>
 </li>
@@ -191,6 +208,7 @@ loadScripts(document, 'script');</script>
 <h3>x</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">x</span></div>
+<div class="block">Current X pixel position on the world map.</div>
 </div>
 </section>
 </li>
@@ -199,6 +217,7 @@ loadScripts(document, 'script');</script>
 <h3>y</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">y</span></div>
+<div class="block">Current Y pixel position on the world map.</div>
 </div>
 </section>
 </li>
@@ -207,6 +226,7 @@ loadScripts(document, 'script');</script>
 <h3>moveTimer</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">moveTimer</span></div>
+<div class="block">Timer (seconds) until the monster picks a new random wander direction.</div>
 </div>
 </section>
 </li>
@@ -215,6 +235,7 @@ loadScripts(document, 'script');</script>
 <h3>dx</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">dx</span></div>
+<div class="block">Current X component of the wander movement velocity.</div>
 </div>
 </section>
 </li>
@@ -223,6 +244,7 @@ loadScripts(document, 'script');</script>
 <h3>dy</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">dy</span></div>
+<div class="block">Current Y component of the wander movement velocity.</div>
 </div>
 </section>
 </li>
@@ -231,6 +253,7 @@ loadScripts(document, 'script');</script>
 <h3>type</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">type</span></div>
+<div class="block">Difficulty tier: 0=easy, 1=medium, 2=hard.</div>
 </div>
 </section>
 </li>
@@ -239,6 +262,7 @@ loadScripts(document, 'script');</script>
 <h3>aggro</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">aggro</span></div>
+<div class="block"><code>true</code> when the monster is chasing the player.</div>
 </div>
 </section>
 </li>

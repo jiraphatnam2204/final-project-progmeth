@@ -32,22 +32,55 @@ import java.util.Objects;
  */
 public class GameView {
 
+    /** Scene width in pixels. */
     private static final int W = GameController.W;
+
+    /** Scene height in pixels. */
     private static final int H = GameController.H;
 
+    /** The game-world controller providing map and entity state. */
     private final GameController controller;
-    private final Image[] playerWalkImgs = new Image[4];
-    private final Image[] playerSlashImgs = new Image[4];
-    private ShopController shopController;
-    private ShopView shopView;
-    private CraftingController craftController;
-    private CraftingView craftView;
-    private InventoryController invController;
-    private InventoryView invView;
-    private Pane shopLayer, craftLayer, invLayer;
-    private StackPane root;
-    private Image imgEasyMonster, imgMediumMonster, imgHardMonster;
 
+    /** Player walk sprite images, indexed by facing direction (0=up, 1=left, 2=down, 3=right). */
+    private final Image[] playerWalkImgs = new Image[4];
+
+    /** Player slash/attack sprite images, indexed by facing direction. */
+    private final Image[] playerSlashImgs = new Image[4];
+
+    /** Controller for the shop overlay. */
+    private ShopController shopController;
+
+    /** View for the shop overlay. */
+    private ShopView shopView;
+
+    /** Controller for the crafting station overlay. */
+    private CraftingController craftController;
+
+    /** View for the crafting station overlay. */
+    private CraftingView craftView;
+
+    /** Controller for the inventory overlay. */
+    private InventoryController invController;
+
+    /** View for the inventory overlay. */
+    private InventoryView invView;
+
+    /** JavaFX pane layers for the shop, crafting, and inventory overlays. */
+    private Pane shopLayer, craftLayer, invLayer;
+
+    /** The root stack pane holding the canvas and overlay layers. */
+    private StackPane root;
+
+    /** Sprite image for easy-tier monsters (Rui). */
+    private Image imgEasyMonster;
+
+    /** Sprite image for medium-tier monsters (Enmu). */
+    private Image imgMediumMonster;
+
+    /** Sprite image for hard-tier monsters (Daki). */
+    private Image imgHardMonster;
+
+    /** The main game animation timer driving the game loop. */
     private AnimationTimer gameLoop;
 
     /**
@@ -61,6 +94,9 @@ public class GameView {
         buildSubScenes();
     }
 
+    /**
+     * Pre-loads all monster and player sprite images from classpath resources.
+     */
     private void loadImages() {
         imgEasyMonster = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Rui.png")));
         imgMediumMonster = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/Enmu.png")));
@@ -73,6 +109,12 @@ public class GameView {
         }
     }
 
+    /**
+     * Attempts to load an image from the given classpath resource path.
+     *
+     * @param path the classpath-relative resource path
+     * @return the loaded {@link Image}, or {@code null} if the resource could not be found
+     */
     private Image loadImage(String path) {
         try {
             var s = getClass().getResourceAsStream(path);
@@ -83,6 +125,9 @@ public class GameView {
         }
     }
 
+    /**
+     * Constructs and initialises the shop, crafting, and inventory overlay sub-scenes.
+     */
     private void buildSubScenes() {
         shopController = new ShopController(controller.getPlayer(), controller.getPickaxeHolder());
         shopView = new ShopView(shopController, this::closeShop);
@@ -153,6 +198,9 @@ public class GameView {
         return scene;
     }
 
+    /**
+     * Checks which building the player is adjacent to and opens the corresponding overlay.
+     */
     private void handleBuildingEntry() {
         GameController.BuildingType type = controller.checkBuildingEntry();
         switch (type) {
@@ -168,32 +216,44 @@ public class GameView {
         }
     }
 
+    /** Toggles the shop overlay visibility. */
     private void toggleShop() {
         shopLayer.setVisible(!shopLayer.isVisible());
     }
 
+    /** Toggles the crafting station overlay visibility. */
     private void toggleCraft() {
         craftLayer.setVisible(!craftLayer.isVisible());
     }
 
+    /** Toggles the inventory overlay visibility and refreshes it when opening. */
     private void toggleInventory() {
         boolean opening = !invLayer.isVisible();
         invLayer.setVisible(opening);
         if (opening) invView.refresh();
     }
 
+    /** Hides the shop overlay. */
     private void closeShop() {
         shopLayer.setVisible(false);
     }
 
+    /** Hides the crafting station overlay. */
     private void closeCraft() {
         craftLayer.setVisible(false);
     }
 
+    /** Hides the inventory overlay. */
     private void closeInventory() {
         invLayer.setVisible(false);
     }
 
+    /**
+     * Renders the full game world scene for one frame.
+     *
+     * @param gc       the graphics context to draw onto
+     * @param nowNanos the current time in nanoseconds (from the animation timer)
+     */
     private void render(GraphicsContext gc, long nowNanos) {
         drawWorld(gc);
         drawMonsters(gc);
@@ -202,6 +262,11 @@ public class GameView {
         drawHUD(gc);
     }
 
+    /**
+     * Draws all world tiles, building highlights, and the facing-tile indicator.
+     *
+     * @param gc the graphics context
+     */
     private void drawWorld(GraphicsContext gc) {
         int[][] world = controller.getWorld();
 
@@ -317,6 +382,17 @@ public class GameView {
             }
     }
 
+    /**
+     * Draws a single ore/rock tile with a durability bar and label.
+     *
+     * @param gc    the graphics context
+     * @param x     the tile's pixel X position
+     * @param y     the tile's pixel Y position
+     * @param stone the mineable stone object for durability data (may be {@code null})
+     * @param light the light fill colour
+     * @param dark  the dark accent colour
+     * @param label the short text label drawn on the tile
+     */
     private void drawRock(GraphicsContext gc, double x, double y,
                           interfaces.Mineable stone, Color light, Color dark, String label) {
         gc.setFill(dark);
@@ -342,6 +418,11 @@ public class GameView {
         }
     }
 
+    /**
+     * Draws all live monster entities with their sprites, aggro indicators, and HP bars.
+     *
+     * @param gc the graphics context
+     */
     private void drawMonsters(GraphicsContext gc) {
         for (GameController.MonsterEntity me : controller.getMonsters()) {
             if (!me.monster.isAlive()) continue;
@@ -394,6 +475,11 @@ public class GameView {
         }
     }
 
+    /**
+     * Draws the player character sprite (with invincibility blink and attack/walk animation).
+     *
+     * @param gc the graphics context
+     */
     private void drawPlayer(GraphicsContext gc) {
         if (controller.getInvincibleFrames() > 0 && controller.getAnimFrame() % 2 == 0) return;
 
@@ -408,6 +494,11 @@ public class GameView {
         }
     }
 
+    /**
+     * Draws all active floating-text pop-ups, fading them out as they age.
+     *
+     * @param gc the graphics context
+     */
     private void drawFloatingTexts(GraphicsContext gc) {
         long now = System.currentTimeMillis();
         gc.setTextAlign(TextAlignment.CENTER);
@@ -422,6 +513,12 @@ public class GameView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
+    /**
+     * Draws the heads-up display: HP/gold bar, equipped gear, inventory preview,
+     * control hints, and notification banner.
+     *
+     * @param gc the graphics context
+     */
     private void drawHUD(GraphicsContext gc) {
         var player = controller.getPlayer();
         var pickaxe = controller.getPickaxeHolder()[0];

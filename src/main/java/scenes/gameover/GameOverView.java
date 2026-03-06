@@ -25,9 +25,13 @@ import logic.util.ItemCounter;
  */
 public class GameOverView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
 
+    /** The controller providing particle animation and player data. */
     private final GameOverController controller;
 
     /**
@@ -81,8 +85,12 @@ public class GameOverView {
         return new Scene(root, W, H);
     }
 
-    // The traffic controller for drawing. It checks the game state to decide whether
-    // to paint the Victory screen or the Defeat screen, and always slaps the stats box on top.
+    /**
+     * Dispatches rendering to either the victory or defeat screen and then draws the stats box.
+     *
+     * @param gc the graphics context
+     * @param t  accumulated animation time in seconds
+     */
     private void draw(GraphicsContext gc, double t) {
         if (controller.isWon()) {
             drawVictory(gc, t);
@@ -92,7 +100,12 @@ public class GameOverView {
         drawStatsBox(gc);
     }
 
-    // Draws the victory screen: a shiny gradient background, confetti particles, and glowing text.
+    /**
+     * Draws the victory screen: gradient background, rising confetti particles, and glowing title text.
+     *
+     * @param gc the graphics context
+     * @param t  accumulated animation time in seconds (drives the bob effect)
+     */
     private void drawVictory(GraphicsContext gc, double t) {
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0d0800")),
@@ -133,7 +146,12 @@ public class GameOverView {
         gc.fillText("All bosses defeated! The kingdom is saved!", W / 2.0, H * 0.42 + bob * 0.5);
     }
 
-    // Draws the defeat screen: a dark red gradient, falling ash particles, and red text.
+    /**
+     * Draws the defeat screen: dark red gradient background, falling ash particles, and red title text.
+     *
+     * @param gc the graphics context
+     * @param t  accumulated animation time in seconds (drives the bob effect)
+     */
     private void drawDefeat(GraphicsContext gc, double t) {
         LinearGradient bg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, Color.web("#0a0000")),
@@ -167,7 +185,11 @@ public class GameOverView {
         gc.fillText("You were vanquished...", W / 2.0, H * 0.42);
     }
 
-    // Renders a semi-transparent dark panel holding the player's final game data.
+    /**
+     * Renders a semi-transparent panel showing the player's final gold, stats, and collected items.
+     *
+     * @param gc the graphics context
+     */
     private void drawStatsBox(GraphicsContext gc) {
         var player = controller.getPlayer();
 
@@ -203,7 +225,14 @@ public class GameOverView {
         gc.setTextAlign(TextAlignment.LEFT);
     }
 
-    // Helper method to create UI buttons and apply CSS styling (like hover effects) directly via code.
+    /**
+     * Creates a styled navigation button with a hover colour transition.
+     *
+     * @param text  the button label text
+     * @param bg    the default background colour hex string
+     * @param hover the hover background colour hex string
+     * @return the configured button
+     */
     private Button makeBtn(String text, String bg, String hover) {
         Button b = new Button(text);
         b.setPrefWidth(130);

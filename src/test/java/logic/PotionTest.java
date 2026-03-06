@@ -12,10 +12,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for health-potion behaviour, including healing values,
+ * max-HP capping, inventory stack management, and potion stats.
+ */
 public class PotionTest {
 
+    /** The player instance under test, reset before each test. */
     private Player player;
 
+    /**
+     * Initialises a fresh player with 100 HP, 20 ATK, 10 DEF and 9999 gold
+     * before every test.
+     */
     @BeforeEach
     void setUp() {
         // Player: 100 HP, 20 ATK, 10 DEF

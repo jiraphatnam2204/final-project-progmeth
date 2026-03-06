@@ -9,6 +9,7 @@ import javafx.scene.media.MediaPlayer;
  */
 public class AudioManager {
 
+    /** The currently playing {@link MediaPlayer} instance, or {@code null} if nothing is playing. */
     private static MediaPlayer mediaPlayer;
 
     /**

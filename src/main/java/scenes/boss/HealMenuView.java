@@ -21,22 +21,49 @@ import java.util.function.Consumer;
  */
 public class HealMenuView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
+
+    /** X pixel position of the panel's left edge. */
     private static final double PX = W / 2.0 + 10;
+
+    /** Y pixel position of the panel's top edge. */
     private static final double PY = H * 0.64;
+
+    /** Width of the panel in pixels. */
     private static final double PW = W / 2.0 - 20;
+
+    /** Height of each potion row in pixels. */
     private static final double ROW_H = 38;
 
+    /** The battle menu controller providing potion availability data. */
     private final BattleMenuController menuCtrl;
+
+    /** Callback invoked when the player selects a potion to consume. */
     private final Consumer<BattleMenuController.PotionEntry> onUsePotion;
+
+    /** Callback invoked when the player selects the Rest option. */
     private final Runnable onRest;
+
+    /** Callback invoked when the player presses the Back button. */
     private final Runnable onClose;
 
+    /** The canvas used to draw the panel background and row contents. */
     private Canvas canvas;
+
+    /** The graphics context of the canvas. */
     private GraphicsContext gc;
+
+    /** Dynamically created buttons (one per potion plus Rest and Back). */
     private final List<Button> dynamicBtns = new ArrayList<>();
+
+    /** The root pane containing the canvas and dynamic buttons. */
     private Pane root;
+
+    /** The potion list from the last {@link #refresh} call, used during redraws. */
     private List<BattleMenuController.PotionEntry> lastPotions = new ArrayList<>();
 
     /**
@@ -134,6 +161,11 @@ public class HealMenuView {
         }
     }
 
+    /**
+     * Redraws the panel background, title, and all potion/rest rows on the canvas.
+     *
+     * @param potions the current list of potions to render
+     */
     private void redraw(List<BattleMenuController.PotionEntry> potions) {
         int rows  = potions.size() + 2;
         double ph = rows * ROW_H + 50;
@@ -220,6 +252,12 @@ public class HealMenuView {
         gc.fillText("Rest  (+10% HP, no items)", PX + 12, restY + 22);
     }
 
+    /**
+     * Returns the accent colour for a potion based on its name.
+     *
+     * @param name the potion's display name
+     * @return a {@link Color} representing the potion's category
+     */
     private Color getPotionColor(String name) {
         if (name.contains("Small"))  return Color.web("#e53935");
         if (name.contains("Medium")) return Color.web("#ff9800");
@@ -227,6 +265,12 @@ public class HealMenuView {
         return Color.web("#9c27b0");
     }
 
+    /**
+     * Creates a "Use" or "Empty" button for the given potion entry.
+     *
+     * @param entry the potion entry to create a button for
+     * @return the configured button
+     */
     private Button makePotionBtn(BattleMenuController.PotionEntry entry) {
         Button b = new Button(entry.hasStock() ? "Use" : "Empty");
         b.setPrefWidth(80);
@@ -241,6 +285,11 @@ public class HealMenuView {
         return b;
     }
 
+    /**
+     * Creates the "Rest" button for the heal menu.
+     *
+     * @return the configured rest button
+     */
     private Button makeRestBtn() {
         Button b = new Button("Rest");
         b.setPrefWidth(80);
@@ -254,6 +303,11 @@ public class HealMenuView {
         return b;
     }
 
+    /**
+     * Creates the "Back" button for the heal menu.
+     *
+     * @return the configured back button
+     */
     private Button makeBackBtn() {
         Button b = new Button("Back");
         b.setPrefWidth(80);
@@ -267,6 +321,12 @@ public class HealMenuView {
         return b;
     }
 
+    /**
+     * Converts a JavaFX {@link Color} to its CSS hex string representation.
+     *
+     * @param c the colour to convert
+     * @return a hex string in the form {@code #rrggbb}
+     */
     private static String toHex(Color c) {
         return String.format("#%02x%02x%02x",
                 (int)(c.getRed()   * 255),

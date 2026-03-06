@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.item.armor.ArmorTest$StoneArmorTests" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-03-02T11:43:08.213Z" hostname="JAMES" time="0.006">
+<testsuite name="logic.item.armor.ArmorTest$StoneArmorTests" tests="18" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:23:53.821Z" hostname="JAMES" time="0.006">
   <properties/>
   <testcase name="canCraft_trueWhenHasGoldAndMaterials()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
-  <testcase name="craftingPrice()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.001"/>
+  <testcase name="craftingPrice()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="craft_deductsGold()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="canCraft_falseWhenNoMaterials()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="recipeSize()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="hp()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="atk()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
-  <testcase name="def()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
+  <testcase name="def()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.001"/>
   <testcase name="spd()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
-  <testcase name="name()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.001"/>
+  <testcase name="name()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="equip_increasesCurrentHp()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="craft_doesNothingWhenCannotCraft()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
-  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
+  <testcase name="craft_consumesMaterials()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.001"/>
   <testcase name="canCraft_falseWhenNotEnoughGold()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="equip_increasesDefAndMaxHp()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
-  <testcase name="unequip_restoresDefAndMaxHp()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
+  <testcase name="unequip_restoresDefAndMaxHp()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.001"/>
   <testcase name="canCraft_falseWhenNotEnoughMaterials()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <testcase name="recipeContent()" classname="logic.item.armor.ArmorTest$StoneArmorTests" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

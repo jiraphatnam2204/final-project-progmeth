@@ -58,4 +58,5 @@ jar {
                 'Main-Class': 'application.Main'
         )
     }
+    from sourceSets.main.allJava
 }

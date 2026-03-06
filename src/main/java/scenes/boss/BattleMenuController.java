@@ -16,23 +16,39 @@ public class BattleMenuController {
 
     /** The number of player skills available in battle. */
     public static final int SKILL_COUNT = 4;
+
+    /** Display names for each skill, indexed 0–3. */
     public static final String[] SKILL_NAMES = {
             "Kagura Dance",
             "Dead Calm",
             "Constant Flux",
             "Water Wheel"
     };
+
+    /** Unicode icon characters for each skill, indexed 0–3. */
     public static final String[] SKILL_ICONS = {"\u26A1", "\uD83D\uDEE1", "\uD83D\uDCA2", "\uD83E\uDE78"};
+
+    /** Short descriptions for each skill shown in the skill menu, indexed 0–3. */
     public static final String[] SKILL_DESCS = {
             "Deal 2x damage to the boss",
             "Reduce next incoming damage by 50%",
             "3 hits but lose 50% DEF next turn",
             "Damage boss + heal 30% of damage"
     };
+
+    /** Maximum cooldown turns for each skill after use, indexed 0–3. */
     public static final int[] SKILL_MAX_CD = {3, 2, 4, 5};
+
+    /** Remaining cooldown turns for each skill; 0 means ready to use. */
     private final int[] cooldowns = new int[SKILL_COUNT];
+
+    /** Which sub-menu (if any) is currently open. */
     private MenuState menuState = MenuState.NONE;
+
+    /** {@code true} while the Dead Calm shield wall effect is active. */
     private boolean shieldWallActive = false;
+
+    /** {@code true} while the Constant Flux berserk debuff is pending on the next enemy turn. */
     private boolean berserkDebuffActive = false;
 
     /**
@@ -157,14 +173,29 @@ public class BattleMenuController {
      * @param counter the backing inventory slot
      */
     public record PotionEntry(ItemCounter counter) {
+        /**
+         * Returns the display name of the potion.
+         *
+         * @return potion name
+         */
         public String name() {
             return counter.getItem().getName();
         }
 
+        /**
+         * Returns the current stack count of this potion in the inventory.
+         *
+         * @return quantity available
+         */
         public int count() {
             return counter.getCount();
         }
 
+        /**
+         * Returns whether at least one potion of this type remains in the inventory.
+         *
+         * @return {@code true} if count is greater than zero
+         */
         public boolean hasStock() {
             return counter.getCount() > 0;
         }
