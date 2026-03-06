@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.pickaxe.PickaxeTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-03-06T02:19:27.811Z" hostname="JAMES" time="0.004">
+<testsuite name="logic.pickaxe.PickaxeTest" tests="15" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:49:09.977Z" hostname="JAMES" time="0.012">
   <properties/>
-  <testcase name="constructor_negativePower_clampsToOne()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
+  <testcase name="constructor_negativePower_clampsToOne()" classname="logic.pickaxe.PickaxeTest" time="0.002"/>
   <testcase name="createHardStonePickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
   <testcase name="constructor_setsNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="use_onUnminedStone_returnsEmptyList()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="use_weakPickaxeRequiresMultipleHitsToBreakHardStone()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="createPlatinumPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
+  <testcase name="use_onUnminedStone_returnsEmptyList()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
+  <testcase name="use_weakPickaxeRequiresMultipleHitsToBreakHardStone()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
+  <testcase name="createPlatinumPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.002"/>
   <testcase name="createNormalStonePickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="use_repeatedUntilBroken_returnsDrops()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="createWoodenPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
+  <testcase name="use_repeatedUntilBroken_returnsDrops()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
+  <testcase name="createWoodenPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
   <testcase name="setPower_updatesPickaxePower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="constructor_powerBelowOne_clampsToOne()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
+  <testcase name="constructor_powerBelowOne_clampsToOne()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
   <testcase name="use_onBrokenStone_returnsEmptyList()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
-  <testcase name="createMithrilPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
+  <testcase name="createMithrilPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.001"/>
   <testcase name="createVibraniumPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
   <testcase name="createIronPickaxe_hasCorrectNameAndPower()" classname="logic.pickaxe.PickaxeTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>

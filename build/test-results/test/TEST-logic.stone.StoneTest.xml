@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.stone.StoneTest" tests="26" skipped="0" failures="0" errors="0" timestamp="2026-03-06T02:19:27.815Z" hostname="JAMES" time="0.005">
+<testsuite name="logic.stone.StoneTest" tests="26" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:49:09.990Z" hostname="JAMES" time="0.009">
   <properties/>
   <testcase name="vibranium_mine_partial_doesNotBreak()" classname="logic.stone.StoneTest" time="0.001"/>
   <testcase name="platinum_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="mithril_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="platinum_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="normalStone_mine_whenBroken_returnsEmpty()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="mithril_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="vibranium_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.001"/>
+  <testcase name="mithril_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.001"/>
+  <testcase name="vibranium_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="normalStone_initialDurability_isFive()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="normalStone_mine_reducesDurability()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="normalStone_mine_reducesDurability()" classname="logic.stone.StoneTest" time="0.001"/>
   <testcase name="hardStone_initialDurability_isFifteen()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="normalStone_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.001"/>
+  <testcase name="normalStone_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="hardStone_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="iron_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="normalStone_mine_withExactDurability_breaks()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="mithril_initialDurability_is135()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="mithril_initialDurability_is135()" classname="logic.stone.StoneTest" time="0.001"/>
   <testcase name="normalStone_minePowerZeroOrNegative_treatedAsOne()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="iron_initialDurability_isThirtySix()" classname="logic.stone.StoneTest" time="0.001"/>
-  <testcase name="iron_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="iron_initialDurability_isThirtySix()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="iron_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.001"/>
   <testcase name="vibranium_initialDurability_is210()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="normalStone_isNotBrokenInitially()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="mine_dropsAddedToPlayerInventory()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="vibranium_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
-  <testcase name="hardStone_mine_reducesDurability()" classname="logic.stone.StoneTest" time="0.001"/>
-  <testcase name="normalStone_mine_returnsEmptyBeforeBreak()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="hardStone_mine_reducesDurability()" classname="logic.stone.StoneTest" time="0.0"/>
+  <testcase name="normalStone_mine_returnsEmptyBeforeBreak()" classname="logic.stone.StoneTest" time="0.001"/>
   <testcase name="platinum_initialDurability_isEighty()" classname="logic.stone.StoneTest" time="0.0"/>
   <testcase name="hardStone_mine_returnsDropsOnBreak()" classname="logic.stone.StoneTest" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
