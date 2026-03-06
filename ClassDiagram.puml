@@ -14,6 +14,8 @@ class scenes.game.GameView {
 - Pane shopLayer
 - StackPane root
 - Image imgEasyMonster
+- Image imgMediumMonster
+- Image imgHardMonster
 - AnimationTimer gameLoop
 + <<Create>> GameView(GameController)
 - void loadImages()
@@ -127,10 +129,10 @@ class logic.creatures.Player$SkillResult {
 - boolean shieldWall
 - boolean berserkDebuff
 + <<Create>> SkillResult(int,int,boolean,boolean)
-+ boolean berserkDebuff()
-+ int damage()
 + int heal()
++ int damage()
 + boolean shieldWall()
++ boolean berserkDebuff()
 }
 
 
@@ -138,6 +140,7 @@ class scenes.boss.BossController {
 - Player player
 - BossInfo[] bosses
 - List<String> log
+- BattleMenuController menuCtrl
 - int bossIndex
 - Monster currentBoss
 - String bossName
@@ -148,7 +151,6 @@ class scenes.boss.BossController {
 - boolean pendingPlayerShake
 - long lastEnemyActionMs
 - int pendingDefenseReset
-- BattleMenuController menuCtrl
 + <<Create>> BossController(Player)
 + ActionResult doDefend()
 + void loadBoss(int)
@@ -209,6 +211,7 @@ class scenes.boss.BossController$BossInfo {
 
 abstract class logic.base.BaseWeapon {
 - int dmg
+- int craftingPrice
 - double cd
 + <<Create>> BaseWeapon(String,int,double,int)
 + boolean canCraft(Player)
@@ -517,6 +520,9 @@ class logic.creatures.TestPlayerClass {
 
 abstract class logic.base.BaseCreature {
 # int healthPoint
+# int maxHealthPoint
+# int attack
+# int defense
 + <<Create>> BaseCreature(int,int,int)
 + boolean isAlive()
 + void takeDamage(int)
@@ -553,10 +559,6 @@ class logic.item.weapon.PlatinumSword {
 + ArrayList<ItemCounter> getRecipe()
 }
 
-class logic.base.Material {
-+ <<Create>> Material(String)
-}
-
 class logic.item.weapon.HardstoneSword {
 + <<Create>> HardstoneSword()
 + ArrayList<ItemCounter> getRecipe()
@@ -581,10 +583,10 @@ class scenes.shop.ShopController$ShopItem {
 - int price
 - Consumer<Player> onBuy
 + <<Create>> ShopItem(String,String,int,Consumer<Player>)
-+ int price()
 + String description()
 + String name()
 + Consumer<Player> onBuy()
++ int price()
 }
 
 
@@ -761,19 +763,25 @@ class scenes.boss.BossView {
 - Image[] imgPlayerSkills
 - BossController.ActionResult r
 - Image imgBoss1
+- Image imgBoss2
+- Image imgBoss3
 - Image imgPlayerIdle
+- Image imgPlayerAttack
 - double animTime
 - boolean showAttackAnim
 - boolean showSkillAnim
 - int activeSkillIdx
 - long attackAnimEndMs
 - double bossShakeX
+- double lastShakeTime
 - double playerShakeX
+- double lastPlayerShake
 - AnimationTimer GameLoop
 - Button attackBtn
 - SkillMenuView skillMenuView
 - HealMenuView healMenuView
 - Pane skillPane
+- Pane healPane
 + <<Create>> BossView(BossController,Pickaxe[])
 - void loadImages()
 - Image loadImg(String)
@@ -1007,6 +1015,7 @@ class scenes.game.GameController {
 - boolean leftMouseDown
 - boolean rightMouseDown
 - double playerX
+- double playerY
 - int facing
 - int animFrame
 - long lastAnimTime
@@ -1071,6 +1080,10 @@ enum scenes.game.BuildingType {
 class scenes.game.GameController$MonsterEntity {
 + Monster monster
 + double x
++ double y
++ double moveTimer
++ double dx
++ double dy
 + int type
 + boolean aggro
 + <<Create>> MonsterEntity(Monster,double,double,int)
@@ -1079,9 +1092,12 @@ class scenes.game.GameController$MonsterEntity {
 
 class scenes.game.GameController$FloatingText {
 + double x
++ double y
++ double vy
 + String text
 + javafx.scene.paint.Color color
 + long born
++ long life
 + <<Create>> FloatingText(double,double,String,javafx.scene.paint.Color,long)
 + boolean isDead()
 }
@@ -1365,6 +1381,10 @@ class logic.item.armor.MithrilArmor {
 
 abstract class logic.base.BaseArmor {
 # int def
+# int atk
+# int spd
+# int hp
+# int craftingPrice
 + <<Create>> BaseArmor(String,int,int,int,int,int)
 + void setCraftingPrice(int)
 + int getCraftingPrice()
@@ -1413,7 +1433,6 @@ logic.stone.baseStone <|-- logic.stone.HardStone
 logic.base.BaseArmor <|-- logic.item.armor.IronArmor
 logic.stone.baseStone <|-- logic.stone.Iron
 logic.base.BaseWeapon <|-- logic.item.weapon.PlatinumSword
-logic.base.BaseItem <|-- logic.base.Material
 logic.base.BaseWeapon <|-- logic.item.weapon.HardstoneSword
 scenes.shop.ShopController +.. scenes.shop.ShopController$ShopItem
 scenes.shop.ShopController +.. scenes.shop.ShopController$BuyResult
