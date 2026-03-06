@@ -10,13 +10,25 @@ import java.util.Random;
  */
 public class MainMenuController {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
+
+    /** Total number of animated stars in the background. */
     private static final int STAR_COUNT = 120;
 
+    /** X-coordinate of each star. */
     private final double[] starX = new double[STAR_COUNT];
+
+    /** Y-coordinate of each star. */
     private final double[] starY = new double[STAR_COUNT];
+
+    /** Vertical falling speed of each star (pixels per frame). */
     private final double[] starSpd = new double[STAR_COUNT];
+
+    /** Radius of each star in pixels. */
     private final double[] starR = new double[STAR_COUNT];
 
     /**

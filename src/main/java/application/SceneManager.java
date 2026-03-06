@@ -26,6 +26,7 @@ public class SceneManager {
     /** The fixed window height in pixels. */
     public static final int H = 755;
 
+    /** The primary JavaFX stage managed by this coordinator. */
     private final Stage stage;
 
     /**

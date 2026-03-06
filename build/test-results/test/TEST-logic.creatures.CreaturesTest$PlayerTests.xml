@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.creatures.CreaturesTest$PlayerTests" tests="40" skipped="0" failures="0" errors="0" timestamp="2026-03-02T11:43:08.109Z" hostname="JAMES" time="0.022">
+<testsuite name="logic.creatures.CreaturesTest$PlayerTests" tests="40" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.140Z" hostname="JAMES" time="0.019">
   <properties/>
-  <testcase name="unequipArmor_restoresStats()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="attack_dealsDamageToTarget()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="unequipArmor_restoresStats()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="attack_dealsDamageToTarget()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <testcase name="setStrength_negativeClampedToZero()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="equipArmor_increasesDefenseAndMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="setLuck_setsCorrectly()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="equipArmor_increasesDefenseAndMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="setLuck_setsCorrectly()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="addItem_countItem()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="getEquippedWeapon_afterEquip()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="initialDefense()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="usePotion_cappedAtMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="getEquippedWeapon_afterEquip()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="initialDefense()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="usePotion_cappedAtMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <testcase name="removeBonus_clampsHpToMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="setHealth_clampsToZero()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="removeBonus_updatesStats()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="countItem_returnsZeroForMissing()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="unequipWeapon_restoresAttack()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="countItem_returnsZeroForMissing()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="unequipWeapon_restoresAttack()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="initialAttack()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="usePotion_healsPlayer()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="usePotion_healsPlayer()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="initialMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="initialSpeed()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="setHealth_clampsAboveMax()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="usePotion_returnsFalseWhenNone()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="equipWeapon_replacesExisting()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="initialHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="setHealth_setsCorrectly()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="addItem_stackable_addsToExisting()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="setHealth_setsCorrectly()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="addItem_stackable_addsToExisting()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <testcase name="isAlive_trueInitially()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="setGold_positive()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="heal_restoresHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <testcase name="getEquippedArmor_nullByDefault()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="getEquippedWeapon_nullByDefault()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="getEquippedWeapon_nullByDefault()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <testcase name="addBonus_updatesStats()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="takeDamage_clampsToZero()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="usePotion_consumesOneItem()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="setStrength_positive()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
-  <testcase name="initialGold()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="initialLuck()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="initialGold()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="initialLuck()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="heal_cappedAtMaxHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="takeDamage_reducesHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
+  <testcase name="takeDamage_reducesHp()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
   <testcase name="equipWeapon_increasesAttack()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
-  <testcase name="setGold_negativeClampedToZero()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.0"/>
+  <testcase name="setGold_negativeClampedToZero()" classname="logic.creatures.CreaturesTest$PlayerTests" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

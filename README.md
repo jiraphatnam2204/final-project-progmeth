@@ -1,11 +1,15 @@
+[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/IY9augGa)
+
+> For detailed gameplay instructions, see the **[Our Report](docs/Report.md)**.
+>
+> Watch the gameplay demo on **[YouTube](https://youtu.be/xRv3S_9mqFc?si=NprY_RVs94q0koyc)**.
+
 # Tanjiro: The Swordsmith
 
 A 2D top-down action RPG built with Java and JavaFX, inspired by *Demon Slayer: Kimetsu no Yaiba*. Mine ores, craft
 gear, and battle iconic demon bosses.
 
 ![Main Menu](docs/images/main-menu.png)
-
-> For detailed gameplay instructions, see the **[Our Report](docs/Report.md)**.
 
 ## Gameplay Loop
 

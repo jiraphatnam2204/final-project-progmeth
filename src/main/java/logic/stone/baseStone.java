@@ -19,6 +19,11 @@ public abstract class baseStone extends BaseItem implements Mineable {
     protected baseStone(String name, int maxDurability, int dropAmount) {
         super(name); this.maxDurability = maxDurability; durability = maxDurability; this.dropAmount = dropAmount;
     }
+    /**
+     * {@inheritDoc}
+     * Reduces this node's durability by {@code minePower} (minimum 1).
+     * Returns the list of dropped items when the node breaks; otherwise returns an empty list.
+     */
     @Override public List<BaseItem> mine(int minePower, Player player) {
         if (isBroken()) return List.of();
         durability -= Math.max(1, minePower);
@@ -45,7 +50,12 @@ public abstract class baseStone extends BaseItem implements Mineable {
      * @return a new {@link BaseItem} representing the ore
      */
     protected abstract BaseItem createItem();
+    /** {@inheritDoc} */
     @Override public boolean isBroken() { return durability <= 0; }
+
+    /** {@inheritDoc} */
     @Override public int getDurability() { return durability; }
+
+    /** {@inheritDoc} */
     @Override public int getMaxDurability() { return maxDurability; }
 }

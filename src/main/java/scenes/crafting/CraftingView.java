@@ -23,24 +23,49 @@ import logic.util.ItemCounter;
  */
 public class CraftingView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
 
+    /** Number of recipe card columns per row. */
     private static final int COLS = 4;
+
+    /** Width of each recipe card in pixels. */
     private static final int CARD_W = 210;
+
+    /** Height of each recipe card in pixels. */
     private static final int CARD_H = 150;
+
+    /** X pixel offset of the first card. */
     private static final int START_X = 18;
+
+    /** Y pixel offset of the first card row. */
     private static final int START_Y = 130;
+
+    /** Horizontal gap between card columns in pixels. */
     private static final int GAP_X = 232;
+
+    /** Vertical gap between card rows in pixels. */
     private static final int GAP_Y = 165;
 
+    /** The crafting controller providing recipe and player data. */
     private final CraftingController controller;
+
+    /** Callback invoked when the player closes the crafting overlay. */
     private final Runnable onClose;
 
+    /** The canvas on which recipe cards and background are drawn. */
     private Canvas canvas;
+
+    /** The graphics context of the canvas. */
     private GraphicsContext gc;
 
+    /** The most recent crafting result message to display. */
     private String feedbackMsg = "";
+
+    /** Colour of the feedback message (green for success, red for failure). */
     private Color feedbackColor = Color.YELLOW;
 
     /**
@@ -93,6 +118,12 @@ public class CraftingView {
         return root;
     }
 
+    /**
+     * Handles a "Craft" button click for the recipe at the given index.
+     * Delegates to the controller and updates the feedback message.
+     *
+     * @param recipeIndex the index of the recipe to craft
+     */
     private void handleCraftClick(int recipeIndex) {
         CraftingController.CraftResult result = controller.craft(recipeIndex);
         feedbackMsg = result.message();
@@ -108,6 +139,9 @@ public class CraftingView {
         redraw();
     }
 
+    /**
+     * Redraws the entire crafting canvas: background, title, player stats, recipe cards, and feedback banner.
+     */
     private void redraw() {
         var player = controller.getPlayer();
 
@@ -198,6 +232,12 @@ public class CraftingView {
     }
 
 
+    /**
+     * Creates a styled crafting button with a teal colour theme and hover effect.
+     *
+     * @param text the button label text
+     * @return the configured button
+     */
     private Button makeBtn(String text) {
         Button b = new Button(text);
         b.setPrefWidth(100);

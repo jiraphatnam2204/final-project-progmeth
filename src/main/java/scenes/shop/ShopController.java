@@ -17,8 +17,13 @@ import java.util.function.Consumer;
  */
 public class ShopController {
 
+    /** The player who is shopping. */
     private final Player player;
+
+    /** Single-element array holding the player's active pickaxe; replaced in-place on purchase. */
     private final Pickaxe[] pickaxeHolder;
+
+    /** The list of items available for purchase in this shop session. */
     private final List<ShopItem> items = new ArrayList<>();
 
     /**
@@ -34,6 +39,9 @@ public class ShopController {
         buildCatalogue();
     }
 
+    /**
+     * Populates the shop with all available items: potions and pickaxes of every tier.
+     */
     private void buildCatalogue() {
         // ── Potions ───────────────────────────────────────────────────────────────
         items.add(new ShopItem("Small Potion", "Heals 40 HP", 50,

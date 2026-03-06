@@ -23,30 +23,53 @@ import java.util.List;
  */
 public class ShopView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
 
-    // Layout constants — used in both build() and redraw() so defined once here
+    /** Number of item card columns per row. */
     private static final int COLS = 4;
+
+    /** Width of each item card in pixels. */
     private static final int CARD_W = 200;
+
+    /** Height of each item card in pixels. */
     private static final int CARD_H = 130;
+
+    /** X pixel offset of the first card. */
     private static final int START_X = 40;
+
+    /** Y pixel offset of the first card row. */
     private static final int START_Y = 160;
+
+    /** Horizontal gap between card columns in pixels. */
     private static final int GAP_X = 220;
+
+    /** Vertical gap between card rows in pixels. */
     private static final int GAP_Y = 150;
 
-    // Colours matching item categories — parallel to ShopController catalogue order
+    /** Header colours for each item card, matching the catalogue order (potions, then pickaxes). */
     private static final Color[] CARD_COLORS = {
             Color.web("#e53935"), Color.web("#c62828"), Color.web("#b71c1c"), // potions
             Color.web("#607d8b"), Color.web("#78909c"), Color.web("#90caf9"), Color.web("#ce93d8"), // pickaxes
             Color.web("#9e9e9e"), Color.web("#b0bec5"), Color.web("#80d8ff")  // swords
     };
 
+    /** The shop controller providing item and player data. */
     private final ShopController controller;
+
+    /** Callback invoked when the player closes the shop. */
     private final Runnable onClose;
 
+    /** The canvas graphics context used to draw card backgrounds and text. */
     private GraphicsContext gc;
+
+    /** The most recent purchase result message to display. */
     private String feedbackMsg = "";
+
+    /** Colour of the feedback message (green for success, red for failure). */
     private Color feedbackColor = Color.YELLOW;
 
     /**
@@ -124,6 +147,9 @@ public class ShopView {
 
     // ── Rendering ─────────────────────────────────────────────────────────────
 
+    /**
+     * Redraws the entire shop canvas: background, title, player stats, item cards, and feedback banner.
+     */
     private void redraw() {
         var player = controller.getPlayer();
         var items = controller.getItems();
@@ -219,6 +245,12 @@ public class ShopView {
 
     // ── Helper ────────────────────────────────────────────────────────────────
 
+    /**
+     * Creates a styled shop button with a golden colour theme and hover effect.
+     *
+     * @param text the button label text
+     * @return the configured button
+     */
     private Button makeBtn(String text) {
         Button b = new Button(text);
         b.setPrefWidth(100);

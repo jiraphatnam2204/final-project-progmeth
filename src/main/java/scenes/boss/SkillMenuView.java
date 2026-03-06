@@ -19,19 +19,31 @@ import java.util.function.IntConsumer;
  */
 public class SkillMenuView {
 
+    /** Scene width in pixels. */
     private static final int W = SceneManager.W;
+
+    /** Scene height in pixels. */
     private static final int H = SceneManager.H;
 
-    // Panel dimensions (bottom-right quadrant, like Pokemon)
+    /** X pixel position of the panel's left edge. */
     private static final double PX = W / 2.0 + 10;
+
+    /** Y pixel position of the panel's top edge. */
     private static final double PY = H * 0.64;
+
+    /** Width of the panel in pixels. */
     private static final double PW = W / 2.0 - 20;
-    // Cell layout (2 columns x 2 rows)
+
+    /** Width of each skill cell in the 2×2 grid. */
     private static final double CW = PW / 2.0 - 6;
+
+    /** Total panel height in pixels. */
     private static final double PH = H * 0.30;
+
+    /** Height of each skill cell in the 2×2 grid. */
     private static final double CH = PH / 2.0 - 14;
 
-    // Skill type colours (one per skill slot)
+    /** Theme colours for each skill slot (gold, ice-blue, red, purple). */
     private static final Color[] SKILL_COLORS = {
             Color.web("#FFD700"),  // Power Strike - gold
             Color.web("#64B5F6"),  // Shield Wall  - ice blue
@@ -39,12 +51,25 @@ public class SkillMenuView {
             Color.web("#AB47BC"),  // Soul Drain   - purple
     };
 
+    /** The battle menu controller providing cooldown state. */
     private final BattleMenuController menuCtrl;
-    private final IntConsumer onSkillSelected;  // callback with skill index
+
+    /** Callback invoked with the chosen skill index when the player presses "Use". */
+    private final IntConsumer onSkillSelected;
+
+    /** Callback invoked when the player presses the Back button. */
     private final Runnable onClose;
+
+    /** The four "Use" skill buttons, one per skill slot. */
     private final Button[] skillBtns = new Button[BattleMenuController.SKILL_COUNT];
+
+    /** The canvas used to draw the skill grid. */
     private Canvas canvas;
+
+    /** The graphics context of the canvas. */
     private GraphicsContext gc;
+
+    /** The "Back" button that closes the skill menu. */
     private Button backBtn;
 
     /**
@@ -62,6 +87,12 @@ public class SkillMenuView {
         this.onClose = onClose;
     }
 
+    /**
+     * Converts a JavaFX {@link Color} to its CSS hex string representation.
+     *
+     * @param c the colour to convert
+     * @return a hex string in the form {@code #rrggbb}
+     */
     private static String toHex(Color c) {
         return String.format("#%02x%02x%02x",
                 (int) (c.getRed() * 255),
@@ -112,6 +143,10 @@ public class SkillMenuView {
         updateButtonStates();
     }
 
+    /**
+     * Redraws the skill panel: outer border, title banner, and all four skill cells
+     * with names, descriptions, cooldown bars, and ready indicators.
+     */
     private void redraw() {
         // Clear only the panel area
         gc.clearRect(PX - 2, PY - 2, PW + 4, PH + 60);
@@ -201,6 +236,10 @@ public class SkillMenuView {
         }
     }
 
+    /**
+     * Synchronises the enabled/disabled state and style of each skill button
+     * with the current cooldown values from the controller.
+     */
     private void updateButtonStates() {
         for (int i = 0; i < BattleMenuController.SKILL_COUNT; i++) {
             boolean ready = menuCtrl.isReady(i);
@@ -219,6 +258,12 @@ public class SkillMenuView {
         }
     }
 
+    /**
+     * Creates a "Use" button styled with the colour of the skill at the given index.
+     *
+     * @param idx the skill index (0–3)
+     * @return the configured button
+     */
     private Button makeSkillBtn(int idx) {
         Button b = new Button("Use");
         b.setPrefWidth(110);
@@ -234,6 +279,11 @@ public class SkillMenuView {
         return b;
     }
 
+    /**
+     * Creates the "Back" button for the skill menu.
+     *
+     * @return the configured back button
+     */
     private Button makeBackBtn() {
         Button b = new Button("Back");
         b.setPrefWidth(110);

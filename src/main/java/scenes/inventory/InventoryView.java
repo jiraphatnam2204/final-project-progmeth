@@ -24,14 +24,28 @@ import java.util.List;
  */
 public class InventoryView {
 
+    /** The inventory controller providing player and paging logic. */
     private final InventoryController controller;
+
+    /** Callback invoked when the player closes the inventory overlay. */
     private final Runnable onClose;
 
+    /** The vertical box that holds the item row entries for the current page. */
     private VBox itemListBox;
+
+    /** Text label displaying the player's current gold amount. */
     private Text goldText;
+
+    /** Text label displaying the player's HP, ATK, and DEF stats. */
     private Text statText;
+
+    /** Text label displaying the currently equipped weapon and armor. */
     private Text equippedText;
+
+    /** Text label showing the current and total page numbers. */
     private Text pageLabel;
+
+    /** Buttons for navigating to the previous and next inventory pages. */
     private Button prevBtn, nextBtn;
 
     /**
@@ -197,6 +211,14 @@ public class InventoryView {
         }
     }
 
+    /**
+     * Builds a single inventory row for the given item counter.
+     *
+     * @param counter the item counter entry to display
+     * @param rowNum  the 1-based row number shown as a prefix
+     * @param even    {@code true} for even-row background, {@code false} for odd
+     * @return the constructed row as an {@link HBox}
+     */
     private HBox buildItemRow(ItemCounter counter, int rowNum, boolean even) {
         BaseItem item = counter.getItem();
 
@@ -239,6 +261,13 @@ public class InventoryView {
         return row;
     }
 
+    /**
+     * Appends an action button (Use, Equip, or none) to the given row based on the item type.
+     *
+     * @param row     the row to append the button to
+     * @param item    the item in the row
+     * @param counter the inventory counter for this item slot
+     */
     private void addActionButton(HBox row, BaseItem item, ItemCounter counter) {
         if (item instanceof BasePotion potion) {
             Button useBtn = makeBtn("Use", "#50fa7b");
@@ -271,6 +300,13 @@ public class InventoryView {
         }
     }
 
+    /**
+     * Creates a styled button with the given label and background colour.
+     *
+     * @param text    the button label text
+     * @param bgColor the background colour CSS value
+     * @return the configured button
+     */
     private Button makeBtn(String text, String bgColor) {
         Button btn = new Button(text);
         btn.setPrefHeight(28);
@@ -284,6 +320,12 @@ public class InventoryView {
         return btn;
     }
 
+    /**
+     * Creates a styled button with the given label and a default teal background colour.
+     *
+     * @param text the button label text
+     * @return the configured button
+     */
     private Button makeBtn(String text) {
         return makeBtn(text, "#00acc1");
     }

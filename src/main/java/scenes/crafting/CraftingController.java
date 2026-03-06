@@ -15,8 +15,10 @@ import java.util.List;
  * and delegates craft operations to the underlying {@link Craftable} items.
  */
 public class CraftingController {
+    /** The player who will be crafting items. */
     private final Player player;
 
+    /** The full list of craftable items available at this station (weapons and armors). */
     private final List<Craftable> recipes = new ArrayList<>();
 
     /**
@@ -29,6 +31,9 @@ public class CraftingController {
         buildRecipeList();
     }
 
+    /**
+     * Populates the recipe list with all craftable weapons and armors in tier order.
+     */
     private void buildRecipeList() {
         recipes.add(new StoneSword());
         recipes.add(new HardstoneSword());

@@ -15,20 +15,46 @@ import java.util.List;
  */
 public class BossController {
 
+    /** The player participating in the boss battle. */
     private final Player player;
+
+    /** Array of all three boss entries (Akaza, Kokushibo, Muzan). */
     private final BossInfo[] bosses;
+
+    /** Rolling battle log displayed in the UI (capped at 8 entries). */
     private final List<String> log = new ArrayList<>();
-    // Sub-menu + skill cooldown controller
+
+    /** Sub-menu and skill cooldown controller for the battle. */
     private final BattleMenuController menuCtrl = new BattleMenuController();
+
+    /** Index of the currently active boss in the {@link #bosses} array. */
     private int bossIndex = 0;
+
+    /** The monster instance for the currently active boss. */
     private Monster currentBoss;
+
+    /** Display name of the current boss. */
     private String bossName;
+
+    /** Theme colour of the current boss, used for UI accents. */
     private Color bossColor;
+
+    /** Current phase of the turn-based battle. */
     private BattleState state = BattleState.PLAYER_TURN;
+
+    /** {@code true} when an attack animation should play this frame. */
     private boolean pendingAttackAnim = false;
+
+    /** {@code true} when the boss shake animation should trigger. */
     private boolean pendingBossShake = false;
+
+    /** {@code true} when the player shake animation should trigger. */
     private boolean pendingPlayerShake = false;
+
+    /** System time (ms) when the enemy last took an action. */
     private long lastEnemyActionMs = 0;
+
+    /** Defense bonus amount to remove after the enemy's turn (from the Defend action). */
     private int pendingDefenseReset = 0;
 
     /**
@@ -254,6 +280,15 @@ public class BossController {
     }
 
     // Victory Check
+
+    /**
+     * Checks whether the current boss was defeated and advances the battle accordingly.
+     * Awards gold, loads the next boss on intermediate victories, or signals all-clear.
+     *
+     * @return {@link ActionResult#BOSS_DEFEATED} if this boss was beaten but more remain,
+     *         {@link ActionResult#ALL_CLEAR} if all bosses are defeated, or
+     *         {@link ActionResult#ENEMY_TURN} to continue the current fight
+     */
     private ActionResult advanceAfterPlayerAction() {
         if (!currentBoss.isAlive()) {
             int gold = currentBoss.dropMoney();
@@ -289,6 +324,9 @@ public class BossController {
         }
     }
 
+    /**
+     * Trims the battle log to a maximum of 8 entries by removing the oldest entries.
+     */
     private void trimLog() {
         while (log.size() > 8) log.remove(0);
     }
@@ -413,14 +451,34 @@ public class BossController {
      * Represents the current phase of the turn-based battle.
      */
     public enum BattleState {
-        PLAYER_TURN, ENEMY_TURN, VICTORY, DEFEAT, ALL_CLEAR
+        /** It is the player's turn to choose an action. */
+        PLAYER_TURN,
+        /** The enemy is taking its turn. */
+        ENEMY_TURN,
+        /** The current boss has been defeated; waiting to advance to the next. */
+        VICTORY,
+        /** The player has been defeated. */
+        DEFEAT,
+        /** All three bosses have been defeated. */
+        ALL_CLEAR
     }
 
     /**
      * Represents the outcome of a player or enemy action for the view to react to.
      */
     public enum ActionResult {
-        NONE, ENEMY_TURN, PLAYER_TURN, BOSS_DEFEATED, ALL_CLEAR, PLAYER_DEFEATED
+        /** No meaningful state change occurred. */
+        NONE,
+        /** Control passes to the enemy turn. */
+        ENEMY_TURN,
+        /** Control passes back to the player turn. */
+        PLAYER_TURN,
+        /** The current boss was defeated and another boss remains. */
+        BOSS_DEFEATED,
+        /** All bosses were defeated. */
+        ALL_CLEAR,
+        /** The player was defeated. */
+        PLAYER_DEFEATED
     }
 
     /**

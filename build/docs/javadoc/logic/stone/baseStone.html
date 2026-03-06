@@ -283,8 +283,9 @@ implements <a href="../../interfaces/Mineable.html" title="interface in interfac
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/24/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../base/BaseItem.html" title="class in logic.base">BaseItem</a>&gt;</span>&nbsp;<span class="element-name">mine</span><wbr><span class="parameters">(int&nbsp;minePower,
  <a href="../creatures/Player.html" title="class in logic.creatures">Player</a>&nbsp;player)</span></div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../interfaces/Mineable.html#mine(int,logic.creatures.Player)">Mineable</a></code></span></div>
-<div class="block">Mines this node with the given power level and grants items to the player.</div>
+<div class="block">Mines this node with the given power level and grants items to the player.
+ Reduces this node's durability by <code>minePower</code> (minimum 1).
+ Returns the list of dropped items when the node breaks; otherwise returns an empty list.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="../../interfaces/Mineable.html#mine(int,logic.creatures.Player)">mine</a></code>&nbsp;in interface&nbsp;<code><a href="../../interfaces/Mineable.html" title="interface in interfaces">Mineable</a></code></dd>
@@ -328,7 +329,6 @@ implements <a href="../../interfaces/Mineable.html" title="interface in interfac
 <h3>isBroken</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">isBroken</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../interfaces/Mineable.html#isBroken()">Mineable</a></code></span></div>
 <div class="block">Returns whether this node is fully depleted and can no longer be mined.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
@@ -344,7 +344,6 @@ implements <a href="../../interfaces/Mineable.html" title="interface in interfac
 <h3>getDurability</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getDurability</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../interfaces/Mineable.html#getDurability()">Mineable</a></code></span></div>
 <div class="block">Returns the current durability of this node.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
@@ -360,7 +359,6 @@ implements <a href="../../interfaces/Mineable.html" title="interface in interfac
 <h3>getMaxDurability</h3>
 <div class="horizontal-scroll">
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getMaxDurability</span>()</div>
-<div class="block"><span class="description-from-type-label">Description copied from interface:&nbsp;<code><a href="../../interfaces/Mineable.html#getMaxDurability()">Mineable</a></code></span></div>
 <div class="block">Returns the maximum durability of this node.</div>
 <dl class="notes">
 <dt>Specified by:</dt>

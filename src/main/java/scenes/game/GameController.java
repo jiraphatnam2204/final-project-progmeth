@@ -19,68 +19,254 @@ import java.util.*;
  */
 public class GameController {
 
-    /** Width in pixels of a single world tile. */
+    /**
+     * Width in pixels of a single world tile.
+     */
     public static final int TILE_SIZE = 48;
-    public static final int COLS = 20;
-    public static final int ROWS = 15;
-    public static final int W = TILE_SIZE * COLS;
-    public static final int H = TILE_SIZE * ROWS;
-    public static final double PLAYER_SPEED = 7.5;
 
-    // Tile type constants
+    /**
+     * Number of tile columns in the world map.
+     */
+    public static final int COLS = 20;
+
+    /**
+     * Number of tile rows in the world map.
+     */
+    public static final int ROWS = 15;
+
+    /**
+     * Total world width in pixels ({@code TILE_SIZE * COLS}).
+     */
+    public static final int W = TILE_SIZE * COLS;
+
+    /**
+     * Total world height in pixels ({@code TILE_SIZE * ROWS}).
+     */
+    public static final int H = TILE_SIZE * ROWS;
+
+    /**
+     * Player movement speed in pixels per frame.
+     */
+    public static final double PLAYER_SPEED = 2.5;
+
+    /**
+     * Tile type: plain ground.
+     */
     public static final int T_GROUND = 0;
+
+    /**
+     * Tile type: grass (decorative ground variant).
+     */
     public static final int T_GRASS = 1;
+
+    /**
+     * Tile type: normal stone rock (solid, mineable).
+     */
     public static final int T_NORMAL_ROCK = 2;
+
+    /**
+     * Tile type: hard stone rock (solid, mineable).
+     */
     public static final int T_HARD_ROCK = 3;
+
+    /**
+     * Tile type: iron ore rock (solid, mineable).
+     */
     public static final int T_IRON_ROCK = 4;
+
+    /**
+     * Tile type: platinum ore rock (solid, mineable).
+     */
     public static final int T_PLATINUM = 5;
+
+    /**
+     * Tile type: mithril ore rock (solid, mineable).
+     */
     public static final int T_MITHRIL = 10;
+
+    /**
+     * Tile type: vibranium ore rock (solid, mineable).
+     */
     public static final int T_VIBRANIUM = 11;
+
+    /**
+     * Tile type: the shop building entrance.
+     */
     public static final int T_SHOP = 6;
+
+    /**
+     * Tile type: the crafting station entrance.
+     */
     public static final int T_CRAFT = 7;
+
+    /**
+     * Tile type: the boss door entrance.
+     */
     public static final int T_BOSS_DOOR = 8;
+
+    /**
+     * Tile type: decorative path tile.
+     */
     public static final int T_PATH = 9;
+
+    /**
+     * Duration in milliseconds that a notification message is displayed.
+     */
     public static final long NOTIF_DURATION = 2200;
-    // Cooldowns / durations (milliseconds)
+
+    /**
+     * Milliseconds between successive player attacks.
+     */
     private static final long ATTACK_COOLDOWN = 600;
+
+    /**
+     * Milliseconds between successive mining hits.
+     */
     private static final long MINE_COOLDOWN = 280;
+
+    /**
+     * Minimum milliseconds before a mined ore respawns.
+     */
     private static final long ORE_RESPAWN_MIN = 1_000;
+
+    /**
+     * Maximum milliseconds before a mined ore respawns.
+     */
     private static final long ORE_RESPAWN_MAX = 2_000;
+
+    /**
+     * Minimum milliseconds before a defeated monster respawns.
+     */
     private static final long MON_RESPAWN_MIN = 1_000;
+
+    /**
+     * Maximum milliseconds before a defeated monster respawns.
+     */
     private static final long MON_RESPAWN_MAX = 3_000;
 
+    /**
+     * The 2-D tile-type grid representing the world map.
+     */
     private final int[][] world = new int[ROWS][COLS];
+
+    /**
+     * Mineable stone/ore objects associated with each tile position.
+     */
     private final Mineable[][] stoneObjects = new Mineable[ROWS][COLS];
 
+    /**
+     * The player character.
+     */
     private final Player player;
+
+    /**
+     * Single-element array holding the player's active pickaxe (shared by reference).
+     */
     private final Pickaxe[] pickaxeHolder;
+
+    /**
+     * Live monster entities currently present on the world map.
+     */
     private final List<MonsterEntity> monsters = new ArrayList<>();
 
+    /**
+     * Active floating-text pop-ups (damage numbers, notifications).
+     */
     private final List<FloatingText> floatingTexts = new ArrayList<>();
 
+    /**
+     * Set of keyboard keys currently held down.
+     */
     private final Set<KeyCode> keys = new HashSet<>();
+
+    /**
+     * Pending ore respawn entries: each is {@code {row, col, tileType, respawnTimeMs}}.
+     */
     private final List<long[]> oreRespawnQueue = new ArrayList<>();
 
+    /**
+     * Pending monster respawn entries: each is {@code {type, respawnTimeMs}}.
+     */
     private final List<long[]> monsterRespawnQueue = new ArrayList<>();
+
+    /**
+     * Random number generator used for respawn position calculations.
+     */
     private final Random spawnRng = new Random();
+
+    /**
+     * {@code true} while the left mouse button is held (attack action).
+     */
     private boolean leftMouseDown = false;
+
+    /**
+     * {@code true} while the right mouse button is held (mine action).
+     */
     private boolean rightMouseDown = false;
 
-    private double playerX, playerY;
-    private int facing = 2; // 0=up 1=left 2=down 3=right
+    /**
+     * Player's current X position in pixels.
+     */
+    private double playerX;
+
+    /**
+     * Player's current Y position in pixels.
+     */
+    private double playerY;
+
+    /**
+     * Direction the player is facing: 0=up, 1=left, 2=down, 3=right.
+     */
+    private int facing = 2;
+
+    /**
+     * Current animation frame index, incremented over time.
+     */
     private int animFrame = 0;
+
+    /**
+     * System time (nanoseconds) of the last animation frame increment.
+     */
     private long lastAnimTime = 0;
+
+    /**
+     * Remaining invincibility frames after the player takes damage.
+     */
     private int playerInvincibleFrames = 0;
 
+    /**
+     * {@code true} while the attack animation should be shown.
+     */
     private boolean isAttackAnim = false;
+
+    /**
+     * System time (ms) at which the current attack animation should end.
+     */
     private long attackAnimEndMs = 0;
+
+    /**
+     * System time (ms) of the player's last successful attack.
+     */
     private long lastAttackTime = 0;
 
+    /**
+     * System time (ms) of the player's last mining hit.
+     */
     private long lastMineTime = 0;
 
+    /**
+     * The most recently triggered notification message to display on-screen.
+     */
     private String notifMsg = "";
+
+    /**
+     * System time (ms) when the current notification message was set.
+     */
     private long notifTime = 0;
 
+    /**
+     * {@code true} once the game has ended (player died or transitioned away).
+     */
     private boolean gameEnded = false;
 
     /**
@@ -99,6 +285,10 @@ public class GameController {
         this.playerY = 7 * TILE_SIZE;
     }
 
+    /**
+     * Procedurally generates the world map: ground/grass tiles, border walls, paths,
+     * buildings, and initial ore deposits.
+     */
     private void generateWorld() {
         Random rng = new Random(77);
         for (int r = 0; r < ROWS; r++)
@@ -138,6 +328,13 @@ public class GameController {
             }
     }
 
+    /**
+     * Places a building tile and surrounds it with path tiles.
+     *
+     * @param r    the row of the main building entrance tile
+     * @param c    the column of the main building entrance tile
+     * @param type the tile type constant for the building entrance
+     */
     private void placeBuilding(int r, int c, int type) {
         for (int dr = -1; dr <= 1; dr++)
             for (int dc = 0; dc <= 1; dc++)
@@ -145,6 +342,14 @@ public class GameController {
         world[r][c] = type;
     }
 
+    /**
+     * Returns {@code true} if the given tile position is a protected area where
+     * ore deposits should not be placed (e.g. near the player start or buildings).
+     *
+     * @param r the row index
+     * @param c the column index
+     * @return {@code true} if the position is protected
+     */
     private boolean isProtectedArea(int r, int c) {
         if (Math.abs(r - ROWS / 2) < 3 && Math.abs(c - COLS / 2) < 3) return true;
         if (r <= 4 && c <= 5) return true;
@@ -175,6 +380,9 @@ public class GameController {
 
     // ── Monster spawning ─────────────────────────────────────────────────────
 
+    /**
+     * Spawns the initial set of monsters on the world map with randomised positions.
+     */
     private void spawnMonsters() {
         Random rng = new Random(55);
         int[][] specs = {{0, 4}, {1, 2}, {2, 1}}; // {type, count}
@@ -234,6 +442,10 @@ public class GameController {
         return true;
     }
 
+    /**
+     * Reads keyboard input and moves the player character, applying diagonal normalisation
+     * and collision detection against solid tiles.
+     */
     private void handleMovement() {
         double dx = 0, dy = 0;
         if (keys.contains(KeyCode.W) || keys.contains(KeyCode.UP)) {
@@ -265,6 +477,12 @@ public class GameController {
         playerY = Math.max(0, Math.min(H - TILE_SIZE, playerY));
     }
 
+    /**
+     * Attempts a player attack if the attack cooldown has expired.
+     * Hits all monsters within melee range, deals damage, and awards gold for kills.
+     *
+     * @param nowNanos the current time in nanoseconds
+     */
     private void handleAttack(long nowNanos) {
         long nowMs = nowNanos / 1_000_000;
         if (nowMs - lastAttackTime < ATTACK_COOLDOWN) return;
@@ -304,6 +522,12 @@ public class GameController {
         if (!hit) showNotif("No monsters in range! (get closer)");
     }
 
+    /**
+     * Attempts a mining hit on the tile the player is facing if the mine cooldown has expired.
+     * Reduces the ore's durability and awards items if it breaks.
+     *
+     * @param nowNanos the current time in nanoseconds
+     */
     private void handleMining(long nowNanos) {
         long nowMs = nowNanos / 1_000_000;
         if (nowMs - lastMineTime < MINE_COOLDOWN) return;
@@ -344,6 +568,11 @@ public class GameController {
         }
     }
 
+    /**
+     * Adds one unit of the given item to the player's inventory, stacking if possible.
+     *
+     * @param item the item to add
+     */
     private void addToInventory(BaseItem item) {
         for (ItemCounter ic : player.getInventory()) {
             if (ic.getItem().getName().equals(item.getName())) {
@@ -354,6 +583,10 @@ public class GameController {
         player.getInventory().add(new ItemCounter(item, 1));
     }
 
+    /**
+     * Updates monster AI for each frame: aggro detection, chasing, wandering,
+     * and attacking the player on contact.
+     */
     private void updateMonsters() {
         double aggroRange = TILE_SIZE * 5.0;
         double attackRange = TILE_SIZE * 1.2;
@@ -395,6 +628,11 @@ public class GameController {
         }
     }
 
+    /**
+     * Processes the ore and monster respawn queues, spawning entities whose timer has elapsed.
+     *
+     * @param nowMs the current system time in milliseconds
+     */
     private void processRespawns(long nowMs) {
         int[] fullOrePool = {
                 T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK, T_NORMAL_ROCK,
@@ -474,11 +712,22 @@ public class GameController {
         return BuildingType.NONE;
     }
 
+    /**
+     * Removes expired floating texts and advances each active text upward by its velocity.
+     */
     private void updateFloatingTexts() {
         floatingTexts.removeIf(FloatingText::isDead);
         for (FloatingText ft : floatingTexts) ft.y += ft.vy;
     }
 
+    /**
+     * Returns {@code true} if the player's bounding box at position {@code (nx, ny)}
+     * does not overlap any solid tile.
+     *
+     * @param nx the candidate X position
+     * @param ny the candidate Y position
+     * @return {@code true} if the position is passable
+     */
     private boolean canMoveTo(double nx, double ny) {
         int m = 5;
         return !isSolid(nx + m, ny + m) && !isSolid(nx + TILE_SIZE - m, ny + m)
@@ -510,6 +759,15 @@ public class GameController {
         return r >= 0 && r < ROWS && c >= 0 && c < COLS;
     }
 
+    /**
+     * Returns {@code true} if the world position {@code (x, y)} is within {@code dist} pixels
+     * of the player's current position.
+     *
+     * @param x    the X pixel coordinate to test
+     * @param y    the Y pixel coordinate to test
+     * @param dist the maximum allowed distance in pixels
+     * @return {@code true} if within range
+     */
     private boolean isNearPlayer(double x, double y, double dist) {
         return Math.hypot(x - playerX, y - playerY) < dist;
     }
@@ -530,11 +788,21 @@ public class GameController {
         };
     }
 
+    /**
+     * Displays a notification message on the HUD for {@link #NOTIF_DURATION} milliseconds.
+     *
+     * @param msg the text to show in the notification area
+     */
     private void showNotif(String msg) {
         notifMsg = msg;
         notifTime = System.currentTimeMillis();
     }
 
+    /**
+     * Returns the standard red colour used for damage floating-text labels.
+     *
+     * @return the colour {@code #ff5252}
+     */
     private javafx.scene.paint.Color floatingRed() {
         return javafx.scene.paint.Color.web("#ff5252");
     }
@@ -575,63 +843,136 @@ public class GameController {
         rightMouseDown = on;
     }
 
+    /**
+     * Returns the player character.
+     *
+     * @return the player
+     */
     public Player getPlayer() {
         return player;
     }
 
+    /**
+     * Returns the single-element array holding the player's active pickaxe.
+     *
+     * @return the pickaxe holder array
+     */
     public Pickaxe[] getPickaxeHolder() {
         return pickaxeHolder;
     }
 
+    /**
+     * Returns the 2-D tile-type grid representing the world map.
+     *
+     * @return the world grid
+     */
     public int[][] getWorld() {
         return world;
     }
 
+    /**
+     * Returns the grid of mineable stone/ore objects corresponding to rock tiles.
+     *
+     * @return the stone object grid
+     */
     public Mineable[][] getStoneObjects() {
         return stoneObjects;
     }
 
+    /**
+     * Returns the list of live monster entities on the world map.
+     *
+     * @return the monster entity list
+     */
     public List<MonsterEntity> getMonsters() {
         return monsters;
     }
 
+    /**
+     * Returns the list of active floating-text pop-ups.
+     *
+     * @return the floating-text list
+     */
     public List<FloatingText> getFloatingTexts() {
         return floatingTexts;
     }
 
+    /**
+     * Returns the player's current X position in pixels.
+     *
+     * @return player X position
+     */
     public double getPlayerX() {
         return playerX;
     }
 
+    /**
+     * Returns the player's current Y position in pixels.
+     *
+     * @return player Y position
+     */
     public double getPlayerY() {
         return playerY;
     }
 
+    /**
+     * Returns the direction the player is currently facing.
+     * Values: 0=up, 1=left, 2=down, 3=right.
+     *
+     * @return facing direction index
+     */
     public int getFacing() {
         return facing;
     }
 
+    /**
+     * Returns the current animation frame index.
+     *
+     * @return animation frame
+     */
     public int getAnimFrame() {
         return animFrame;
     }
 
+    /**
+     * Returns whether an attack animation is currently playing.
+     *
+     * @return {@code true} if the attack animation is active
+     */
     public boolean isAttackAnim() {
         return isAttackAnim;
     }
 
+    /**
+     * Returns the number of remaining player invincibility frames after taking damage.
+     *
+     * @return invincibility frames remaining
+     */
     public int getInvincibleFrames() {
         return playerInvincibleFrames;
     }
 
+    /**
+     * Returns the most recently triggered notification message.
+     *
+     * @return the notification message string
+     */
     public String getNotifMsg() {
         return notifMsg;
     }
 
+    /**
+     * Returns the system time (ms) when the current notification was set.
+     *
+     * @return notification timestamp in milliseconds
+     */
     public long getNotifTime() {
         return notifTime;
     }
 
-    /** The type of building the player is adjacent to on the game world map. */
+    /**
+     * The type of building the player is adjacent to on the game world map.
+     */
     public enum BuildingType {NONE, SHOP, CRAFT, BOSS}
 
     /**
@@ -639,9 +980,44 @@ public class GameController {
      * AI state, and movement variables.
      */
     public static class MonsterEntity {
+        /**
+         * The underlying monster logic object (stats, health, etc.).
+         */
         public Monster monster;
-        public double x, y, moveTimer, dx, dy;
+
+        /**
+         * Current X pixel position on the world map.
+         */
+        public double x;
+
+        /**
+         * Current Y pixel position on the world map.
+         */
+        public double y;
+
+        /**
+         * Timer (seconds) until the monster picks a new random wander direction.
+         */
+        public double moveTimer;
+
+        /**
+         * Current X component of the wander movement velocity.
+         */
+        public double dx;
+
+        /**
+         * Current Y component of the wander movement velocity.
+         */
+        public double dy;
+
+        /**
+         * Difficulty tier: 0=easy, 1=medium, 2=hard.
+         */
         public int type;
+
+        /**
+         * {@code true} when the monster is chasing the player.
+         */
         public boolean aggro;
 
         /**
@@ -666,10 +1042,40 @@ public class GameController {
      * Used for damage numbers, item pickups, and event notifications.
      */
     public static class FloatingText {
-        public double x, y, vy;
+        /**
+         * Current X pixel position.
+         */
+        public double x;
+
+        /**
+         * Current Y pixel position.
+         */
+        public double y;
+
+        /**
+         * Vertical velocity in pixels per frame (negative = upward).
+         */
+        public double vy;
+
+        /**
+         * The string to display.
+         */
         public String text;
+
+        /**
+         * The colour of the text.
+         */
         public javafx.scene.paint.Color color;
-        public long born, life;
+
+        /**
+         * System time (ms) when this text was created.
+         */
+        public long born;
+
+        /**
+         * How long (ms) this text should remain visible.
+         */
+        public long life;
 
         /**
          * Creates a new FloatingText at the given world position.
