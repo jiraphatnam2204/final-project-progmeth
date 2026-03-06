@@ -374,3 +374,219 @@ To regenerate the Javadoc:
 ```bash
 ./gradlew javadoc
 ```
+
+---
+
+## 4. Class Diagram
+
+The class diagram is split into multiple diagrams by package for clarity.
+
+### 4.1 Interfaces
+
+Core interfaces implemented throughout the codebase.
+
+| Interface    | Key Methods                                                                   |
+|--------------|-------------------------------------------------------------------------------|
+| `Equipable`  | `equip(Player)`, `unequip(Player)`                                            |
+| `Mineable`   | `mine(int,Player)`, `isBroken()`, `getDurability()`, `getMaxDurability()`    |
+| `Consumable` | `consume(Player)`                                                             |
+| `Craftable`  | `getCraftingPrice()`, `getRecipe()`, `canCraft(Player)`, `craft(Player)`     |
+| `Buyable`    | `getPrice()`                                                                  |
+| `Lootable`   | `dropMoney()`                                                                 |
+| `Stackable`  | `maxStack`                                                                    |
+
+![Interfaces](images/01_interfaces.png)
+
+---
+
+### 4.2 Logic — Base Classes
+
+Abstract base classes for all game entities and items.
+
+- **`BaseItem`** — common name, stackable flag, and max-stack for all items.
+- **`BaseCreature`** — shared HP/ATK/DEF stats and `attack()` for both the player and monsters.
+- **`BaseWeapon`** — extends `BaseItem`; implements `Equipable` & `Craftable`. Stores damage, crafting price, and cooldown.
+- **`BaseArmor`** — extends `BaseItem`; implements `Equipable` & `Craftable`. Stores DEF, ATK, SPD, HP, and crafting price.
+- **`BasePotion`** — extends `BaseItem`; implements `Consumable`. Stores the heal/stat value.
+
+![Logic — Base](images/02_logic_base.png)
+
+---
+
+### 4.3 Logic — Creatures
+
+Player and monster class hierarchy.
+
+- **`Player`** — extends `BaseCreature`. Holds gold, inventory (`ArrayList<ItemCounter>`), speed, equipped weapon/armor, and all skill methods (`skillKaguraDance`, `skillDeadCalm`, `skillConstantFlux`, `skillWaterWheel`).
+- **`Player$SkillResult`** — inner record holding the outcome of a skill (damage, heal, shieldWall, berserkDebuff).
+- **`Monster`** — abstract, extends `BaseCreature`; implements `Lootable`. Concrete subclasses: `EasyMonster`, `MediumMonster`, `HardMonster`.
+- **Boss monsters** (`EasyBoss`, `MediumBoss`, `HardBoss`) — also extend `Monster`.
+
+![Logic — Creatures](images/03_logic_creatures.png)
+
+---
+
+### 4.4 Logic — Items
+
+#### ItemCounter (util)
+
+A utility wrapper pairing a `BaseItem` with a stack `count`.
+
+![ItemCounter](images/04a_item_counter.png)
+
+#### Weapons
+
+Seven concrete weapon classes (`WoodenSword` … `VibraniumSword`) all extend `BaseWeapon` and override `getRecipe()`.
+
+![Weapons](images/04b_weapon.png)
+
+#### Armor
+
+Six concrete armor classes (`StoneArmor` … `VibraniumArmor`) all extend `BaseArmor` and override `getRecipe()`.
+
+![Armor](images/04c_armor.png)
+
+#### Potions
+
+Four concrete potion classes (`SmallHealthPotion`, `MediumHealthPotion`, `BigHealthPotion`, `HealPotion`) extend `BasePotion`. `HealPotion` overrides `consume(Player)`.
+
+![Potions](images/04d_potions.png)
+
+---
+
+### 4.5 Logic — Stone & Pickaxe
+
+- **`Pickaxe`** — extends `BaseItem`. Provides static factory methods for each tier and a `use(Mineable, Player)` method.
+- **`baseStone`** — abstract, extends `BaseItem`; implements `Mineable`. Stores `durability`, `maxDurability`, and `dropAmount`. Concrete subclasses: `NormalStone`, `HardStone`, `Iron`, `Platinum`, `Mithril`, `Vibranium`.
+
+![Logic — Stone & Pickaxe](images/05_logic_stone.png)
+
+---
+
+### 4.6 Scenes — Game
+
+The main world scene.
+
+- **`GameController`** — central game loop class. Manages the tile world, player position, monsters, ore respawning, movement, attack, and mining. Contains inner classes `MonsterEntity` and `FloatingText`.
+- **`GameView`** — JavaFX canvas renderer. Holds references to all sub-controllers (shop, crafting, inventory) and draws the world, player, monsters, HUD, and floating texts.
+- **`BuildingType`** — enum (`NONE`, `SHOP`, `CRAFT`, `BOSS`).
+
+![Scenes — Game](images/06_scenes_game.png)
+
+---
+
+### 4.7 Scenes — Boss
+
+The turn-based boss battle scene.
+
+- **`BossController`** — orchestrates the battle loop. Tracks boss sequence, battle state, pending animations, and player actions. Contains inner class `BossInfo`.
+- **`BossView`** — renders the boss arena, HP bars, player/boss sprites, and turn indicator.
+- **`BattleMenuController`** — manages skill cooldowns, shield-wall and berserk-debuff flags, and potion list. Contains inner record `PotionEntry`.
+- **`SkillMenuView`** — skill selection panel with button states.
+- **`HealMenuView`** — potion selection panel.
+- **Enums:** `BattleState` (`PLAYER_TURN`, `ENEMY_TURN`, `VICTORY`, `DEFEAT`, `ALL_CLEAR`), `ActionResult` (`NONE` … `PLAYER_DEFEATED`), `MenuState` (`NONE`, `SKILLS`, `HEAL`).
+
+![Scenes — Boss](images/07_scenes_boss.png)
+
+---
+
+### 4.8 Scenes — Shop
+
+- **`ShopController`** — holds the item catalogue and processes purchases via `buy(ShopItem)`. Returns a `BuyResult` inner record.
+- **`ShopView`** — renders the shop card grid and feedback messages.
+- **`ShopController$ShopItem`** — inner record (name, description, price, `onBuy` consumer).
+- **`ShopController$BuyResult`** — inner record (success flag, message).
+
+![Scenes — Shop](images/08_scenes_shop.png)
+
+---
+
+### 4.9 Scenes — Other
+
+- **`CraftingController` / `CraftingView`** — recipe list, crafting logic, and UI. `CraftingController$CraftResult` inner record for success/message.
+- **`InventoryController` / `InventoryView`** — paginated inventory display, equip/unequip/use-potion actions.
+- **`MainMenuController` / `MainMenuView`** — start-screen with animated stars.
+- **`GameOverController` / `GameOverView`** — victory/defeat screen with particle effects.
+
+![Scenes — Other](images/09_scenes_other.png)
+
+---
+
+### 4.10 Application & Audio
+
+- **`Main`** — JavaFX `Application` entry point; creates `SceneManager` and calls `showMainMenu()`.
+- **`SceneManager`** — manages scene transitions: `showMainMenu()`, `showGame()`, `showBossRoom()`, `showGameOver()`.
+- **`AudioManager`** — wraps JavaFX `MediaPlayer` for background music (`playBGM`, `stopBGM`, `setVolume`).
+
+![Application & Audio](images/10_app_audio.png)
+
+---
+
+### 4.11 Test Classes
+
+JUnit test classes organised by the package they target.
+
+#### Armor Tests (`ArmorTest`)
+
+`ArmorTest` is the outer test class (holds a shared `Player` fixture and `@BeforeEach setup()`). Each armor tier has its own inner test class:
+
+| Inner Class                      | Armor Under Test  |
+|----------------------------------|-------------------|
+| `ArmorTest$StoneArmorTests`      | `StoneArmor`      |
+| `ArmorTest$HardstoneArmorTests`  | `HardstoneArmor`  |
+| `ArmorTest$IronArmorTests`       | `IronArmor`       |
+| `ArmorTest$PlatinumArmorTests`   | `PlatinumArmor`   |
+| `ArmorTest$MithrilArmorTests`    | `MithrilArmor`    |
+| `ArmorTest$VibraniumArmorTests`  | `VibraniumArmor`  |
+
+Each inner class verifies: name, stats (def/hp/atk/spd), crafting price, recipe size & contents, `equip` increases DEF and Max HP, `canCraft` and `craft` behaviour (gold deduction, material consumption).
+
+![Test — Armor](images/11a_test_armor.png)
+
+#### Creatures Tests (`CreaturesTest`)
+
+`CreaturesTest` groups monster and boss tests as inner classes. Each tests initial stats, `isAlive`, `takeDamage`, `heal`, `attack`, and `dropMoney`.
+
+| Inner Class                         | Creature Under Test |
+|-------------------------------------|---------------------|
+| `CreaturesTest$EasyMonsterTests`    | `EasyMonster`       |
+| `CreaturesTest$MediumMonsterTests`  | `MediumMonster`     |
+| `CreaturesTest$HardMonsterTests`    | `HardMonster`       |
+| `CreaturesTest$EasyBossTests`       | `EasyBoss`          |
+| `CreaturesTest$MediumBossTests`     | `MediumBoss`        |
+| `CreaturesTest$HardBossTests`       | `HardBoss`          |
+
+![Test — Creatures](images/11b_test_creatures.png)
+
+#### Player Tests (`TestPlayerClass` / `CreaturesTest$PlayerTests`)
+
+Two complementary test classes cover `Player` logic:
+
+- **`TestPlayerClass`** — standalone class testing stats, bonus add/remove, gold clamping, inventory management, potion use, and all four skills (`kaguraDance`, `deadCalm`, `constantFlux`, `waterWheel`).
+- **`CreaturesTest$PlayerTests`** — inner class of `CreaturesTest` covering the same areas with additional edge-case tests (negative gold clamped to zero, stackable item merging, `equipWeapon`/`equipArmor` replace-existing, `addBonus`/`removeBonus`, `setStrength`/`setLuck`).
+
+![Test — Player](images/11c_test_player.png)
+
+#### Stone Tests (`StoneTest`)
+
+`StoneTest` (with a `Player` fixture) tests every ore type: initial durability, `isBroken` false initially, `mine` reduces durability, breaks at exact durability, drops returned on break, returns empty list before break, and zero/negative pick-power treated as 1. Also verifies mined drops are added to the player's inventory.
+
+![Test — Stone](images/11d_test_stone.png)
+
+#### Pickaxe Tests (`PickaxeTest`)
+
+`PickaxeTest` verifies the `Pickaxe` class: constructor sets name and power, power clamped to 1 for zero/negative values, all seven factory methods (`createWoodenPickaxe` … `createVibraniumPickaxe`) produce correct name and power, `setPower`, and `use` behaviour (unbroken stone returns empty list, repeated use until broken returns drops, use on already-broken stone returns empty list, weak pickaxe requires multiple hits to break a hard stone).
+
+![Test — Pickaxe](images/11e_test_pickaxe.png)
+
+#### Potion Tests (`PotionTest`)
+
+`PotionTest` covers all three potion tiers: correct heal amounts (40 / 100 / 200 HP), healing capped at max HP, `stat` field values, `consume` decrements inventory count, and `maxStack` value.
+
+![Test — Potion](images/11f_test_potion.png)
+
+#### Weapon Tests (`WeaponTest`)
+
+`WeaponTest` tests all seven weapon tiers: `equip` increases ATK, `unequip` restores ATK, stat values, `canCraft`/`craft` with enough materials, crafting deducts gold and materials, equipping a new weapon replaces the old one, `isStackable` is false, and `canCraft` fails without gold.
+
+![Test — Weapon](images/11g_test_weapon.png)
