@@ -19,154 +19,254 @@ import java.util.*;
  */
 public class GameController {
 
-    /** Width in pixels of a single world tile. */
+    /**
+     * Width in pixels of a single world tile.
+     */
     public static final int TILE_SIZE = 48;
 
-    /** Number of tile columns in the world map. */
+    /**
+     * Number of tile columns in the world map.
+     */
     public static final int COLS = 20;
 
-    /** Number of tile rows in the world map. */
+    /**
+     * Number of tile rows in the world map.
+     */
     public static final int ROWS = 15;
 
-    /** Total world width in pixels ({@code TILE_SIZE * COLS}). */
+    /**
+     * Total world width in pixels ({@code TILE_SIZE * COLS}).
+     */
     public static final int W = TILE_SIZE * COLS;
 
-    /** Total world height in pixels ({@code TILE_SIZE * ROWS}). */
+    /**
+     * Total world height in pixels ({@code TILE_SIZE * ROWS}).
+     */
     public static final int H = TILE_SIZE * ROWS;
 
-    /** Player movement speed in pixels per frame. */
-    public static final double PLAYER_SPEED = 7.5;
+    /**
+     * Player movement speed in pixels per frame.
+     */
+    public static final double PLAYER_SPEED = 2.5;
 
-    /** Tile type: plain ground. */
+    /**
+     * Tile type: plain ground.
+     */
     public static final int T_GROUND = 0;
 
-    /** Tile type: grass (decorative ground variant). */
+    /**
+     * Tile type: grass (decorative ground variant).
+     */
     public static final int T_GRASS = 1;
 
-    /** Tile type: normal stone rock (solid, mineable). */
+    /**
+     * Tile type: normal stone rock (solid, mineable).
+     */
     public static final int T_NORMAL_ROCK = 2;
 
-    /** Tile type: hard stone rock (solid, mineable). */
+    /**
+     * Tile type: hard stone rock (solid, mineable).
+     */
     public static final int T_HARD_ROCK = 3;
 
-    /** Tile type: iron ore rock (solid, mineable). */
+    /**
+     * Tile type: iron ore rock (solid, mineable).
+     */
     public static final int T_IRON_ROCK = 4;
 
-    /** Tile type: platinum ore rock (solid, mineable). */
+    /**
+     * Tile type: platinum ore rock (solid, mineable).
+     */
     public static final int T_PLATINUM = 5;
 
-    /** Tile type: mithril ore rock (solid, mineable). */
+    /**
+     * Tile type: mithril ore rock (solid, mineable).
+     */
     public static final int T_MITHRIL = 10;
 
-    /** Tile type: vibranium ore rock (solid, mineable). */
+    /**
+     * Tile type: vibranium ore rock (solid, mineable).
+     */
     public static final int T_VIBRANIUM = 11;
 
-    /** Tile type: the shop building entrance. */
+    /**
+     * Tile type: the shop building entrance.
+     */
     public static final int T_SHOP = 6;
 
-    /** Tile type: the crafting station entrance. */
+    /**
+     * Tile type: the crafting station entrance.
+     */
     public static final int T_CRAFT = 7;
 
-    /** Tile type: the boss door entrance. */
+    /**
+     * Tile type: the boss door entrance.
+     */
     public static final int T_BOSS_DOOR = 8;
 
-    /** Tile type: decorative path tile. */
+    /**
+     * Tile type: decorative path tile.
+     */
     public static final int T_PATH = 9;
 
-    /** Duration in milliseconds that a notification message is displayed. */
+    /**
+     * Duration in milliseconds that a notification message is displayed.
+     */
     public static final long NOTIF_DURATION = 2200;
 
-    /** Milliseconds between successive player attacks. */
+    /**
+     * Milliseconds between successive player attacks.
+     */
     private static final long ATTACK_COOLDOWN = 600;
 
-    /** Milliseconds between successive mining hits. */
+    /**
+     * Milliseconds between successive mining hits.
+     */
     private static final long MINE_COOLDOWN = 280;
 
-    /** Minimum milliseconds before a mined ore respawns. */
+    /**
+     * Minimum milliseconds before a mined ore respawns.
+     */
     private static final long ORE_RESPAWN_MIN = 1_000;
 
-    /** Maximum milliseconds before a mined ore respawns. */
+    /**
+     * Maximum milliseconds before a mined ore respawns.
+     */
     private static final long ORE_RESPAWN_MAX = 2_000;
 
-    /** Minimum milliseconds before a defeated monster respawns. */
+    /**
+     * Minimum milliseconds before a defeated monster respawns.
+     */
     private static final long MON_RESPAWN_MIN = 1_000;
 
-    /** Maximum milliseconds before a defeated monster respawns. */
+    /**
+     * Maximum milliseconds before a defeated monster respawns.
+     */
     private static final long MON_RESPAWN_MAX = 3_000;
 
-    /** The 2-D tile-type grid representing the world map. */
+    /**
+     * The 2-D tile-type grid representing the world map.
+     */
     private final int[][] world = new int[ROWS][COLS];
 
-    /** Mineable stone/ore objects associated with each tile position. */
+    /**
+     * Mineable stone/ore objects associated with each tile position.
+     */
     private final Mineable[][] stoneObjects = new Mineable[ROWS][COLS];
 
-    /** The player character. */
+    /**
+     * The player character.
+     */
     private final Player player;
 
-    /** Single-element array holding the player's active pickaxe (shared by reference). */
+    /**
+     * Single-element array holding the player's active pickaxe (shared by reference).
+     */
     private final Pickaxe[] pickaxeHolder;
 
-    /** Live monster entities currently present on the world map. */
+    /**
+     * Live monster entities currently present on the world map.
+     */
     private final List<MonsterEntity> monsters = new ArrayList<>();
 
-    /** Active floating-text pop-ups (damage numbers, notifications). */
+    /**
+     * Active floating-text pop-ups (damage numbers, notifications).
+     */
     private final List<FloatingText> floatingTexts = new ArrayList<>();
 
-    /** Set of keyboard keys currently held down. */
+    /**
+     * Set of keyboard keys currently held down.
+     */
     private final Set<KeyCode> keys = new HashSet<>();
 
-    /** Pending ore respawn entries: each is {@code {row, col, tileType, respawnTimeMs}}. */
+    /**
+     * Pending ore respawn entries: each is {@code {row, col, tileType, respawnTimeMs}}.
+     */
     private final List<long[]> oreRespawnQueue = new ArrayList<>();
 
-    /** Pending monster respawn entries: each is {@code {type, respawnTimeMs}}. */
+    /**
+     * Pending monster respawn entries: each is {@code {type, respawnTimeMs}}.
+     */
     private final List<long[]> monsterRespawnQueue = new ArrayList<>();
 
-    /** Random number generator used for respawn position calculations. */
+    /**
+     * Random number generator used for respawn position calculations.
+     */
     private final Random spawnRng = new Random();
 
-    /** {@code true} while the left mouse button is held (attack action). */
+    /**
+     * {@code true} while the left mouse button is held (attack action).
+     */
     private boolean leftMouseDown = false;
 
-    /** {@code true} while the right mouse button is held (mine action). */
+    /**
+     * {@code true} while the right mouse button is held (mine action).
+     */
     private boolean rightMouseDown = false;
 
-    /** Player's current X position in pixels. */
+    /**
+     * Player's current X position in pixels.
+     */
     private double playerX;
 
-    /** Player's current Y position in pixels. */
+    /**
+     * Player's current Y position in pixels.
+     */
     private double playerY;
 
-    /** Direction the player is facing: 0=up, 1=left, 2=down, 3=right. */
+    /**
+     * Direction the player is facing: 0=up, 1=left, 2=down, 3=right.
+     */
     private int facing = 2;
 
-    /** Current animation frame index, incremented over time. */
+    /**
+     * Current animation frame index, incremented over time.
+     */
     private int animFrame = 0;
 
-    /** System time (nanoseconds) of the last animation frame increment. */
+    /**
+     * System time (nanoseconds) of the last animation frame increment.
+     */
     private long lastAnimTime = 0;
 
-    /** Remaining invincibility frames after the player takes damage. */
+    /**
+     * Remaining invincibility frames after the player takes damage.
+     */
     private int playerInvincibleFrames = 0;
 
-    /** {@code true} while the attack animation should be shown. */
+    /**
+     * {@code true} while the attack animation should be shown.
+     */
     private boolean isAttackAnim = false;
 
-    /** System time (ms) at which the current attack animation should end. */
+    /**
+     * System time (ms) at which the current attack animation should end.
+     */
     private long attackAnimEndMs = 0;
 
-    /** System time (ms) of the player's last successful attack. */
+    /**
+     * System time (ms) of the player's last successful attack.
+     */
     private long lastAttackTime = 0;
 
-    /** System time (ms) of the player's last mining hit. */
+    /**
+     * System time (ms) of the player's last mining hit.
+     */
     private long lastMineTime = 0;
 
-    /** The most recently triggered notification message to display on-screen. */
+    /**
+     * The most recently triggered notification message to display on-screen.
+     */
     private String notifMsg = "";
 
-    /** System time (ms) when the current notification message was set. */
+    /**
+     * System time (ms) when the current notification message was set.
+     */
     private long notifTime = 0;
 
-    /** {@code true} once the game has ended (player died or transitioned away). */
+    /**
+     * {@code true} once the game has ended (player died or transitioned away).
+     */
     private boolean gameEnded = false;
 
     /**
@@ -870,7 +970,9 @@ public class GameController {
         return notifTime;
     }
 
-    /** The type of building the player is adjacent to on the game world map. */
+    /**
+     * The type of building the player is adjacent to on the game world map.
+     */
     public enum BuildingType {NONE, SHOP, CRAFT, BOSS}
 
     /**
@@ -878,28 +980,44 @@ public class GameController {
      * AI state, and movement variables.
      */
     public static class MonsterEntity {
-        /** The underlying monster logic object (stats, health, etc.). */
+        /**
+         * The underlying monster logic object (stats, health, etc.).
+         */
         public Monster monster;
 
-        /** Current X pixel position on the world map. */
+        /**
+         * Current X pixel position on the world map.
+         */
         public double x;
 
-        /** Current Y pixel position on the world map. */
+        /**
+         * Current Y pixel position on the world map.
+         */
         public double y;
 
-        /** Timer (seconds) until the monster picks a new random wander direction. */
+        /**
+         * Timer (seconds) until the monster picks a new random wander direction.
+         */
         public double moveTimer;
 
-        /** Current X component of the wander movement velocity. */
+        /**
+         * Current X component of the wander movement velocity.
+         */
         public double dx;
 
-        /** Current Y component of the wander movement velocity. */
+        /**
+         * Current Y component of the wander movement velocity.
+         */
         public double dy;
 
-        /** Difficulty tier: 0=easy, 1=medium, 2=hard. */
+        /**
+         * Difficulty tier: 0=easy, 1=medium, 2=hard.
+         */
         public int type;
 
-        /** {@code true} when the monster is chasing the player. */
+        /**
+         * {@code true} when the monster is chasing the player.
+         */
         public boolean aggro;
 
         /**
@@ -924,25 +1042,39 @@ public class GameController {
      * Used for damage numbers, item pickups, and event notifications.
      */
     public static class FloatingText {
-        /** Current X pixel position. */
+        /**
+         * Current X pixel position.
+         */
         public double x;
 
-        /** Current Y pixel position. */
+        /**
+         * Current Y pixel position.
+         */
         public double y;
 
-        /** Vertical velocity in pixels per frame (negative = upward). */
+        /**
+         * Vertical velocity in pixels per frame (negative = upward).
+         */
         public double vy;
 
-        /** The string to display. */
+        /**
+         * The string to display.
+         */
         public String text;
 
-        /** The colour of the text. */
+        /**
+         * The colour of the text.
+         */
         public javafx.scene.paint.Color color;
 
-        /** System time (ms) when this text was created. */
+        /**
+         * System time (ms) when this text was created.
+         */
         public long born;
 
-        /** How long (ms) this text should remain visible. */
+        /**
+         * How long (ms) this text should remain visible.
+         */
         public long life;
 
         /**

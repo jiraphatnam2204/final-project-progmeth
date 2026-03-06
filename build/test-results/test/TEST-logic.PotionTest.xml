@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.PotionTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:23:53.665Z" hostname="JAMES" time="0.028">
+<testsuite name="logic.PotionTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.096Z" hostname="JAMES" time="0.025">
   <properties/>
   <testcase name="bigPotion_heals200HP()" classname="logic.PotionTest" time="0.018"/>
   <testcase name="smallPotion_heals40HP()" classname="logic.PotionTest" time="0.001"/>
-  <testcase name="bigPotion_statIs200()" classname="logic.PotionTest" time="0.0"/>
+  <testcase name="bigPotion_statIs200()" classname="logic.PotionTest" time="0.001"/>
   <testcase name="potion_MaxStackTest()" classname="logic.PotionTest" time="0.0"/>
   <testcase name="mediumPotion_TestHealMoreThanMaxHP()" classname="logic.PotionTest" time="0.001"/>
-  <testcase name="potion_consumeReducesCountInInventory()" classname="logic.PotionTest" time="0.001"/>
-  <testcase name="mediumPotion_doesNotExceedMaxHP()" classname="logic.PotionTest" time="0.001"/>
+  <testcase name="potion_consumeReducesCountInInventory()" classname="logic.PotionTest" time="0.0"/>
+  <testcase name="mediumPotion_doesNotExceedMaxHP()" classname="logic.PotionTest" time="0.0"/>
   <testcase name="smallPotion_doesNotExceedMaxHP()" classname="logic.PotionTest" time="0.0"/>
-  <testcase name="mediumPotion_statIs100()" classname="logic.PotionTest" time="0.0"/>
+  <testcase name="mediumPotion_statIs100()" classname="logic.PotionTest" time="0.001"/>
   <testcase name="smallPotion_statIs40()" classname="logic.PotionTest" time="0.0"/>
-  <testcase name="bigPotion_doesNotExceedMaxHP()" classname="logic.PotionTest" time="0.0"/>
+  <testcase name="bigPotion_doesNotExceedMaxHP()" classname="logic.PotionTest" time="0.001"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>

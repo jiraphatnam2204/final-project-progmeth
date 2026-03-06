@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.creatures.CreaturesTest$HardBossTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:23:53.741Z" hostname="JAMES" time="0.005">
+<testsuite name="logic.creatures.CreaturesTest$HardBossTests" tests="10" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.160Z" hostname="JAMES" time="0.008">
   <properties/>
-  <testcase name="attack_dealsDamageToTarget()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
-  <testcase name="initialDefense()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
+  <testcase name="attack_dealsDamageToTarget()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
+  <testcase name="initialDefense()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
   <testcase name="initialAttack()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
   <testcase name="dropMoney()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
-  <testcase name="initialHp()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
-  <testcase name="maxHp()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
-  <testcase name="isAlive_trueInitially()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
+  <testcase name="initialHp()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
+  <testcase name="maxHp()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
+  <testcase name="isAlive_trueInitially()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
   <testcase name="takeDamage_clampsToZero()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
-  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.001"/>
+  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
   <testcase name="takeDamage_reducesHp()" classname="logic.creatures.CreaturesTest$HardBossTests" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>

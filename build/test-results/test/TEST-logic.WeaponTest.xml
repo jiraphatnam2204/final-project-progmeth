@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.WeaponTest" tests="22" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:23:53.696Z" hostname="JAMES" time="0.015">
+<testsuite name="logic.WeaponTest" tests="22" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.124Z" hostname="JAMES" time="0.014">
   <properties/>
-  <testcase name="hardstoneSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.0"/>
-  <testcase name="mithrilSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="hardstoneSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.001"/>
+  <testcase name="mithrilSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="platinumSword_stats()" classname="logic.WeaponTest" time="0.001"/>
-  <testcase name="woodenSword_stats()" classname="logic.WeaponTest" time="0.001"/>
-  <testcase name="weapon_isNotStackable()" classname="logic.WeaponTest" time="0.001"/>
+  <testcase name="woodenSword_stats()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="weapon_isNotStackable()" classname="logic.WeaponTest" time="0.002"/>
   <testcase name="ironSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="vibraniumSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.0"/>
   <testcase name="mithrilSword_stats()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="ironSword_stats()" classname="logic.WeaponTest" time="0.0"/>
   <testcase name="stoneSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.0"/>
-  <testcase name="weapon_cannotCraft_withoutGold()" classname="logic.WeaponTest" time="0.001"/>
-  <testcase name="vibraniumSword_stats()" classname="logic.WeaponTest" time="0.0"/>
-  <testcase name="weapon_craftDeductsGold()" classname="logic.WeaponTest" time="0.001"/>
-  <testcase name="woodenSword_unequip_restoresATK()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="weapon_cannotCraft_withoutGold()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="vibraniumSword_stats()" classname="logic.WeaponTest" time="0.001"/>
+  <testcase name="weapon_craftDeductsGold()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="woodenSword_unequip_restoresATK()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="stoneSword_stats()" classname="logic.WeaponTest" time="0.0"/>
   <testcase name="stoneSword_cannotCraft_withoutMaterials()" classname="logic.WeaponTest" time="0.0"/>
   <testcase name="hardstoneSword_stats()" classname="logic.WeaponTest" time="0.0"/>
-  <testcase name="stoneSword_equip_increasesATK()" classname="logic.WeaponTest" time="0.0"/>
+  <testcase name="stoneSword_equip_increasesATK()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="woodenSword_equip_increasesATK()" classname="logic.WeaponTest" time="0.0"/>
   <testcase name="weapon_craftDeductsMaterials()" classname="logic.WeaponTest" time="0.001"/>
   <testcase name="platinumSword_canCraft_withEnoughMaterials()" classname="logic.WeaponTest" time="0.0"/>

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="logic.creatures.CreaturesTest$MediumMonsterTests" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:23:53.765Z" hostname="JAMES" time="0.006">
+<testsuite name="logic.creatures.CreaturesTest$MediumMonsterTests" tests="12" skipped="0" failures="0" errors="0" timestamp="2026-03-06T01:40:26.183Z" hostname="JAMES" time="0.005">
   <properties/>
   <testcase name="attack_dealsDamageToTarget()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="initialDefense()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="initialAttack()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.001"/>
-  <testcase name="dropMoney()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
-  <testcase name="initialHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.001"/>
+  <testcase name="dropMoney()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.001"/>
+  <testcase name="initialHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="maxHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.001"/>
   <testcase name="isAlive_trueInitially()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="heal_restoresHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="takeDamage_clampsToZero()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
-  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.001"/>
+  <testcase name="takeDamage_blockedByDefense()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="heal_cappedAtMaxHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <testcase name="takeDamage_reducesHp()" classname="logic.creatures.CreaturesTest$MediumMonsterTests" time="0.0"/>
   <system-out><![CDATA[]]></system-out>
